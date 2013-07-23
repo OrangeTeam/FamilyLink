@@ -1,5 +1,26 @@
+# Set behaviour for all files, in case developers don't have core.autocrlf set.
 # Auto detect text files and perform LF normalization
-* -text
+*        text=auto
+
+# Explicitly declare text files we want to always be normalized and converted to native line endings on checkout.
+*.txt    text
+
+# Declare files that will always have CRLF line endings on checkout.
+*.cs     diff=csharp
+*.sln    text eol=crlf
+
+# Declare files that will always have LF line endings on checkout.
+*.java   text eol=lf
+*.xml    text eol=lf
+.gitattributes text
+.gitignore text
+project.properties text
+
+# Denote all files that are truly binary and should not be modified.
+*.jar    binary
+*.jpg    binary
+*.jped   binary
+*.png    binary
 
 # Custom for Visual Studio
 *.cs     diff=csharp
