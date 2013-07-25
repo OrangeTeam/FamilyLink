@@ -22,6 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="org.orange.familylink.ListContactsActivity"
+            android:label="@string/contacts"
+            android:parentActivityName="org.orange.familylink.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.orange.familylink.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

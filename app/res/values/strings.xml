@@ -7,6 +7,8 @@
     <string name="log">Log</string>
     <string name="navigate">Navigate</string>
 
+    <string name="contacts">Contacts</string>
+
     <string name="action_settings">Settings</string>
 
 </resources>

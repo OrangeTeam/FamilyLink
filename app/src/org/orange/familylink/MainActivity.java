@@ -15,13 +15,11 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
 
 /**
  * @author Team Orange
  */
-public class MainActivity extends SherlockFragmentActivity {
+public class MainActivity extends BaseActivity {
 	private ViewPager mViewPager;
 
 	@Override
@@ -30,13 +28,13 @@ public class MainActivity extends SherlockFragmentActivity {
 		setContentView(R.layout.activity_main);
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 
-		setUpViewPager(mViewPager);
-		setUpActionBar();
+		setupViewPager(mViewPager);
+		setupActionBar();
 	}
 	/**
 	 * 配置{@link ActionBar}，典型情况下在{@link #onCreate(Bundle)}调用
 	 */
-	protected void setUpActionBar() {
+	protected void setupActionBar() {
 		ActionBar actionBar = getSupportActionBar();
 		// Specify that the Home/Up button should not be enabled, since there is no hierarchical parent.
 		actionBar.setHomeButtonEnabled(false);
@@ -61,7 +59,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	/**
 	 * 配置{@link ViewPager}，典型情况下在{@link #onCreate(Bundle)}调用
 	 */
-	protected void setUpViewPager(ViewPager viewPager) {
+	protected void setupViewPager(ViewPager viewPager) {
 		mViewPager.setAdapter(new AppSectionsPagerAdapter(getSupportFragmentManager()));
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener(){
 			@Override
@@ -73,13 +71,6 @@ public class MainActivity extends SherlockFragmentActivity {
 			@Override
 			public void onPageScrollStateChanged(int state) {}
 		});
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getSupportMenuInflater().inflate(R.menu.main, menu);
-		return true;
 	}
 
 	/**
