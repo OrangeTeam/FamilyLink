@@ -2,7 +2,11 @@
 <resources>
 
     <string name="app_name">心连每刻</string>
+
+    <string name="seek_help">求助</string>
+    <string name="log">日志</string>
+    <string name="navigate">导航</string>
+
     <string name="action_settings">设置</string>
-    <string name="hello_world">你好，世界！</string>
 
 </resources>
