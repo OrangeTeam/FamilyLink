@@ -12,13 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 /**
  * 日志{@link Fragment}
  * @author Team Orange
  */
-public class LogFragment extends SherlockFragment {
+public class LogFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

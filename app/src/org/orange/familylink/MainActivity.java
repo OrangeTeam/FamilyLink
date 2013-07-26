@@ -12,9 +12,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBar.Tab;
 
 /**
  * @author Team Orange

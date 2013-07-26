@@ -4,8 +4,7 @@
 package org.orange.familylink;
 
 import android.os.Bundle;
-
-import com.actionbarsherlock.app.ActionBar;
+import android.support.v7.app.ActionBar;
 
 /**
  * @author Team Orange
