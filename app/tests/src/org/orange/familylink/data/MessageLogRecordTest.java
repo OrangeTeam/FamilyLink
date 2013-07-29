@@ -23,10 +23,19 @@ public class MessageLogRecordTest extends TestCase {
 		assertEquals(MessageLogRecord.mDefaultValue.getMessage(), mMessageLogRecord.getMessage());
 	}
 	public void testDefaultValue() {
+		assertNull(MessageLogRecord.mDefaultValue.getId());
 		assertEquals(0, MessageLogRecord.mDefaultValue.getTimestamp());
 		assertNull(MessageLogRecord.mDefaultValue.getDirection());
 		assertNull(MessageLogRecord.mDefaultValue.getMessage());
 		MessageLogRecord defaultValue = MessageLogRecord.mDefaultValue;
+		try {
+			defaultValue.setId(null);
+			fail( "Missing exception" );
+		} catch(Exception e) {
+			// Optionally make sure you get the correct Exception, too
+			assertTrue(e instanceof IllegalStateException);
+			System.out.println(e.getMessage());
+		}
 		try {
 			defaultValue.setTimestamp(0);
 			fail( "Missing exception" );
@@ -53,6 +62,31 @@ public class MessageLogRecordTest extends TestCase {
 		}
 	}
 
+	public void testId() {
+		Long id = Long.valueOf(348123498);
+		mMessageLogRecord.setId(id);
+		assertEquals(id, mMessageLogRecord.getId());
+
+		id = Long.valueOf(0);
+		mMessageLogRecord.setId(id);
+		assertEquals(id, mMessageLogRecord.getId());
+
+		id = Long.valueOf(-348123498);
+		mMessageLogRecord.setId(id);
+		assertEquals(id, mMessageLogRecord.getId());
+
+		id = Long.MAX_VALUE;
+		mMessageLogRecord.setId(id);
+		assertEquals(id, mMessageLogRecord.getId());
+
+		id = Long.MIN_VALUE;
+		mMessageLogRecord.setId(id);
+		assertEquals(id, mMessageLogRecord.getId());
+
+		id = null;
+		mMessageLogRecord.setId(id);
+		assertEquals(id, mMessageLogRecord.getId());
+	}
 	public void testTimestamp() {
 		long time = System.currentTimeMillis();
 		mMessageLogRecord.setTimestamp(time);
@@ -128,18 +162,22 @@ public class MessageLogRecordTest extends TestCase {
 		mMessageLogRecord = new MessageLogRecord();
 		assertEquals(mMessageLogRecord, MessageLogRecord.mDefaultValue);
 
+		Long id = Long.valueOf(5234543);
 		long time = System.currentTimeMillis();
 		Direction direction = Direction.RECEIVE;
 		Message message = new Message(Message.Code.INFORM, MessageTest.TEST_CASE_BODY);
-		mMessageLogRecord = new MessageLogRecord(time, direction, message);
+		mMessageLogRecord = new MessageLogRecord(id, time, direction, message);
+		assertEquals(id, mMessageLogRecord.getId());
 		assertEquals(time, mMessageLogRecord.getTimestamp());
 		assertEquals(direction, mMessageLogRecord.getDirection());
 		assertEquals(message, mMessageLogRecord.getMessage());
 
+		id = null;
 		time = -System.currentTimeMillis();
 		direction = null;
 		message = null;
-		mMessageLogRecord = new MessageLogRecord(time, direction, message);
+		mMessageLogRecord = new MessageLogRecord(id, time, direction, message);
+		assertEquals(id, mMessageLogRecord.getId());
 		assertEquals(time, mMessageLogRecord.getTimestamp());
 		assertEquals(direction, mMessageLogRecord.getDirection());
 		assertEquals(message, mMessageLogRecord.getMessage());
@@ -156,6 +194,10 @@ public class MessageLogRecordTest extends TestCase {
 
 		mMessageLogRecord = new MessageLogRecord();
 		mMessageLogRecord.setMessage(new Message());
+		assertFalse(mMessageLogRecord.equals(MessageLogRecord.mDefaultValue));
+
+		mMessageLogRecord = new MessageLogRecord();
+		mMessageLogRecord.setId(Long.MIN_VALUE);
 		assertFalse(mMessageLogRecord.equals(MessageLogRecord.mDefaultValue));
 
 		mMessageLogRecord = new MessageLogRecord();
@@ -180,12 +222,21 @@ public class MessageLogRecordTest extends TestCase {
 		}
 
 		MessageLogRecord record;
-		mMessageLogRecord.setMessage(new Message());
+		mMessageLogRecord.setMessage(new Message(
+				Message.Code.INFORM | Message.Code.Extra.Inform.PULSE,
+				MessageTest.TEST_CASE_BODY));
+		mMessageLogRecord.setId(Long.MAX_VALUE);
+		mMessageLogRecord.setDirection(Direction.SEND);
+		mMessageLogRecord.setTimestamp(System.currentTimeMillis());
+
+		// 验证 拷贝件和原件相同
+		assertEquals(mMessageLogRecord, mMessageLogRecord.clone());
+
 		// 验证 对 拷贝件的修改不影响原对象
 		record = mMessageLogRecord.clone();
 		assertEquals(mMessageLogRecord, record);
 		// 修改拷贝件
-		record.clone().setMessage(null).setDirection(Direction.RECEIVE).setTimestamp(System.currentTimeMillis());
+		record.clone().setMessage(null).setDirection(Direction.RECEIVE).setTimestamp(System.currentTimeMillis()).setId(Long.MAX_VALUE);
 		// 原对象不受影响
 		assertEquals(mMessageLogRecord, record);
 

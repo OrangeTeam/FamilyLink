@@ -26,6 +26,13 @@ public class MessageLogRecord implements Cloneable {
 		 * 禁用此方法
 		 */
 		@Override
+		public MessageLogRecord setId(Long id) {
+			throw new IllegalStateException("you cannot chang default value.");
+		}
+		/**
+		 * 禁用此方法
+		 */
+		@Override
 		public MessageLogRecord setTimestamp(long timestamp) {
 			throw new IllegalStateException("you cannot chang default value.");
 		}
@@ -53,6 +60,8 @@ public class MessageLogRecord implements Cloneable {
 		}
 	};
 
+	/** 记录ID */
+	private Long mId = null;
 	/** 消息时间戳 */
 	private long mTimestamp = 0;
 	/** 消息方向 */
@@ -67,13 +76,29 @@ public class MessageLogRecord implements Cloneable {
 		super();
 	}
 	/**
+	 * @param id 记录ID。允许设置为null
 	 * @param timestamp 消息时间戳。{@link System#currentTimeMillis()}格式
 	 * @param direction 消息方向。如{@link Direction#SEND}
 	 * @param message 消息内容
 	 */
-	public MessageLogRecord(long timestamp, Direction direction, Message message) {
+	public MessageLogRecord(Long id, long timestamp, Direction direction, Message message) {
 		this();
-		setTimestamp(timestamp).setDirection(direction).setMessage(message);
+		setId(id).setTimestamp(timestamp).setDirection(direction).setMessage(message);
+	}
+
+	/**
+	 * @return 记录ID。可能为null
+	 */
+	public Long getId() {
+		return mId;
+	}
+	/**
+	 * @param id 记录ID。可以设置为null，来取消之前的设置
+	 * @return this（用于链式调用）
+	 */
+	public MessageLogRecord setId(Long id) {
+		mId = id;
+		return this;
 	}
 	/**
 	 * @return 消息时间戳。{@link System#currentTimeMillis()}格式
@@ -142,7 +167,8 @@ public class MessageLogRecord implements Cloneable {
 			return false;
 		else {
 			MessageLogRecord other = (MessageLogRecord) o;
-			return mTimestamp == other.mTimestamp && mDirection == other.mDirection
+			return mId == other.mId && mTimestamp == other.mTimestamp
+					&& mDirection == other.mDirection
 					&& Objects.compare(mMessage, other.mMessage);
 		}
 	}

@@ -157,6 +157,10 @@ public class MessageTest extends TestCase {
 			System.out.println(e.getMessage());
 		}
 
+		mMessage.setBody(TEST_CASE_BODY)
+			.setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);
+		assertEquals(mMessage, mMessage.clone());
+
 		// 验证 是深拷贝
 		Message m = mMessage.clone();
 		assertEquals(mMessage, m);
