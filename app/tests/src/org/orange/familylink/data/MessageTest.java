@@ -10,7 +10,7 @@ import junit.framework.TestCase;
  *
  */
 public class MessageTest extends TestCase {
-	private static final String TEST_CASE_BODY =
+	static final String TEST_CASE_BODY =
 			"badsfo放假阿道夫拉法基propellerバトル作品の原点『あやかしびと』の続編にあたる" +
 					"『あやかしびと2　あやかしびと異伝-雷鷲は天に羽ばたく-』の序盤部分を" +
 					"PDFファイルにてダウンロードが可能になります。スタッフはもちろん" +
@@ -38,6 +38,23 @@ public class MessageTest extends TestCase {
 	public void testDefaultValue() {
 		assertEquals(Message.Code.UNDEFINED, Message.mDefaultValue.getCode());
 		assertNull(Message.mDefaultValue.getBody());
+		Message defaultValue = Message.mDefaultValue;
+		try {
+			defaultValue.setCode(Message.Code.COMMAND | Message.Code.Extra.Command.LOCATE_NOW);
+			fail( "Missing exception" );
+		} catch(Exception e) {
+			// Optionally make sure you get the correct Exception, too
+			assertTrue(e instanceof IllegalStateException);
+			System.out.println(e.getMessage());
+		}
+		try {
+			defaultValue.setBody(TEST_CASE_BODY);
+			fail( "Missing exception" );
+		} catch(Exception e) {
+			// Optionally make sure you get the correct Exception, too
+			assertTrue(e instanceof IllegalStateException);
+			System.out.println(e.getMessage());
+		}
 	}
 	public void testCode() {
 		mMessage.setCode(Message.Code.COMMAND);
@@ -85,7 +102,7 @@ public class MessageTest extends TestCase {
 	}
 	public void testConstructor() {
 		mMessage = new Message();
-		mMessage.equals(Message.mDefaultValue);
+		assertTrue(mMessage.equals(Message.mDefaultValue));
 
 		int code = Message.Code.INFORM |Message.Code.Extra.Inform.PULSE
 				| Message.Code.Extra.Inform.RESPOND | Message.Code.Extra.Inform.URGENT;
@@ -127,6 +144,24 @@ public class MessageTest extends TestCase {
 
 		mMessage.setCode(Message.Code.UNDEFINED);
 		assertTrue(Message.mDefaultValue.equals(mMessage));
+	}
+	public void testClone() {
+		assertTrue(mMessage.equals(Message.mDefaultValue));
+		assertTrue(mMessage.equals(Message.mDefaultValue.clone()));
+		try{
+			Message.mDefaultValue.clone().setBody(TEST_CASE_BODY);
+			fail( "Missing exception" );
+		} catch(Exception e) {
+			// Optionally make sure you get the correct Exception, too
+			assertTrue(e instanceof IllegalStateException);
+			System.out.println(e.getMessage());
+		}
+
+		// 验证 是深拷贝
+		Message m = mMessage.clone();
+		assertEquals(mMessage, m);
+		m.clone().setBody(TEST_CASE_BODY).setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);
+		assertEquals(mMessage, m);
 	}
 
 	public void testJson() {

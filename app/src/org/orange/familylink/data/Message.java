@@ -3,6 +3,8 @@
  */
 package org.orange.familylink.data;
 
+import org.orange.familylink.util.Objects;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -11,7 +13,7 @@ import com.google.gson.JsonSyntaxException;
  * <p><em>本类的Setters允许链式调用（Method chaining）</em></p>
  * @author Team Orange
  */
-public class Message {
+public class Message implements Cloneable{
 	/**
 	 * 消息代码。指明消息主体的语义，明确命令。
 	 * @author Team Orange
@@ -196,9 +198,22 @@ public class Message {
 	}
 
 	/**
+	 * 深拷贝
+	 */
+	@Override
+	public Message clone() {
+		Message clone = null;
+		try {
+			clone = (Message) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException("can't clone Message", e);
+		}
+		return clone;
+	}
+	/**
 	 * 判断指定对象是否与本对象内容相同。
 	 * <p><em>会调用{@link #isSameClass(Object)}判断是否是本类的实例，
-	 * 调用{@link #compare(Object, Object)}比较{@link String}等对象</em></p>
+	 * 调用{@link Objects#compare(Object, Object)}比较{@link String}等对象</em></p>
 	 * @param o 待比较对象
 	 * @return 如果内容与本对象相同，返回true；不同，返回false
 	 */
@@ -210,7 +225,7 @@ public class Message {
 			return false;
 		else {
 			Message other = (Message) o;
-			return code == other.code && compare(body, other.body);
+			return code == other.code && Objects.compare(body, other.body);
 		}
 	}
 	/**
@@ -220,15 +235,5 @@ public class Message {
 	 */
 	protected boolean isSameClass(Object o) {
 		return getClass() == o.getClass() || mDefaultValue.getClass() == o.getClass();
-	}
-	/**
-	 * 判断两对象是否相等，根据o1的<code>equals</code>方法判断。
-	 * <p><em>当o1为null时：若o2也为null，返回true；若o2不是null，返回false</em></p>
-	 * @param o1 待比较对象1
-	 * @param o2 待比较对象2
-	 * @return 若o1 == o2，返回true；若o1 != o2，返回false
-	 */
-	protected static boolean compare(Object o1, Object o2) {
-		return o1 == null ? o2 == null : o1.equals(o2);
 	}
 }
