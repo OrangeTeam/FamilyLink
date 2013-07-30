@@ -1,5 +1,7 @@
 package org.orange.familylink.data;
 
+import java.util.Date;
+
 import org.orange.familylink.data.MessageLogRecord.Direction;
 
 import junit.framework.TestCase;
@@ -24,7 +26,7 @@ public class MessageLogRecordTest extends TestCase {
 		assertNull(MessageLogRecord.mDefaultValue.getId());
 		assertNull(MessageLogRecord.mDefaultValue.getContact());
 		assertNull(MessageLogRecord.mDefaultValue.getAddress());
-		assertEquals(0, MessageLogRecord.mDefaultValue.getTimestamp());
+		assertNull(MessageLogRecord.mDefaultValue.getDate());
 		assertNull(MessageLogRecord.mDefaultValue.getDirection());
 		assertNull(MessageLogRecord.mDefaultValue.hasRead());
 		assertNull(MessageLogRecord.mDefaultValue.getMessage());
@@ -54,7 +56,7 @@ public class MessageLogRecordTest extends TestCase {
 			System.out.println(e.getMessage());
 		}
 		try {
-			defaultValue.setTimestamp(0);
+			defaultValue.setDate(null);
 			fail( "Missing exception" );
 		} catch(Exception e) {
 			// Optionally make sure you get the correct Exception, too
@@ -137,18 +139,21 @@ public class MessageLogRecordTest extends TestCase {
 		mMessageLogRecord.setAddress(null);
 		assertNull(mMessageLogRecord.getAddress());
 	}
-	public void testTimestamp() {
-		long time = System.currentTimeMillis();
-		mMessageLogRecord.setTimestamp(time);
-		assertEquals(time, mMessageLogRecord.getTimestamp());
+	public void testDate() {
+		Date date = new Date();
+		mMessageLogRecord.setDate(date);
+		assertEquals(date, mMessageLogRecord.getDate());
 
-		time = -324123;
-		mMessageLogRecord.setTimestamp(time);
-		assertEquals(time, mMessageLogRecord.getTimestamp());
+		date = new Date(Long.MIN_VALUE);
+		mMessageLogRecord.setDate(date);
+		assertEquals(date, mMessageLogRecord.getDate());
 
-		time = 0;
-		mMessageLogRecord.setTimestamp(time);
-		assertEquals(time, mMessageLogRecord.getTimestamp());
+		date = new Date(0);
+		mMessageLogRecord.setDate(date);
+		assertEquals(date, mMessageLogRecord.getDate());
+
+		mMessageLogRecord.setDate(null);
+		assertNull(mMessageLogRecord.getDate());
 	}
 	public void testDirection() {
 		Direction d;
@@ -227,29 +232,28 @@ public class MessageLogRecordTest extends TestCase {
 		Long id = 5234543L;
 		Contact contact = new Contact();
 		String address = "baijie1991@gmail.com";
-		long time = System.currentTimeMillis();
+		Date date = new Date();
 		Direction direction = Direction.RECEIVE;
 		Boolean hasRead = true;
 		Message message = new Message(Message.Code.INFORM, MessageTest.TEST_CASE_BODY);
 		mMessageLogRecord = new MessageLogRecord().setId(id).setContact(contact)
-				.setAddress(address).setTimestamp(time).setDirection(direction)
+				.setAddress(address).setDate(date).setDirection(direction)
 				.setHasRead(hasRead).setMessage(message);
 		assertEquals(id, mMessageLogRecord.getId());
 		assertEquals(contact, mMessageLogRecord.getContact());
 		assertEquals(address, mMessageLogRecord.getAddress());
-		assertEquals(time, mMessageLogRecord.getTimestamp());
+		assertEquals(date, mMessageLogRecord.getDate());
 		assertEquals(direction, mMessageLogRecord.getDirection());
 		assertEquals(hasRead, mMessageLogRecord.hasRead());
 		assertEquals(message, mMessageLogRecord.getMessage());
 
-		time = -System.currentTimeMillis();
 		mMessageLogRecord = new MessageLogRecord().setId(null).setContact(null)
-				.setAddress(null).setTimestamp(time).setDirection(null)
+				.setAddress(null).setDate(null).setDirection(null)
 				.setHasRead(null).setMessage(null);
 		assertNull(mMessageLogRecord.getId());
 		assertNull(mMessageLogRecord.getContact());
 		assertNull(mMessageLogRecord.getAddress());
-		assertEquals(time, mMessageLogRecord.getTimestamp());
+		assertNull(mMessageLogRecord.getDate());
 		assertNull(mMessageLogRecord.getDirection());
 		assertNull(mMessageLogRecord.hasRead());
 		assertNull(mMessageLogRecord.getMessage());
@@ -274,7 +278,7 @@ public class MessageLogRecordTest extends TestCase {
 		assertFalse(mMessageLogRecord.equals(MessageLogRecord.mDefaultValue));
 
 		mMessageLogRecord = new MessageLogRecord();
-		mMessageLogRecord.setTimestamp(System.currentTimeMillis());
+		mMessageLogRecord.setDate(new Date());
 		assertFalse(mMessageLogRecord.equals(MessageLogRecord.mDefaultValue));
 
 		mMessageLogRecord = new MessageLogRecord();
@@ -298,7 +302,7 @@ public class MessageLogRecordTest extends TestCase {
 		// 注意: 默认值是null,也应当能正确地拷贝null
 		assertEquals(mMessageLogRecord, MessageLogRecord.mDefaultValue.clone());
 		try {
-			MessageLogRecord.mDefaultValue.clone().setTimestamp(0);
+			MessageLogRecord.mDefaultValue.clone().setDate(new Date(0));
 			fail( "Missing exception" );
 		} catch(Exception e) {
 			// Optionally make sure you get the correct Exception, too
@@ -309,12 +313,12 @@ public class MessageLogRecordTest extends TestCase {
 		Long id = 5234543L;
 		Contact contact = new Contact();
 		String address = "baijie1991@gmail.com";
-		long time = System.currentTimeMillis();
+		Date date = new Date();
 		Direction direction = Direction.RECEIVE;
 		Boolean hasRead = true;
 		Message message = new Message(Message.Code.INFORM, MessageTest.TEST_CASE_BODY);
 		mMessageLogRecord.setId(id).setContact(contact)
-				.setAddress(address).setTimestamp(time).setDirection(direction)
+				.setAddress(address).setDate(date).setDirection(direction)
 				.setHasRead(hasRead).setMessage(message);
 
 		MessageLogRecord record;
@@ -327,7 +331,7 @@ public class MessageLogRecordTest extends TestCase {
 		assertEquals(mMessageLogRecord, record);
 		// 修改拷贝件
 		record.clone().setId(4312435L).setContact(null)
-		.setAddress("fasdfadsf").setTimestamp(-4431534).setDirection(Direction.SEND)
+		.setAddress("fasdfadsf").setDate(new Date(4431534)).setDirection(Direction.SEND)
 		.setHasRead(false).setMessage(null);
 		// 原对象不受影响
 		assertEquals(mMessageLogRecord, record);
@@ -342,6 +346,16 @@ public class MessageLogRecordTest extends TestCase {
 		// Contact 是同一引用
 		assertTrue(record.clone().getContact() == record.getContact());
 
+		// 验证 Date是深拷贝
+		record = mMessageLogRecord.clone();
+		assertEquals(mMessageLogRecord, record);
+		// 如果是影子拷贝，修改拷贝件里的对象，原对象也会受影响
+		record.clone().getDate().setTime(0);
+		// 原对象不受影响
+		assertEquals(mMessageLogRecord, record);
+		// Date 不是同一引用
+		assertFalse(record.clone().getDate() == record.getDate());
+
 		// 验证 Message是深拷贝
 		record = mMessageLogRecord.clone();
 		assertEquals(mMessageLogRecord, record);
@@ -349,5 +363,7 @@ public class MessageLogRecordTest extends TestCase {
 		record.clone().getMessageToSet().setBody(MessageTest.TEST_CASE_BODY);
 		// 原对象不受影响
 		assertEquals(mMessageLogRecord, record);
+		// Message 不是同一引用
+		assertFalse(record.clone().getMessage() == record.getMessage());
 	}
 }

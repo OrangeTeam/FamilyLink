@@ -1,5 +1,7 @@
 package org.orange.familylink.data;
 
+import java.util.Date;
+
 import org.orange.familylink.util.Objects;
 
 /**
@@ -47,7 +49,7 @@ public class MessageLogRecord implements Cloneable {
 		 * 禁用此方法
 		 */
 		@Override
-		public MessageLogRecord setTimestamp(long timestamp) {
+		public MessageLogRecord setDate(Date date) {
 			throw new IllegalStateException("you cannot chang default value.");
 		}
 		/**
@@ -87,8 +89,8 @@ public class MessageLogRecord implements Cloneable {
 	private Contact mContact = null;
 	/** 电话号、Email等地址。允许为null */
 	private String mAddress = null;
-	/** 消息时间戳 */
-	private long mTimestamp = 0;
+	/** 消息发送或接收时间 */
+	private Date mDate = null;
 	/** 消息方向 */
 	private Direction mDirection = null;
 	/** 已读。true表示已读，false表示未读，null表示未知（未设置） */
@@ -148,17 +150,17 @@ public class MessageLogRecord implements Cloneable {
 		return this;
 	}
 	/**
-	 * @return 消息时间戳。{@link System#currentTimeMillis()}格式
+	 * @return 消息发送或接收的时间。返回<strong>{@link Date#clone()}</strong>
 	 */
-	public long getTimestamp() {
-		return mTimestamp;
+	public Date getDate() {
+		return mDate != null ? (Date) (mDate.clone()) : null;
 	}
 	/**
-	 * @param timestamp 消息时间戳。{@link System#currentTimeMillis()}格式
+	 * @param date 消息发送或接收的时间。本对象保留<strong>{@link Date#clone()}</strong>
 	 * @return this（用于链式调用）
 	 */
-	public MessageLogRecord setTimestamp(long timestamp) {
-		this.mTimestamp = timestamp;
+	public MessageLogRecord setDate(Date date) {
+		this.mDate = date != null ? (Date) (date.clone()) : null;
 		return this;
 	}
 	/**
@@ -231,7 +233,7 @@ public class MessageLogRecord implements Cloneable {
 			return Objects.compare(mId, other.mId)
 					&& Objects.compare(mContact, other.mContact)
 					&& Objects.compare(mAddress, other.mAddress)
-					&& mTimestamp == other.mTimestamp
+					&& Objects.compare(mDate, other.mDate)
 					&& Objects.compare(mDirection, other.mDirection)
 					&& Objects.compare(mHasRead, other.mHasRead)
 					&& Objects.compare(mMessage, other.mMessage);
@@ -246,13 +248,15 @@ public class MessageLogRecord implements Cloneable {
 		return getClass() == o.getClass() || mDefaultValue.getClass() == o.getClass();
 	}
 	/**
-	 * 拷贝本对象。本拷贝既不是深拷贝，也不是影子拷贝。拷贝件中的联系人（对方）与原件的引用相同，拷贝件中的消息内容是原件消息的深拷贝。
+	 * 拷贝本对象。本拷贝既不是深拷贝，也不是影子拷贝。
+	 * <p>拷贝件中的联系人（对方）与原件的引用相同，拷贝件中的消息时间、消息内容是原件消息的深拷贝。</p>
 	 */
 	@Override
 	public MessageLogRecord clone() {
 		MessageLogRecord clone = null;
 		try {
 			clone = (MessageLogRecord) super.clone();
+			clone.mDate = getDate();
 			clone.mMessage = getMessage();
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException("can't clone MessageLogRecord", e);
