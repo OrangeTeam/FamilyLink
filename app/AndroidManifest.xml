@@ -25,16 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- Contacts Activity which is a child of the main activity -->
-        <activity
-            android:name="org.orange.familylink.ListContactsActivity"
-            android:label="@string/contacts"
-            android:parentActivityName="org.orange.familylink.MainActivity" >
-            <!-- Parent activity meta-data to support API level 7+ -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.orange.familylink.MainActivity" />
-        </activity>
     </application>
 
 </manifest>

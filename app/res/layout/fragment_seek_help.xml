@@ -4,18 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <fragment
-        android:id="@+id/contact"
-        android:name="org.orange.familylink.fragment.SeekHelpContactFragment"
+    <TextView
+        android:id="@+id/demo"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.6" />
-
-    <fragment
-        android:id="@+id/control"
-        android:name="org.orange.familylink.fragment.SeekHelpControlFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.4" />
+        android:layout_height="match_parent"
+        android:textSize="50sp"
+        android:text="@string/seek_help"
+         />
 
 </LinearLayout>
