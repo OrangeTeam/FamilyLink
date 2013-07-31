@@ -36,7 +36,7 @@ public class MessageTest extends TestCase {
 		assertEquals(Message.mDefaultValue.getBody(), mMessage.getBody());
 	}
 	public void testDefaultValue() {
-		assertEquals(Message.Code.UNDEFINED, Message.mDefaultValue.getCode());
+		assertNull(Message.mDefaultValue.getCode());
 		assertNull(Message.mDefaultValue.getBody());
 		Message defaultValue = Message.mDefaultValue;
 		try {
@@ -58,13 +58,13 @@ public class MessageTest extends TestCase {
 	}
 	public void testCode() {
 		mMessage.setCode(Message.Code.COMMAND);
-		assertEquals(Message.Code.COMMAND, mMessage.getCode());
+		assertEquals(Message.Code.COMMAND, mMessage.getCode().intValue());
 		mMessage.setCode(Message.Code.INFORM);
-		assertEquals(Message.Code.INFORM, mMessage.getCode());
-		mMessage.setCode(Message.Code.UNDEFINED);
-		assertEquals(Message.Code.UNDEFINED, mMessage.getCode());
+		assertEquals(Message.Code.INFORM, mMessage.getCode().intValue());
+		mMessage.setCode(null);
+		assertNull(mMessage.getCode());
 
-		int code = Message.Code.UNDEFINED;
+		Integer code = null;
 		code = Message.Code.INFORM | Message.Code.Extra.Inform.PULSE;
 		mMessage.setCode(code);
 		assertEquals(code, mMessage.getCode());
@@ -104,14 +104,14 @@ public class MessageTest extends TestCase {
 		mMessage = new Message();
 		assertTrue(mMessage.equals(Message.mDefaultValue));
 
-		int code = Message.Code.INFORM |Message.Code.Extra.Inform.PULSE
+		Integer code = Message.Code.INFORM |Message.Code.Extra.Inform.PULSE
 				| Message.Code.Extra.Inform.RESPOND | Message.Code.Extra.Inform.URGENT;
-		mMessage = new Message(code, TEST_CASE_BODY);
+		mMessage = new Message().setCode(code).setBody(TEST_CASE_BODY);
 		assertEquals(code, mMessage.getCode());
 		assertEquals(TEST_CASE_BODY, mMessage.getBody());
 
 		try {
-			mMessage = new Message(0x200, TEST_CASE_BODY);
+			mMessage = new Message().setCode(0x200).setBody(TEST_CASE_BODY);
 			fail( "Missing exception" );
 		} catch(Exception e) {
 			// Optionally make sure you get the correct Exception, too
@@ -119,7 +119,7 @@ public class MessageTest extends TestCase {
 			System.out.println(e.getMessage());
 		}
 		try {
-			mMessage = new Message(-2, TEST_CASE_BODY);
+			mMessage = new Message().setCode(-2).setBody(TEST_CASE_BODY);
 			fail( "Missing exception" );
 		} catch(Exception e) {
 			// Optionally make sure you get the correct Exception, too
@@ -142,7 +142,7 @@ public class MessageTest extends TestCase {
 		mMessage.setCode(Message.Code.COMMAND | Message.Code.Extra.Command.LOCATE_NOW);
 		assertFalse(mMessage.equals(Message.mDefaultValue));
 
-		mMessage.setCode(Message.Code.UNDEFINED);
+		mMessage.setCode(null);
 		assertTrue(Message.mDefaultValue.equals(mMessage));
 	}
 	public void testClone() {

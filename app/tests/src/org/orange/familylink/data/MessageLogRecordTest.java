@@ -235,7 +235,7 @@ public class MessageLogRecordTest extends TestCase {
 		Date date = new Date();
 		Direction direction = Direction.RECEIVE;
 		Boolean hasRead = true;
-		Message message = new Message(Message.Code.INFORM, MessageTest.TEST_CASE_BODY);
+		Message message = new Message().setCode(Message.Code.INFORM).setBody(MessageTest.TEST_CASE_BODY);
 		mMessageLogRecord = new MessageLogRecord().setId(id).setContact(contact)
 				.setAddress(address).setDate(date).setDirection(direction)
 				.setHasRead(hasRead).setMessage(message);
@@ -316,7 +316,8 @@ public class MessageLogRecordTest extends TestCase {
 		Date date = new Date();
 		Direction direction = Direction.RECEIVE;
 		Boolean hasRead = true;
-		Message message = new Message(Message.Code.INFORM, MessageTest.TEST_CASE_BODY);
+		Message message = new Message().setBody(MessageTest.TEST_CASE_BODY)
+				.setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);
 		mMessageLogRecord.setId(id).setContact(contact)
 				.setAddress(address).setDate(date).setDirection(direction)
 				.setHasRead(hasRead).setMessage(message);

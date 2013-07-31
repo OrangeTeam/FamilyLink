@@ -20,10 +20,6 @@ public class Message implements Cloneable{
 	 */
 	public abstract static class Code {
 		/**
-		 * 未定义。这是默认值，表示尚未指明代码。
-		 */
-		public static final int UNDEFINED	 =-0x001;
-		/**
 		 * 通告。如定时通告、紧急通知、应答命令等
 		 * @see Extra.Inform
 		 */
@@ -59,6 +55,37 @@ public class Message implements Cloneable{
 				 * 紧急消息
 				 */
 				public static final int URGENT	 = 0x04;
+
+				/**
+				 * 检测指定code是不是设置了{@link #RESPOND}位
+				 * @param code 待检测code
+				 * @return 如果code是{@link Code#INFORM}并且设置了{@link #RESPOND}位，返回true；否则返回false
+				 */
+				public static boolean hasSetRespond(int code) {
+					if(!isInform(code))
+						return false;
+					return (code & RESPOND) == RESPOND;
+				}
+				/**
+				 * 检测指定code是不是设置了{@link #PULSE}位
+				 * @param code 待检测code
+				 * @return 如果code是{@link Code#INFORM}并且设置了{@link #PULSE}位，返回true；否则返回false
+				 */
+				public static boolean hasSetPulse(int code) {
+					if(!isInform(code))
+						return false;
+					return (code & PULSE) == PULSE;
+				}
+				/**
+				 * 检测指定code是不是设置了{@link #URGENT}位
+				 * @param code 待检测code
+				 * @return 如果code是{@link Code#INFORM}并且设置了{@link #URGENT}位，返回true；否则返回false
+				 */
+				public static boolean hasSetUrgent(int code) {
+					if(!isInform(code))
+						return false;
+					return (code & URGENT) == URGENT;
+				}
 			}
 			/**
 			 * {@link Code#COMMAND}的额外信息，指明具体命令
@@ -70,10 +97,25 @@ public class Message implements Cloneable{
 				 * 现在定位
 				 */
 				public static final int LOCATE_NOW = 0x01;
+
+				/**
+				 * 检测指定code是不是设置了{@link #LOCATE_NOW}位
+				 * @param code 待检测code
+				 * @return 如果code是{@link Code#COMMAND}并且设置了{@link #LOCATE_NOW}位，返回true；否则返回false
+				 */
+				public static boolean hasSetLocateNow(int code) {
+					if(!isCommand(code))
+						return false;
+					return (code & LOCATE_NOW) == LOCATE_NOW;
+				}
 			}
 		}
-		private static final int MINIMUM	 = UNDEFINED;
-		private static final int MAXIMUM		 = 0x1ff;
+		/** {@link Extra}所在位置 */
+		public static final int EXTRA_BITS	 = 0xff;
+		/** 可能的最小{@link Code} */
+		public static final int MINIMUM		 = INFORM;
+		/** 可能的最大{@link Code} */
+		public static final int MAXIMUM		 = COMMAND | EXTRA_BITS;
 
 		/**
 		 * 检查code的合法性。
@@ -86,6 +128,26 @@ public class Message implements Cloneable{
 			else
 				return false;
 		}
+		/**
+		 * 检测指定code是不是{@link #INFORM} code
+		 * @param code 待检测code
+		 * @return 如果是{@link #INFORM}，返回true；如果不是，返回false
+		 */
+		public static boolean isInform(int code) {
+			if(!isLegalCode(code))
+				return false;
+			return (code & (~EXTRA_BITS)) == INFORM;
+		}
+		/**
+		 * 检测指定code是不是{@link #COMMAND} code
+		 * @param code 待检测code
+		 * @return 如果是{@link #COMMAND}，返回true；如果不是，返回false
+		 */
+		public static boolean isCommand(int code) {
+			if(!isLegalCode(code))
+				return false;
+			return (code & (~EXTRA_BITS)) == COMMAND;
+		}
 	}
 	/**
 	 * 本类的默认值，你可以通过它取得本类各字段的默认值。
@@ -96,7 +158,7 @@ public class Message implements Cloneable{
 		 * 禁用此方法
 		 */
 		@Override
-		public Message setCode(int code) {
+		public Message setCode(Integer code) {
 			throw new IllegalStateException("you cannot chang default value.");
 		}
 		/**
@@ -119,7 +181,7 @@ public class Message implements Cloneable{
 	 * 消息代码
 	 * @see Code
 	 */
-	private int code = Code.UNDEFINED;
+	private Integer code = null;
 	/**
 	 * 消息主体
 	 */
@@ -127,19 +189,12 @@ public class Message implements Cloneable{
 
 	/**
 	 * 使用默认值构造本类。
+	 * <p>Tips：可以类似这样使用链式调用
+	 * <pre><code>new Message().setBody(MessageTest.TEST_CASE_BODY)
+	 *     .setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);</code></pre></p>
 	 */
 	public Message() {
 		super();
-	}
-	/**
-	 * 使用指定值构造本类。
-	 * @param code 消息代码，参见{@link Code}
-	 * @param body 消息主体
-	 * @see Message#mDefaultValue
-	 */
-	public Message(int code, String body) {
-		this();
-		setCode(code).setBody(body);
 	}
 
 	/**
@@ -147,7 +202,7 @@ public class Message implements Cloneable{
 	 * @return 消息代码
 	 * @see Code
 	 */
-	public int getCode() {
+	public Integer getCode() {
 		return code;
 	}
 	/**
@@ -156,8 +211,8 @@ public class Message implements Cloneable{
 	 * @return this（为了链式调用）
 	 * @see Code
 	 */
-	public Message setCode(int code) {
-		if(!Code.isLegalCode(code))
+	public Message setCode(Integer code) {
+		if((code != null) && (!Code.isLegalCode(code)))
 			throw new IllegalArgumentException("Illegal Code :" + code);
 		this.code = code;
 		return this;
@@ -225,7 +280,7 @@ public class Message implements Cloneable{
 			return false;
 		else {
 			Message other = (Message) o;
-			return code == other.code && Objects.compare(body, other.body);
+			return Objects.compare(code, other.code) && Objects.compare(body, other.body);
 		}
 	}
 	/**
