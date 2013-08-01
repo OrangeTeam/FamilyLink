@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:paddingTop="4dp"
         android:src="@drawable/left"
         android:contentDescription="@string/send"
          />
@@ -56,15 +57,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/contact_name"
         android:layout_toLeftOf="@id/unread_icon"
+        android:paddingBottom="4dp"
          />
 
     <ImageView
         android:id="@id/unread_icon"
-        android:layout_width="4dp"
+        android:layout_width="6dp"
         android:layout_height="0dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignBottom="@id/date"
+        android:layout_marginLeft="10dp"
         android:src="@color/unread"
         android:contentDescription="@string/unread"
          />

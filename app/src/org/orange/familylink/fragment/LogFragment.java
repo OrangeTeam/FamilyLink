@@ -21,8 +21,10 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 /**
@@ -35,6 +37,15 @@ public class LogFragment extends ListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = super.onCreateView(inflater, container, savedInstanceState);
+		// 按照Android设计指导，设置上下margin
+		// http://developer.android.com/design/style/metrics-grids.html
+		ListView listView = (ListView) view.findViewById(android.R.id.list);
+		int margin = getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
+		View space = new View(getActivity());
+		space.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, margin));
+		listView.addHeaderView(space, null, false);
+		listView.addFooterView(space, null, false);
+
 		setListAdapter(new MockLogAdapter(getActivity()));
 		return view;
 	}
