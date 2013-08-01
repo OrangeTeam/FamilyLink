@@ -14,19 +14,27 @@
          />
     <TextView
         android:id="@+id/code"
-        android:layout_width="90dp"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/direction_icon"
         android:layout_alignParentTop="true"
-        android:layout_alignBaseline="@+id/body"
          />
     <TextView
-        android:id="@id/body"
+        android:id="@+id/code_extra"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/code"
         android:layout_toLeftOf="@+id/unread_icon"
         android:layout_alignParentTop="true"
+        android:layout_alignBaseline="@id/code"
+         />
+    <TextView
+        android:id="@+id/body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/direction_icon"
+        android:layout_toLeftOf="@id/unread_icon"
+        android:layout_below="@id/code_extra"
          />
     <TextView
         android:id="@+id/address"
@@ -34,10 +42,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/body"
         android:layout_toRightOf="@id/direction_icon"
-        android:layout_alignBaseline="@+id/contact_name"
          />
     <TextView
-        android:id="@id/contact_name"
+        android:id="@+id/contact_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/body"

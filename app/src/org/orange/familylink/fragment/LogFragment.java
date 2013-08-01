@@ -39,7 +39,7 @@ public class LogFragment extends ListFragment {
 		return view;
 	}
 
-	private int getStringResIdOfCode(Integer code) {
+	private int getImportantCode(Integer code) {
 		if(code == null) {
 			return R.string.undefined;
 		} else if(Code.isInform(code)){
@@ -63,11 +63,41 @@ public class LogFragment extends ListFragment {
 		}
 	}
 	private String valueOfCode(Integer code) {
-		int resId = getStringResIdOfCode(code);
-		if(resId != R.string.illegal_code)
-			return getString(resId);
-		else
+		if(code == null)
+			return getString(R.string.undefined);
+		else if(Code.isInform(code))
+			return getString(R.string.inform);
+		else if(Code.isCommand(code))
+			return getString(R.string.command);
+		else if(!Code.isLegalCode(code))
 			return getString(R.string.illegal_code, code.intValue());
+		else
+			throw new IllegalArgumentException("May be method Code.isLegalCode() not correct");
+	}
+	private String valueOfCodeExtra(Integer code, String delimiter) {
+		if(delimiter.length() == 0)
+			throw new IllegalArgumentException("you should set a delimiter");
+		if(code == null || !Code.isLegalCode(code))
+			return "";
+		StringBuilder sb = new StringBuilder();
+		if(Code.isInform(code)){
+			if(Code.Extra.Inform.hasSetUrgent(code))
+				sb.append(getString(R.string.urgent) + delimiter);
+			if(Code.Extra.Inform.hasSetRespond(code))
+				sb.append(getString(R.string.respond) + delimiter);
+			if(Code.Extra.Inform.hasSetPulse(code))
+				sb.append(getString(R.string.pulse) + delimiter);
+		} else if(Code.isCommand(code)) {
+			if(Code.Extra.Command.hasSetLocateNow(code))
+				sb.append(getString(R.string.locate_now) + delimiter);
+		} else {
+			throw new IllegalArgumentException("May be method Code.isLegalCode() not correct");
+		}
+		int last = sb.lastIndexOf(delimiter);
+		if(last > 0)
+			return sb.substring(0, last);
+		else
+			return "";
 	}
 	private String valueOfDirection(Direction direction) {
 		if(direction == null)
@@ -153,12 +183,13 @@ public class LogFragment extends ListFragment {
 			// to reinflate it. We only inflate a new View when the convertView supplied
 			// by ListView is null.
 			if(convertView == null) {
-				convertView = mInflater.inflate(R.layout.fragment_log_item, parent, false);
+				convertView = mInflater.inflate(R.layout.fragment_log_list_item, parent, false);
 				// Creates a ViewHolder and store references to the two children views
 				// we want to bind data to.
 				holder = new ViewHolder();
 				holder.parent = convertView;
 				holder.code = (TextView) convertView.findViewById(R.id.code);
+				holder.code_extra = (TextView) convertView.findViewById(R.id.code_extra);
 				holder.body = (TextView) convertView.findViewById(R.id.body);
 				holder.contact_name = (TextView) convertView.findViewById(R.id.contact_name);
 				holder.address = (TextView) convertView.findViewById(R.id.address);
@@ -184,6 +215,7 @@ public class LogFragment extends ListFragment {
 			MessageLogRecord record = mMockLog.get(position);
 			// message code
 			holder.code.setText(valueOfCode(record.getMessageToSet().getCode()));
+			holder.code_extra.setText(valueOfCodeExtra(record.getMessageToSet().getCode(), " | "));
 			setViewColor(position, holder);
 			// message body
 			if(record.getMessageToSet().getBody() != null)
@@ -237,7 +269,7 @@ public class LogFragment extends ListFragment {
 		 */
 		private void setViewColor(int position, ViewHolder holder) {
 			Integer colorResId = null;
-			switch(getStringResIdOfCode(mMockLog.get(position).getMessageToSet().getCode())) {
+			switch(getImportantCode(mMockLog.get(position).getMessageToSet().getCode())) {
 				case R.string.urgent:
 					colorResId = R.color.urgent;
 					break;
@@ -260,6 +292,7 @@ public class LogFragment extends ListFragment {
 		 */
 		private void setTextAppearance(ViewHolder holder, int resid) {
 			holder.code.setTextAppearance(mContext, resid);
+			holder.code_extra.setTextAppearance(mContext, resid);
 			holder.body.setTextAppearance(mContext, resid);
 			holder.contact_name.setTextAppearance(mContext, resid);
 			holder.address.setTextAppearance(mContext, resid);
@@ -274,6 +307,7 @@ public class LogFragment extends ListFragment {
 			View parent;
 
 			TextView code;
+			TextView code_extra;
 			TextView body;
 			TextView contact_name;
 			TextView address;
