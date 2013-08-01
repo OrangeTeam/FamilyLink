@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- textColor -->
+    <color name="default_text_color">#000</color>
+    <color name="weak_text_color">#777</color>
+    <!-- 未读标记条默认颜色 -->
+    <color name="unread">#33B5E5</color>
+    <!-- 默认日志配色方案 -->
+    <color name="urgent">#1f00</color>
+    <color name="respond">#20f0</color>
+    <color name="command">#3ff0</color>
+    <color name="other_code">#0fff</color>
+
+</resources>

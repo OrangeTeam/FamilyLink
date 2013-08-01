@@ -9,4 +9,18 @@
 
     <string name="action_settings">设置</string>
 
+    <string name="unknown">未知</string>
+    <string name="undefined">未定义</string>
+    <!-- Log -->
+    <string name="illegal_code">非法代码：%d</string>
+    <string name="inform">通告</string>
+    <string name="command">命令</string>
+    <string name="respond">应答</string>
+    <string name="pulse">定时报告</string>
+    <string name="urgent">紧急消息</string>
+    <string name="locate_now">现在定位</string>
+    <string name="send">发送 </string>
+    <string name="receive">接收</string>
+    <string name="has_read">已读</string>
+    <string name="unread">未读</string>
 </resources>

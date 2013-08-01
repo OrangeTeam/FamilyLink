@@ -9,4 +9,19 @@
 
     <string name="action_settings">Settings</string>
 
+    <string name="unknown">unknown</string>
+    <string name="undefined">undefined</string>
+    <!-- Log -->
+    <string name="illegal_code">Ilegal Code: %d</string>
+    <string name="inform">inform</string>
+    <string name="command">command</string>
+    <string name="respond">respond</string>
+    <string name="pulse">pulse</string>
+    <string name="urgent">urgent</string>
+    <string name="locate_now">locate now</string>
+
+    <string name="send">send</string>
+    <string name="receive">receive</string>
+    <string name="has_read">read</string>
+    <string name="unread">unread</string>
 </resources>
