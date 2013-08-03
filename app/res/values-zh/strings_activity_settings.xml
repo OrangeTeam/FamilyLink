@@ -1,0 +1,32 @@
+<resources>
+
+    <!-- Strings related to Settings -->
+
+
+    <!-- Example General settings -->
+    <string name="pref_title_role">角色</string>
+    <string name="pref_title_sync_frequency">同步频率</string>
+
+    <string-array name="pref_role_titles">
+        <item>照料者</item>
+        <item>受顾者</item>
+    </string-array>
+
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 分钟</item>
+        <item>30 分钟</item>
+        <item>1 小时</item>
+        <item>3 小时</item>
+        <item>6 小时</item>
+        <item>从不</item>
+    </string-array>
+
+
+    <!-- settings for Notifications -->
+    <string name="pref_notifications">通知</string>
+    <string name="pref_title_new_message_notifications">新消息通知</string>
+    <string name="pref_title_ringtone">铃声</string>
+    <string name="pref_ringtone_silent">静音</string>
+    <string name="pref_title_vibrate">振动</string>
+
+</resources>
