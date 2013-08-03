@@ -1,5 +1,7 @@
 package org.orange.familylink;
 
+import org.orange.familylink.data.Settings;
+import org.orange.familylink.data.Settings.Role;
 import org.orange.familylink.fragment.LogFragment;
 import org.orange.familylink.fragment.NavigateFragment;
 import org.orange.familylink.fragment.SeekHelpFragment;
@@ -22,6 +24,7 @@ import android.support.v7.app.ActionBar.Tab;
  */
 public class MainActivity extends BaseActivity {
 	private ViewPager mViewPager;
+	private int[] mPagersOrder;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,15 @@ public class MainActivity extends BaseActivity {
 		setContentView(R.layout.activity_main);
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 
+		setup();
+	}
+
+	protected void setup() {
+		Role role = Settings.getRole(this);
+		if(role == Role.CARER)
+			mPagersOrder = new int[]{R.string.log, R.string.seek_help, R.string.navigate};
+		else if(role == Role.CAREE)
+			mPagersOrder = new int[]{R.string.seek_help, R.string.log, R.string.navigate};
 		setupViewPager(mViewPager);
 		setupActionBar();
 	}
@@ -60,10 +72,9 @@ public class MainActivity extends BaseActivity {
 			@Override
 			public void onTabReselected(Tab tab, FragmentTransaction ft) {}
 		};
-		// Add 3 tabs, specifying the tab's text and TabListener
-		actionBar.addTab(actionBar.newTab().setText(R.string.seek_help).setTabListener(tabListener));
-		actionBar.addTab(actionBar.newTab().setText(R.string.log).setTabListener(tabListener));
-		actionBar.addTab(actionBar.newTab().setText(R.string.navigate).setTabListener(tabListener));
+		// Add tabs, specifying the tab's text and TabListener
+		for(int i = 0 ;i < mPagersOrder.length ; i++)
+			actionBar.addTab(actionBar.newTab().setText(mPagersOrder[i]).setTabListener(tabListener));
 	}
 	/**
 	 * 配置{@link ViewPager}，典型情况下在{@link #onCreate(Bundle)}调用
@@ -88,30 +99,27 @@ public class MainActivity extends BaseActivity {
 	 * @see FragmentPagerAdapter
 	 * @author Team Orange
 	 */
-	public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
-		public static final int PAGE_COUNT = 3;
-
+	protected class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 		public AppSectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
 
 		@Override
 		public Fragment getItem(int position) {
-			switch(position){
-			case 0:
+			switch(mPagersOrder[position]){
+			case R.string.seek_help:
 				return new SeekHelpFragment();
-			case 1:
+			case R.string.log:
 				return new LogFragment();
-			case 2:
+			case R.string.navigate:
 				return new NavigateFragment();
-			default:
-				throw new IllegalArgumentException("position should be lower than "+PAGE_COUNT);
 			}
+			throw new IllegalArgumentException("illegal position: " + position);
 		}
 
 		@Override
 		public int getCount() {
-			return PAGE_COUNT;
+			return mPagersOrder.length;
 		}
 	}
 }
