@@ -6,6 +6,7 @@ import org.orange.familylink.fragment.SeekHelpFragment;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -24,6 +25,8 @@ public class MainActivity extends BaseActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		mViewPager = (ViewPager) findViewById(R.id.pager);
