@@ -3,6 +3,8 @@
  */
 package org.orange.familylink.data;
 
+import android.content.Context;
+import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 
 /**
@@ -55,5 +57,47 @@ public class Settings {
 	public static final String PREF_KEY_NOTIFICATIONS_NEW_MESSAGE_VIBRATE
 								= "notifications_new_message_vibrate";
 
+	/**
+	 * 用户角色。
+	 * @author Team Orange
+	 */
+	public enum Role {
+		/** 照料着 */
+		CARER,
+		/** 受顾者 */
+		CAREE
+	}
 
+	/**
+	 * 获取 用户角色
+	 * @param context 上下文环境
+	 * @return 用户角色；null表示未设置
+	 */
+	public static Role getRole(Context context) {
+		String role = PreferenceManager.getDefaultSharedPreferences(context)
+				.getString(PREF_KEY_ROLE, null);
+		if("1".equals(role))
+			return Role.CARER;
+		else if("0".equals(role))
+			return Role.CAREE;
+		else if(role == null)
+			return null;
+		else
+			throw new IllegalStateException("Illegal role value: "+role);
+	}
+	/**
+	 * 取得同步频率。用更新间隔表示，单位微秒。如3 600 000表示每1小时更新一次。
+	 * @param context 上下文环境
+	 * @return 以微秒为单位的更新间隔；-1表示不自动更新（never）；null表示未设置
+	 */
+	public static Long getSyncFrequency(Context context) {
+		String freq = PreferenceManager.getDefaultSharedPreferences(context)
+				.getString(PREF_KEY_SYNC_FREQUENCY, null);
+		if(freq == null)
+			return null;
+		else if("-1".equals(freq))
+			return -1L;
+		else
+			return Long.parseLong(freq) * 60 * 1000;
+	}
 }

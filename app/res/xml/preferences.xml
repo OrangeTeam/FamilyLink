@@ -7,7 +7,7 @@
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference
         android:key="role"
-        android:defaultValue="1"
+        android:defaultValue="0"
         android:title="@string/pref_title_role"
         android:entries="@array/pref_role_titles"
         android:entryValues="@array/pref_role_values"
