@@ -65,7 +65,7 @@ public class MainActivity extends BaseActivity {
 	 */
 	protected void setup() {
 		setPagersOrder(Settings.getRole(this));
-		setupViewPager(mViewPager);
+		setupViewPager();
 		setupActionBar();
 	}
 	/**
@@ -101,7 +101,7 @@ public class MainActivity extends BaseActivity {
 	/**
 	 * 配置{@link ViewPager}，典型情况下在{@link #onCreate(Bundle)}调用
 	 */
-	protected void setupViewPager(ViewPager viewPager) {
+	protected void setupViewPager() {
 		mViewPager.setAdapter(new AppSectionsPagerAdapter(getSupportFragmentManager()));
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener(){
 			@Override
