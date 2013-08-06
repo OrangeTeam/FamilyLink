@@ -7,7 +7,7 @@ import java.util.List;
 import org.orange.familylink.data.Contact;
 import org.orange.familylink.data.Message;
 import org.orange.familylink.data.MessageLogRecord;
-import org.orange.familylink.data.MessageLogRecord.Direction;
+import org.orange.familylink.data.MessageLogRecord.Status;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -177,8 +177,7 @@ public class FamilyLinkDBAdapter {
 		contentValues.put(Contract.Messages.COLUMN_NAME_CONTACT_ID, messageLogRecord.getContact().getId());
 		contentValues.put(Contract.Messages.COLUMN_NAME_ADDRESS, messageLogRecord.getAddress());
 		contentValues.put(Contract.Messages.COLUMN_NAME_TIME, messageLogRecord.getDate().getTime());
-		contentValues.put(Contract.Messages.COLUMN_NAME_READ, messageLogRecord.hasRead());
-		contentValues.put(Contract.Messages.COLUMN_NAME_DIRECTION, messageLogRecord.getDirection().toString());
+		contentValues.put(Contract.Messages.COLUMN_NAME_STATUS, messageLogRecord.getStatus().toString());
 		contentValues.put(Contract.Messages.COLUMN_NAME_BODY, messageLogRecord.getMessage().getBody());
 		contentValues.put(Contract.Messages.COLUMN_NAME_CODE, messageLogRecord.getMessage().getCode());
 		db.insert(Contract.DATABASE_MESSAGES_TABLE, null, contentValues);
@@ -195,8 +194,7 @@ public class FamilyLinkDBAdapter {
 			contentValues.put(Contract.Messages.COLUMN_NAME_CONTACT_ID, aMessageLogRecord.getContact().getId());
 			contentValues.put(Contract.Messages.COLUMN_NAME_ADDRESS, aMessageLogRecord.getAddress());
 			contentValues.put(Contract.Messages.COLUMN_NAME_TIME, aMessageLogRecord.getDate().getTime());
-			contentValues.put(Contract.Messages.COLUMN_NAME_READ, aMessageLogRecord.hasRead());
-			contentValues.put(Contract.Messages.COLUMN_NAME_DIRECTION, aMessageLogRecord.getDirection().toString());
+			contentValues.put(Contract.Messages.COLUMN_NAME_STATUS, aMessageLogRecord.getStatus().toString());
 			contentValues.put(Contract.Messages.COLUMN_NAME_BODY, aMessageLogRecord.getMessage().getBody());
 			contentValues.put(Contract.Messages.COLUMN_NAME_CODE, aMessageLogRecord.getMessage().getCode());
 			db.insert(Contract.DATABASE_MESSAGES_TABLE, null, contentValues);
@@ -312,15 +310,9 @@ public class FamilyLinkDBAdapter {
 			db.update(Contract.DATABASE_MESSAGES_TABLE, contentValues, Contract.Messages._ID + " = " + mId, null);
 			contentValues.clear();
 		}
-		if(cursor.getInt(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_READ))
-				!= Integer.parseInt(messageLogRecord.hasRead().toString())){
-			contentValues.put(Contract.Messages.COLUMN_NAME_READ, messageLogRecord.hasRead());
-			db.update(Contract.DATABASE_MESSAGES_TABLE, contentValues, Contract.Messages._ID + " = " + mId, null);
-			contentValues.clear();
-		}
-		if(cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_DIRECTION))
-				.equals(messageLogRecord.getDirection().toString())){
-			contentValues.put(Contract.Messages.COLUMN_NAME_DIRECTION, messageLogRecord.getDirection().toString());
+		if(cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_STATUS))
+				.equals(messageLogRecord.getStatus().toString())){
+			contentValues.put(Contract.Messages.COLUMN_NAME_STATUS, messageLogRecord.getStatus().toString());
 			db.update(Contract.DATABASE_MESSAGES_TABLE, contentValues, Contract.Messages._ID + " = " + mId, null);
 			contentValues.clear();
 		}
@@ -413,16 +405,14 @@ public class FamilyLinkDBAdapter {
 				long mContactId = cursor.getLong(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CONTACT_ID));
 				String mAddress = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_ADDRESS));
 				long mTime = cursor.getLong(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_TIME));
-				int mRead = cursor.getInt(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_READ));
-				String mDirection = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_DIRECTION));
+				String mStatus = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_STATUS));
 				String mBody = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_BODY));
 				int mCode = cursor.getInt(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE));
 				messageLogRecord.setId(mId);
 				messageLogRecord.setContact(getContact(Contract.Contacts._ID + " = " + mContactId, null));
 				messageLogRecord.setAddress(mAddress);
 				messageLogRecord.setDate(new Date(mTime));
-				messageLogRecord.setHasRead(Boolean.parseBoolean(String.valueOf(mRead)));
-				messageLogRecord.setDirection(Direction.valueOf(mDirection));
+				messageLogRecord.setStatus(Status.valueOf(mStatus));
 				messageLogRecord.setMessage(aMessage.setBody(mBody).setCode(mCode));
 				messageLogRecords.add(messageLogRecord.clone());
 			}

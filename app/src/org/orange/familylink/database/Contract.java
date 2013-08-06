@@ -82,16 +82,15 @@ public class Contract {
 		public static final String COLUMN_NAME_CONTACT_ID = "contact_id";
 		public static final String COLUMN_NAME_ADDRESS = "address";
 		public static final String COLUMN_NAME_TIME = "time";
-		public static final String COLUMN_NAME_READ = "read";
-		public static final String COLUMN_NAME_DIRECTION = "direction";
+		public static final String COLUMN_NAME_STATUS = "status";
 		public static final String COLUMN_NAME_BODY = "body";
 		public static final String COLUMN_NAME_CODE = "CODE";
 
 		//这个常量字符串是创建messages表的sql语句
 		public static final String MESSAGES_TABLE_CREATE = "create table " + DATABASE_MESSAGES_TABLE + " (" + 
 		_ID + " integer primary key," + COLUMN_NAME_CONTACT_ID + " integer references contacts(_id)," + 
-		COLUMN_NAME_ADDRESS + " varchar(20)," + COLUMN_NAME_TIME + " integer," + COLUMN_NAME_READ + " boolean,"
-		+ COLUMN_NAME_DIRECTION + " varchar(15)," + COLUMN_NAME_BODY + " text," + COLUMN_NAME_CODE + " integer"
+		COLUMN_NAME_ADDRESS + " varchar(20)," + COLUMN_NAME_TIME + " integer," + COLUMN_NAME_STATUS + " varchar(30),"
+		+ COLUMN_NAME_BODY + " text," + COLUMN_NAME_CODE + " integer"
 		+ ");";
 
 		public static final String MESSAGES_DEFAULT_SORT_ORDER = COLUMN_NAME_TIME + " DESC";

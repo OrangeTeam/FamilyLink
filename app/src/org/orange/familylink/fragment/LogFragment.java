@@ -14,6 +14,7 @@ import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.Message.Code.Extra;
 import org.orange.familylink.data.MessageLogRecord;
 import org.orange.familylink.data.MessageLogRecord.Direction;
+import org.orange.familylink.data.MessageLogRecord.Status;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -110,23 +111,24 @@ public class LogFragment extends ListFragment {
 		else
 			return "";
 	}
-	private String valueOfDirection(Direction direction) {
-		if(direction == null)
-			return getString(R.string.unknown);
-		else if(direction == Direction.SEND)
+	private String valueOfDirection(Status status) {
+		if(status == null)
+			return "";
+		Direction direction = status.getDirection();
+		if(direction == Direction.SEND)
 			return getString(R.string.send);
 		else if(direction == Direction.RECEIVE)
 			return getString(R.string.receive);
 		else
 			throw new UnsupportedOperationException("unsupport "+direction+" now.");
 	}
-	private String valueOfHasRead(Boolean hasRead) {
-		if(hasRead == null)
-			return getString(R.string.unknown);
-		else if(hasRead)
+	private String valueOfHasRead(Status status) {
+		if(status == Status.HAVE_READ)
 			return getString(R.string.has_read);
-		else
+		else if(status == Status.UNREAD)
 			return getString(R.string.unread);
+		else
+			return "";
 	}
 
 	private class MockLogAdapter extends BaseAdapter {
@@ -141,17 +143,14 @@ public class LogFragment extends ListFragment {
 					Code.INFORM | Extra.Inform.PULSE | Extra.Inform.RESPOND | Extra.Inform.URGENT,
 					Code.COMMAND,
 					Code.COMMAND | Extra.Command.LOCATE_NOW};
-			Boolean[] booleans = new Boolean[]{null, Boolean.FALSE, Boolean.TRUE};
-			Direction[] directions = new Direction[Direction.values().length+1];
-			for(int i = 0 ; i < Direction.values().length ; i++)
-				directions[i] = Direction.values()[i];
-			directions[directions.length-1] = null;
+			Status[] statuses = new Status[Status.values().length+1];
+			System.arraycopy(Status.values(), 0, statuses, 0, Status.values().length);
+			statuses[statuses.length-1] = null;
 			for(int i = 1 ; i <= 100 ; i++) {
 				mMockLog.add(new MessageLogRecord().setId((long)i).setContact(new Contact())
 						.setAddress("Address "+ i)
 						.setDate(new Date(System.currentTimeMillis() + i * 1000000))
-						.setDirection(directions[i%directions.length])
-						.setHasRead(booleans[i%booleans.length])
+						.setStatus(statuses[i % statuses.length])
 						.setMessage(new Message().setCode(codes[i % codes.length])
 						.setBody("Body " + i)));
 			}
@@ -249,31 +248,32 @@ public class LogFragment extends ListFragment {
 			} else {
 				holder.date.setVisibility(View.INVISIBLE);
 			}
-			// direction
-			if(record.getDirection() != null) {
+			// status (include direction)
+			if(record.getStatus() != null) {
+				//direction
 				holder.directon_icon.setVisibility(View.VISIBLE);
-				holder.directon_icon.setContentDescription(valueOfDirection(record.getDirection()));
-				if(record.getDirection() == Direction.SEND)
+				Direction dirct = record.getStatus().getDirection();
+				if(dirct == Direction.SEND)
 					holder.directon_icon.setImageResource(R.drawable.left);
-				else if(record.getDirection() == Direction.RECEIVE)
+				else if(dirct == Direction.RECEIVE)
 					holder.directon_icon.setImageResource(R.drawable.right);
 				else
-					throw new IllegalStateException("unknown Direction: "
-							+ record.getDirection().name());
+					throw new IllegalStateException("unknown Direction: " + dirct.name());
 			} else {
 				holder.directon_icon.setVisibility(View.INVISIBLE);
 			}
-			// has read or unread
-			if(record.hasRead() != null && record.hasRead()){
-				holder.unread_icon.setVisibility(View.INVISIBLE);
-				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem_Weak);
-				holder.parent.getBackground().setAlpha(100);
-			} else {
+			holder.directon_icon.setContentDescription(valueOfDirection(record.getStatus()));
+			// unread
+			if((record.getStatus() == Status.UNREAD)) {
 				holder.unread_icon.setVisibility(View.VISIBLE);
 				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem);
 				holder.parent.getBackground().setAlpha(255);
+			} else {
+				holder.unread_icon.setVisibility(View.INVISIBLE);
+				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem_Weak);
+				holder.parent.getBackground().setAlpha(100);
 			}
-			holder.unread_icon.setContentDescription(valueOfHasRead(record.hasRead()));
+			holder.unread_icon.setContentDescription(valueOfHasRead(record.getStatus()));
 		}
 		/**
 		 * 设置每项记录视图的颜色

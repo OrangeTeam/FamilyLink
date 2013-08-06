@@ -20,6 +20,35 @@ public class MessageLogRecord implements Cloneable {
 		RECEIVE
 	}
 	/**
+	 * 消息状态
+	 * @author Team Orange
+	 */
+	public enum Status {
+		/** 未读 */
+		UNREAD(Direction.RECEIVE),
+		/** 已读 */
+		HAVE_READ(Direction.RECEIVE),
+		/** 发送中 */
+		SENDING(Direction.SEND),
+		/** 已发送 */
+		SENT(Direction.SEND),
+		/** 已送达 */
+		DELIVERED(Direction.SEND),
+		/** 发送失败 */
+		FAILED_TO_SEND(Direction.SEND);
+
+		private final Direction mDirection;
+		private Status(Direction direction) {
+			this.mDirection = direction;
+		}
+		/**
+		 * @return 消息方向。如{@link Direction#SEND}
+		 */
+		public Direction getDirection() {
+			return mDirection;
+		}
+	}
+	/**
 	 * 本类的默认值，你可以通过它取得本类各字段的默认值。
 	 * <p><em>禁用此对象的Setters</em></p>
 	 */
@@ -56,14 +85,7 @@ public class MessageLogRecord implements Cloneable {
 		 * 禁用此方法
 		 */
 		@Override
-		public MessageLogRecord setDirection(Direction direction) {
-			throw new IllegalStateException("you cannot chang default value.");
-		}
-		/**
-		 * 禁用此方法
-		 */
-		@Override
-		public MessageLogRecord setHasRead(Boolean hasRead) {
+		public MessageLogRecord setStatus(Status status) {
 			throw new IllegalStateException("you cannot chang default value.");
 		}
 		/**
@@ -91,10 +113,12 @@ public class MessageLogRecord implements Cloneable {
 	private String mAddress = null;
 	/** 消息发送或接收时间 */
 	private Date mDate = null;
-	/** 消息方向 */
-	private Direction mDirection = null;
-	/** 已读。true表示已读，false表示未读，null表示未知（未设置） */
-	private Boolean mHasRead = null;
+	/**
+	 * 消息状态
+	 * <p>
+	 * <strong>Tips</strong>: 可以用{@link Status#getDirection()}得到消息方向
+	 */
+	private Status mStatus = null;
 	/** 消息内容 */
 	private Message mMessage = null;
 
@@ -164,31 +188,20 @@ public class MessageLogRecord implements Cloneable {
 		return this;
 	}
 	/**
-	 * @return 消息方向。如{@link Direction#SEND}
+	 * 取得消息状态
+	 * <p>
+	 * <strong>Tips</strong>: 可以用{@link Status#getDirection()}方法得到消息方向
+	 * @return 如果本条消息的状态
 	 */
-	public Direction getDirection() {
-		return mDirection;
+	public Status getStatus() {
+		return mStatus;
 	}
 	/**
-	 * @param direction 消息方向。如{@link Direction#SEND}
+	 * @param status 消息状态
 	 * @return this（用于链式调用）
 	 */
-	public MessageLogRecord setDirection(Direction direction) {
-		this.mDirection = direction;
-		return this;
-	}
-	/**
-	 * @return 如果本条消息已读，返回true；未读，返回false；null表示未设置或未知
-	 */
-	public Boolean hasRead() {
-		return mHasRead;
-	}
-	/**
-	 * @param hasRead 如果本条消息已读，应设为true；未读用false表示；null表示未设置
-	 * @return this（用于链式调用）
-	 */
-	public MessageLogRecord setHasRead(Boolean hasRead) {
-		this.mHasRead = hasRead;
+	public MessageLogRecord setStatus(Status status) {
+		this.mStatus = status;
 		return this;
 	}
 	/**
@@ -234,8 +247,7 @@ public class MessageLogRecord implements Cloneable {
 					&& Objects.compare(mContact, other.mContact)
 					&& Objects.compare(mAddress, other.mAddress)
 					&& Objects.compare(mDate, other.mDate)
-					&& Objects.compare(mDirection, other.mDirection)
-					&& Objects.compare(mHasRead, other.mHasRead)
+					&& Objects.compare(mStatus, other.mStatus)
 					&& Objects.compare(mMessage, other.mMessage);
 		}
 	}

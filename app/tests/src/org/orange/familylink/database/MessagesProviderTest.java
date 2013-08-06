@@ -6,6 +6,7 @@ import org.orange.familylink.data.Contact;
 import org.orange.familylink.data.Message;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.MessageLogRecord.Direction;
+import org.orange.familylink.data.MessageLogRecord.Status;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -26,14 +27,14 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 
 	//测试联系人时用的一些记录
 	private final MessageInfo[] TEST_MESSAGES = {
-			new MessageInfo("12345678900", true),
-			new MessageInfo("12345678900", false),
-			new MessageInfo("222-7135", true),
-			new MessageInfo("222-7135", false),
-			new MessageInfo("10086", true),
-			new MessageInfo("10086", false),
-			new MessageInfo("10000", true),
-			new MessageInfo("10000", false)
+			new MessageInfo("12345678900"),
+			new MessageInfo("12345678900"),
+			new MessageInfo("222-7135"),
+			new MessageInfo("222-7135"),
+			new MessageInfo("10086"),
+			new MessageInfo("10086"),
+			new MessageInfo("10000"),
+			new MessageInfo("10000")
 	};
 
 	//匹配全部的mime
@@ -80,7 +81,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 			mMessage.setCode(Code.EXTRA_BITS);
 			TEST_MESSAGES[i].setContactId(mContact);
 			TEST_MESSAGES[i].setTime(new Date(2013/8/5));
-			TEST_MESSAGES[i].setDirection(Direction.SEND);
+			TEST_MESSAGES[i].setStatus(Status.DELIVERED);
 			TEST_MESSAGES[i].setBody(mMessage);
 			TEST_MESSAGES[i].setCode(mMessage);
 			db.insertOrThrow(Contract.DATABASE_MESSAGES_TABLE, null, TEST_MESSAGES[i].getContentValues());
@@ -120,8 +121,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
         		Contract.Messages.COLUMN_NAME_CONTACT_ID,
         		Contract.Messages.COLUMN_NAME_ADDRESS,
         		Contract.Messages.COLUMN_NAME_TIME,
-        		Contract.Messages.COLUMN_NAME_READ,
-        		Contract.Messages.COLUMN_NAME_DIRECTION,
+        		Contract.Messages.COLUMN_NAME_STATUS,
         		Contract.Messages.COLUMN_NAME_BODY,
         		Contract.Messages.COLUMN_NAME_CODE
         };
@@ -217,8 +217,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 	    	   Contract.Messages._ID,
 	    	   Contract.Messages.COLUMN_NAME_CONTACT_ID,
 	    	   Contract.Messages.COLUMN_NAME_TIME,
-	    	   Contract.Messages.COLUMN_NAME_READ,
-	    	   Contract.Messages.COLUMN_NAME_DIRECTION,
+	    	   Contract.Messages.COLUMN_NAME_STATUS,
 	    	   Contract.Messages.COLUMN_NAME_BODY,
 	    	   Contract.Messages.COLUMN_NAME_CODE};
 
@@ -267,10 +266,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 	    }
 
 	public void testInserts() {
-        MessageInfo message = new MessageInfo(
-            "10086", 
-            true 
-        );
+        MessageInfo message = new MessageInfo("10086");
 
         Contact mContact = new Contact();
         mContact.setId((long)10);
@@ -279,7 +275,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
         mMessage.setCode(Code.EXTRA_BITS);
         message.setContactId(mContact);
         message.setTime(new Date(2013/8/5));
-        message.setDirection(Direction.RECEIVE);
+        message.setStatus(Status.DELIVERED);
         message.setBody(mMessage);
         message.setCode(mMessage);
 
@@ -305,16 +301,14 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
         int addressIndex = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_ADDRESS);
         int contactIdIndex = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CONTACT_ID);
         int timeIndex = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_TIME);
-        int readIndex = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_READ);
-        int directionIndex = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_DIRECTION);
+        int directionIndex = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_STATUS);
         int bodyIndex = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_BODY);
         int codeIndex = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE);
 
         assertEquals(message.address, cursor.getString(addressIndex));
         assertEquals(message.contactId, cursor.getLong(contactIdIndex));
         assertEquals(message.time, cursor.getLong(timeIndex));
-        assertTrue(cursor.getInt(readIndex)>0);
-        assertEquals(String.valueOf(message.direction), cursor.getString(directionIndex));
+        assertEquals(String.valueOf(message.status), cursor.getString(directionIndex));
         assertEquals(message.body, cursor.getString(bodyIndex));
         assertEquals(message.code, cursor.getInt(codeIndex));
 
@@ -387,7 +381,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 
         ContentValues values = new ContentValues();
 
-        values.put(Contract.Messages.COLUMN_NAME_READ, false);
+        values.put(Contract.Messages.COLUMN_NAME_STATUS, Status.SENT.toString());
 
         int rowsUpdated = mMockResolver.update(
         	Contract.Messages.MESSAGES_URI,
@@ -420,13 +414,11 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 		long contactId;
 		String address;
 		long time;
-		boolean read;
-		String direction;
+		String status;
 		String body;
 		int code;
-		public MessageInfo(String mAddress, boolean mRead){
+		public MessageInfo(String mAddress){
 			address = mAddress;
-			read = mRead;
 		}
 
 		void setContactId(Contact mContact){
@@ -437,8 +429,8 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 			time = mDate.getTime();
 		}
 
-		void setDirection(Direction mDirection){
-			direction = mDirection.toString();
+		void setStatus(Status mStatus){
+			status = mStatus.toString();
 		}
 
 		void setBody(Message mMessage){
@@ -454,8 +446,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 			v.put(Contract.Messages.COLUMN_NAME_CONTACT_ID, contactId);
 			v.put(Contract.Messages.COLUMN_NAME_ADDRESS, address);
 			v.put(Contract.Messages.COLUMN_NAME_TIME, time);
-			v.put(Contract.Messages.COLUMN_NAME_READ, read);
-			v.put(Contract.Messages.COLUMN_NAME_DIRECTION, direction);
+			v.put(Contract.Messages.COLUMN_NAME_STATUS, status);
 			v.put(Contract.Messages.COLUMN_NAME_BODY, body);
 			v.put(Contract.Messages.COLUMN_NAME_CODE, code);
 			return v;

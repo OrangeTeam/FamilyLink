@@ -3,6 +3,7 @@ package org.orange.familylink.data;
 import java.util.Date;
 
 import org.orange.familylink.data.MessageLogRecord.Direction;
+import org.orange.familylink.data.MessageLogRecord.Status;
 
 import junit.framework.TestCase;
 
@@ -27,8 +28,7 @@ public class MessageLogRecordTest extends TestCase {
 		assertNull(MessageLogRecord.mDefaultValue.getContact());
 		assertNull(MessageLogRecord.mDefaultValue.getAddress());
 		assertNull(MessageLogRecord.mDefaultValue.getDate());
-		assertNull(MessageLogRecord.mDefaultValue.getDirection());
-		assertNull(MessageLogRecord.mDefaultValue.hasRead());
+		assertNull(MessageLogRecord.mDefaultValue.getStatus());
 		assertNull(MessageLogRecord.mDefaultValue.getMessage());
 		MessageLogRecord defaultValue = MessageLogRecord.mDefaultValue;
 		try {
@@ -64,15 +64,7 @@ public class MessageLogRecordTest extends TestCase {
 			System.out.println(e.getMessage());
 		}
 		try {
-			defaultValue.setDirection(null);
-			fail( "Missing exception" );
-		} catch(Exception e) {
-			// Optionally make sure you get the correct Exception, too
-			assertTrue(e instanceof IllegalStateException);
-			System.out.println(e.getMessage());
-		}
-		try {
-			defaultValue.setHasRead(null);
+			defaultValue.setStatus(null);
 			fail( "Missing exception" );
 		} catch(Exception e) {
 			// Optionally make sure you get the correct Exception, too
@@ -155,34 +147,40 @@ public class MessageLogRecordTest extends TestCase {
 		mMessageLogRecord.setDate(null);
 		assertNull(mMessageLogRecord.getDate());
 	}
-	public void testDirection() {
-		Direction d;
-		d = Direction.RECEIVE;
-		mMessageLogRecord.setDirection(d);
-		assertEquals(d, mMessageLogRecord.getDirection());
+	public void testStatus() {
+		Status s;
+		s = Status.UNREAD;
+		mMessageLogRecord.setStatus(s);
+		assertEquals(s, mMessageLogRecord.getStatus());
+		assertEquals(Direction.RECEIVE, mMessageLogRecord.getStatus().getDirection());
 
-		d = Direction.SEND;
-		mMessageLogRecord.setDirection(d);
-		assertEquals(d, mMessageLogRecord.getDirection());
-		// 验证（伪） setDirection()是深拷贝
-		d = Direction.RECEIVE;
-		assertFalse(Direction.RECEIVE.equals(mMessageLogRecord.getDirection()));
+		s = Status.HAVE_READ;
+		mMessageLogRecord.setStatus(s);
+		assertEquals(s, mMessageLogRecord.getStatus());
+		assertEquals(Direction.RECEIVE, mMessageLogRecord.getStatus().getDirection());
 
-		d = null;
-		mMessageLogRecord.setDirection(d);
-		assertNull(mMessageLogRecord.getDirection());
-	}
-	public void testHasRead() {
-		Boolean hasRead = true;
-		mMessageLogRecord.setHasRead(hasRead);
-		assertEquals(hasRead, mMessageLogRecord.hasRead());
+		s = Status.SENDING;
+		mMessageLogRecord.setStatus(s);
+		assertEquals(s, mMessageLogRecord.getStatus());
+		assertEquals(Direction.SEND, mMessageLogRecord.getStatus().getDirection());
 
-		hasRead = false;
-		mMessageLogRecord.setHasRead(hasRead);
-		assertEquals(hasRead, mMessageLogRecord.hasRead());
+		s = Status.SENT;
+		mMessageLogRecord.setStatus(s);
+		assertEquals(s, mMessageLogRecord.getStatus());
+		assertEquals(Direction.SEND, mMessageLogRecord.getStatus().getDirection());
 
-		mMessageLogRecord.setHasRead(null);
-		assertNull(mMessageLogRecord.hasRead());
+		s = Status.DELIVERED;
+		mMessageLogRecord.setStatus(s);
+		assertEquals(s, mMessageLogRecord.getStatus());
+		assertEquals(Direction.SEND, mMessageLogRecord.getStatus().getDirection());
+
+		s = Status.FAILED_TO_SEND;
+		mMessageLogRecord.setStatus(s);
+		assertEquals(s, mMessageLogRecord.getStatus());
+		assertEquals(Direction.SEND, mMessageLogRecord.getStatus().getDirection());
+
+		mMessageLogRecord.setStatus(null);
+		assertNull(mMessageLogRecord.getStatus());
 	}
 	public void testMessage() {
 		Message m;
@@ -233,29 +231,26 @@ public class MessageLogRecordTest extends TestCase {
 		Contact contact = new Contact();
 		String address = "baijie1991@gmail.com";
 		Date date = new Date();
-		Direction direction = Direction.RECEIVE;
-		Boolean hasRead = true;
+		Status status = Status.DELIVERED;
 		Message message = new Message().setCode(Message.Code.INFORM).setBody(MessageTest.TEST_CASE_BODY);
 		mMessageLogRecord = new MessageLogRecord().setId(id).setContact(contact)
-				.setAddress(address).setDate(date).setDirection(direction)
-				.setHasRead(hasRead).setMessage(message);
+				.setAddress(address).setDate(date)
+				.setStatus(status).setMessage(message);
 		assertEquals(id, mMessageLogRecord.getId());
 		assertEquals(contact, mMessageLogRecord.getContact());
 		assertEquals(address, mMessageLogRecord.getAddress());
 		assertEquals(date, mMessageLogRecord.getDate());
-		assertEquals(direction, mMessageLogRecord.getDirection());
-		assertEquals(hasRead, mMessageLogRecord.hasRead());
+		assertEquals(status, mMessageLogRecord.getStatus());
 		assertEquals(message, mMessageLogRecord.getMessage());
 
 		mMessageLogRecord = new MessageLogRecord().setId(null).setContact(null)
-				.setAddress(null).setDate(null).setDirection(null)
-				.setHasRead(null).setMessage(null);
+				.setAddress(null).setDate(null)
+				.setStatus(null).setMessage(null);
 		assertNull(mMessageLogRecord.getId());
 		assertNull(mMessageLogRecord.getContact());
 		assertNull(mMessageLogRecord.getAddress());
 		assertNull(mMessageLogRecord.getDate());
-		assertNull(mMessageLogRecord.getDirection());
-		assertNull(mMessageLogRecord.hasRead());
+		assertNull(mMessageLogRecord.getStatus());
 		assertNull(mMessageLogRecord.getMessage());
 	}
 
@@ -282,11 +277,7 @@ public class MessageLogRecordTest extends TestCase {
 		assertFalse(mMessageLogRecord.equals(MessageLogRecord.mDefaultValue));
 
 		mMessageLogRecord = new MessageLogRecord();
-		mMessageLogRecord.setDirection(Direction.RECEIVE);
-		assertFalse(mMessageLogRecord.equals(MessageLogRecord.mDefaultValue));
-
-		mMessageLogRecord = new MessageLogRecord();
-		mMessageLogRecord.setHasRead(false);
+		mMessageLogRecord.setStatus(Status.FAILED_TO_SEND);
 		assertFalse(mMessageLogRecord.equals(MessageLogRecord.mDefaultValue));
 
 		mMessageLogRecord = new MessageLogRecord();
@@ -314,13 +305,12 @@ public class MessageLogRecordTest extends TestCase {
 		Contact contact = new Contact();
 		String address = "baijie1991@gmail.com";
 		Date date = new Date();
-		Direction direction = Direction.RECEIVE;
-		Boolean hasRead = true;
+		Status status = Status.HAVE_READ;
 		Message message = new Message().setBody(MessageTest.TEST_CASE_BODY)
 				.setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);
 		mMessageLogRecord.setId(id).setContact(contact)
-				.setAddress(address).setDate(date).setDirection(direction)
-				.setHasRead(hasRead).setMessage(message);
+				.setAddress(address).setDate(date)
+				.setStatus(status).setMessage(message);
 
 		MessageLogRecord record;
 
@@ -332,8 +322,8 @@ public class MessageLogRecordTest extends TestCase {
 		assertEquals(mMessageLogRecord, record);
 		// 修改拷贝件
 		record.clone().setId(4312435L).setContact(null)
-		.setAddress("fasdfadsf").setDate(new Date(4431534)).setDirection(Direction.SEND)
-		.setHasRead(false).setMessage(null);
+		.setAddress("fasdfadsf").setDate(new Date(4431534))
+		.setStatus(status).setMessage(null);
 		// 原对象不受影响
 		assertEquals(mMessageLogRecord, record);
 

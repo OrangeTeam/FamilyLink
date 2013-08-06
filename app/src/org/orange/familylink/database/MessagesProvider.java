@@ -48,8 +48,7 @@ public class MessagesProvider extends ContentProvider{
 			mMessagesProjectionMap.put(Contract.Messages.COLUMN_NAME_CONTACT_ID, Contract.Messages.COLUMN_NAME_CONTACT_ID);
 			mMessagesProjectionMap.put(Contract.Messages.COLUMN_NAME_ADDRESS, Contract.Messages.COLUMN_NAME_ADDRESS);
 			mMessagesProjectionMap.put(Contract.Messages.COLUMN_NAME_TIME, Contract.Messages.COLUMN_NAME_TIME);
-			mMessagesProjectionMap.put(Contract.Messages.COLUMN_NAME_READ, Contract.Messages.COLUMN_NAME_READ);
-			mMessagesProjectionMap.put(Contract.Messages.COLUMN_NAME_DIRECTION, Contract.Messages.COLUMN_NAME_DIRECTION);
+			mMessagesProjectionMap.put(Contract.Messages.COLUMN_NAME_STATUS, Contract.Messages.COLUMN_NAME_STATUS);
 			mMessagesProjectionMap.put(Contract.Messages.COLUMN_NAME_BODY, Contract.Messages.COLUMN_NAME_BODY);
 			mMessagesProjectionMap.put(Contract.Messages.COLUMN_NAME_CODE, Contract.Messages.COLUMN_NAME_CODE);
 		}
@@ -118,9 +117,9 @@ public class MessagesProvider extends ContentProvider{
 		}
 
 		/**
-		 * 对messages表的插入操作，数据库中messages表的各个字段（contactId long,address String,time long,read boolean,direction String,
+		 * 对messages表的插入操作，数据库中messages表的各个字段（contactId long,address String,time long,status String,
 		 * body String,code int）操作时应该注意数据的转换，contactId不是直接放入的是通过Contacts类中的getId方法得到的，time是Date.getTime()，
-		 * direction是要枚举类型转换为String型，body和code是从Messsages类中来的。
+		 * status是要枚举类型转换为String型，body和code是从Messsages类中来的。
 		 */
 		@Override
 		public Uri insert(Uri uri, ContentValues values) {
@@ -145,9 +144,9 @@ public class MessagesProvider extends ContentProvider{
 		}
 
 		/**
-		 * 对messages表的查询操作数据库中messages表的各个字段（contactId long,address String,time long,read boolean,direction String,
-		 * body String,code int）操作时应该注意数据的转换，得到的各个字段是要放到Contacts和Messages类中用的，那么time就要转换成Date，要注意的是read这个存储时
-		 * 是用boolean但应为sqlite3在实际把存成了int所以提取是要用getInt之后转成boolean，direction要转成枚举，因为这里返回的是Cursor所以操作要由调用者自己
+		 * 对messages表的查询操作数据库中messages表的各个字段（contactId long,address String,time long,status String,
+		 * body String,code int）操作时应该注意数据的转换，得到的各个字段是要放到Contacts和Messages类中用的，那么time就要转换成Date,
+		 * status要转成枚举，因为这里返回的是Cursor所以操作要由调用者自己
 		 * 转换，而数据库操作类中的放回是放到了相应的类中返回的，所以调用者没有转换操作。
 		 */
 		@Override
@@ -193,9 +192,9 @@ public class MessagesProvider extends ContentProvider{
 		}
 
 		/**
-		 * 对messages表的更新操作,数据库中messages表的各个字段（contactId long,address String,time long,read boolean,direction String,
+		 * 对messages表的更新操作,数据库中messages表的各个字段（contactId long,address String,time long,status String,
 		 * body String,code int）操作时应该注意数据的转换，contactId不是直接放入的是通过Contacts类中的getId方法得到的，time是Date.getTime()，
-		 * direction是要枚举类型转换为String型，body和code是从Messsages类中来的。
+		 * status是要枚举类型转换为String型，body和code是从Messsages类中来的。
 		 */
 		@Override
 		public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
