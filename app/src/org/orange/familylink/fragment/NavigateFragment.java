@@ -5,6 +5,7 @@ package org.orange.familylink.fragment;
 
 import org.orange.familylink.R;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.TextView;
  * 导航{@link Fragment}
  * @author Team Orange
  */
+
 public class NavigateFragment extends Fragment {
 
 	@Override

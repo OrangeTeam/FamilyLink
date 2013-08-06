@@ -2,6 +2,7 @@ package org.orange.familylink;
 
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
+import org.orange.familylink.fragment.LocationFragment;
 import org.orange.familylink.fragment.LogFragment;
 import org.orange.familylink.fragment.NavigateFragment;
 import org.orange.familylink.fragment.SeekHelpFragment;
@@ -52,9 +53,9 @@ public class MainActivity extends BaseActivity {
 	 */
 	protected void setPagersOrder(Role role) {
 		if(role == Role.CARER)
-			mPagersOrder = new int[]{R.string.log, R.string.seek_help, R.string.navigate};
+			mPagersOrder = new int[]{R.string.log, R.string.seek_help, R.string.navigate,R.string.location};
 		else if(role == Role.CAREE)
-			mPagersOrder = new int[]{R.string.seek_help, R.string.log, R.string.navigate};
+			mPagersOrder = new int[]{R.string.seek_help, R.string.log, R.string.navigate,R.string.location};
 		else
 			throw new IllegalArgumentException("ilegal role: " + role);
 		mRole = role;
@@ -153,6 +154,8 @@ public class MainActivity extends BaseActivity {
 				return new LogFragment();
 			case R.string.navigate:
 				return new NavigateFragment();
+			case R.string.location:
+				return new LocationFragment();
 			}
 			throw new IllegalArgumentException("illegal position: " + position);
 		}
