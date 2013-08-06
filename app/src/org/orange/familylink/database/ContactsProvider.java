@@ -39,8 +39,8 @@ public class ContactsProvider extends ContentProvider {
 		//UriMatcher类的实例化
 		mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		//添加uri与常量进行匹配
-		mUriMatcher.addURI(Contract.AUTHORITY, "contacts", CONTACTS);
-		mUriMatcher.addURI(Contract.AUTHORITY, "contacts/#", CONTACT_ID);
+		mUriMatcher.addURI(Contract.Contacts.AUTHORITY, "contacts", CONTACTS);
+		mUriMatcher.addURI(Contract.Contacts.AUTHORITY, "contacts/#", CONTACT_ID);
 
 		//查询映射的添加
 		mContactsProjectionMap = new HashMap<String, String>();

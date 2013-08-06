@@ -39,7 +39,7 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 	 * 构造方法告诉测试类要测试的父类和权威路径
 	 */
 	public ContactsProviderTest() {
-		super(ContactsProvider.class, Contract.AUTHORITY);
+		super(ContactsProvider.class, Contract.Contacts.AUTHORITY);
 	}
 
 	/**

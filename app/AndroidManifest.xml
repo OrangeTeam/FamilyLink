@@ -7,7 +7,7 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="18" />
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />  
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -15,12 +15,14 @@
         android:theme="@style/AppTheme" >
 
         <provider android:name="org.orange.familylink.database.ContactsProvider"
-            android:authorities="org.orange.familylink.provider"
-            android:exported="false">
+            android:authorities="org.orange.familylink.provider.contactsprovider"
+            android:exported="false"
+            android:multiprocess="true">
         </provider>
         <provider android:name="org.orange.familylink.database.MessagesProvider"
-            android:authorities="org.orange.familylink.provider"
-            android:exported="false">
+            android:authorities="org.orange.familylink.provider.messagesprovider"
+            android:exported="false"
+            android:multiprocess="true">
         </provider>
         <!-- The main/home activity (has no parent activity) -->
         <activity

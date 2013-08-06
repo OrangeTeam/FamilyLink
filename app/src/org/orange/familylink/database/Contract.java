@@ -11,8 +11,6 @@ import android.provider.BaseColumns;
 public class Contract {
 	//scheme为uri中的头部，已由android规定
 	public static final String SCHEME = "content://";
-	//authority为uri中主机地址
-	public static final String AUTHORITY = "org.orange.familylink.provider";
 
 	//数据库名字
 	public static final String DATABASE_NAME = "familylink.db";
@@ -33,6 +31,8 @@ public class Contract {
 	public static final  class Contacts implements BaseColumns{
 		//防止实例化
 		private Contacts(){}
+		//authority为uri中主机地址
+		public static final String AUTHORITY = "org.orange.familylink.provider.contactsprovider";
 		//这是uri中contacts表的路径
 		private static final String PATH_CONTACTS = "/contacts";
 		//这是uri中contacts表中的记录的路径
@@ -66,6 +66,8 @@ public class Contract {
 	public static final class Messages implements BaseColumns{
 		//防止实例化
 		private Messages(){}
+		//authority为uri中主机地址
+		public static final String AUTHORITY = "org.orange.familylink.provider.messagesprovider";
 		//uri中messages表的路径
 		public static final String PATH_MESSAGES = "/messages";
 		//uri中messages表的记录的路径

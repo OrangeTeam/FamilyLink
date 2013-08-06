@@ -48,7 +48,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 	 * 构造方法告诉测试类要测试的父类和权威路径
 	 */
 	public MessagesProviderTest() {
-		super(MessagesProvider.class, Contract.AUTHORITY);
+		super(MessagesProvider.class, Contract.Messages.AUTHORITY);
 	}
 
 	/**
@@ -381,7 +381,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 
         ContentValues values = new ContentValues();
 
-        values.put(Contract.Messages.COLUMN_NAME_STATUS, Status.SENT.toString());
+        values.put(Contract.Messages.COLUMN_NAME_STATUS, Status.SENT.name());
 
         int rowsUpdated = mMockResolver.update(
         	Contract.Messages.MESSAGES_URI,
@@ -430,7 +430,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 		}
 
 		void setStatus(Status mStatus){
-			status = mStatus.toString();
+			status = mStatus.name();
 		}
 
 		void setBody(Message mMessage){

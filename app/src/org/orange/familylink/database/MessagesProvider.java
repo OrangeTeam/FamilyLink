@@ -39,8 +39,8 @@ public class MessagesProvider extends ContentProvider{
 			//UriMatcher类的实例化
 			mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 			//添加uri与常量进行匹配
-			mUriMatcher.addURI(Contract.AUTHORITY, "messages", MESSAGES);
-			mUriMatcher.addURI(Contract.AUTHORITY, "messages/#", MESSAGE_ID);
+			mUriMatcher.addURI(Contract.Messages.AUTHORITY, "messages", MESSAGES);
+			mUriMatcher.addURI(Contract.Messages.AUTHORITY, "messages/#", MESSAGE_ID);
 
 			//查询映射的添加
 			mMessagesProjectionMap = new HashMap<String, String>();

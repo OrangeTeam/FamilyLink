@@ -177,7 +177,7 @@ public class FamilyLinkDBAdapter {
 		contentValues.put(Contract.Messages.COLUMN_NAME_CONTACT_ID, messageLogRecord.getContact().getId());
 		contentValues.put(Contract.Messages.COLUMN_NAME_ADDRESS, messageLogRecord.getAddress());
 		contentValues.put(Contract.Messages.COLUMN_NAME_TIME, messageLogRecord.getDate().getTime());
-		contentValues.put(Contract.Messages.COLUMN_NAME_STATUS, messageLogRecord.getStatus().toString());
+		contentValues.put(Contract.Messages.COLUMN_NAME_STATUS, messageLogRecord.getStatus().name());
 		contentValues.put(Contract.Messages.COLUMN_NAME_BODY, messageLogRecord.getMessage().getBody());
 		contentValues.put(Contract.Messages.COLUMN_NAME_CODE, messageLogRecord.getMessage().getCode());
 		db.insert(Contract.DATABASE_MESSAGES_TABLE, null, contentValues);
@@ -194,7 +194,7 @@ public class FamilyLinkDBAdapter {
 			contentValues.put(Contract.Messages.COLUMN_NAME_CONTACT_ID, aMessageLogRecord.getContact().getId());
 			contentValues.put(Contract.Messages.COLUMN_NAME_ADDRESS, aMessageLogRecord.getAddress());
 			contentValues.put(Contract.Messages.COLUMN_NAME_TIME, aMessageLogRecord.getDate().getTime());
-			contentValues.put(Contract.Messages.COLUMN_NAME_STATUS, aMessageLogRecord.getStatus().toString());
+			contentValues.put(Contract.Messages.COLUMN_NAME_STATUS, aMessageLogRecord.getStatus().name());
 			contentValues.put(Contract.Messages.COLUMN_NAME_BODY, aMessageLogRecord.getMessage().getBody());
 			contentValues.put(Contract.Messages.COLUMN_NAME_CODE, aMessageLogRecord.getMessage().getCode());
 			db.insert(Contract.DATABASE_MESSAGES_TABLE, null, contentValues);
@@ -311,8 +311,8 @@ public class FamilyLinkDBAdapter {
 			contentValues.clear();
 		}
 		if(cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_STATUS))
-				.equals(messageLogRecord.getStatus().toString())){
-			contentValues.put(Contract.Messages.COLUMN_NAME_STATUS, messageLogRecord.getStatus().toString());
+				.equals(messageLogRecord.getStatus().name())){
+			contentValues.put(Contract.Messages.COLUMN_NAME_STATUS, messageLogRecord.getStatus().name());
 			db.update(Contract.DATABASE_MESSAGES_TABLE, contentValues, Contract.Messages._ID + " = " + mId, null);
 			contentValues.clear();
 		}
