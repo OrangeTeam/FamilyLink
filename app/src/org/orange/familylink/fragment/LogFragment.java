@@ -3,27 +3,28 @@
  */
 package org.orange.familylink.fragment;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 import org.orange.familylink.R;
-import org.orange.familylink.data.Contact;
-import org.orange.familylink.data.Message;
 import org.orange.familylink.data.Message.Code;
-import org.orange.familylink.data.Message.Code.Extra;
-import org.orange.familylink.data.MessageLogRecord;
 import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.MessageLogRecord.Status;
+import org.orange.familylink.database.Contract;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.LayoutParams;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,6 +34,8 @@ import android.widget.TextView;
  * @author Team Orange
  */
 public class LogFragment extends ListFragment {
+	// This is the Adapter being used to display the list's data.
+	CursorAdapter mAdapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,9 +49,32 @@ public class LogFragment extends ListFragment {
 		space.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, margin));
 		listView.addHeaderView(space, null, false);
 		listView.addFooterView(space, null, false);
-
-		setListAdapter(new MockLogAdapter(getActivity()));
 		return view;
+	}
+
+	/* (non-Javadoc)
+	 * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
+	 */
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+		// Give some text to display if there is no data.
+		setEmptyText(getResources().getText(R.string.no_message_record));
+
+		// We have a menu item to show in action bar.
+		setHasOptionsMenu(true);
+
+		// Create an empty adapter we will use to display the loaded data.
+		mAdapter = new LogAdapter(getActivity(), null, 0);
+		setListAdapter(mAdapter);
+
+		// Start out with a progress indicator.
+		setListShown(false);
+
+		// Prepare the loader.  Either re-connect with an existing one,
+		// or start a new one.
+		getLoaderManager().initLoader(0, null, mLoaderCallbacks);
 	}
 
 	private int getImportantCode(Integer code) {
@@ -131,128 +157,120 @@ public class LogFragment extends ListFragment {
 			return "";
 	}
 
-	private class MockLogAdapter extends BaseAdapter {
-		private final ArrayList<MessageLogRecord> mMockLog = new ArrayList<MessageLogRecord>();
-		{
-			int[] codes = new int[]{Code.INFORM,
-					Code.INFORM | Extra.Inform.PULSE, Code.INFORM | Extra.Inform.RESPOND,
-					Code.INFORM | Extra.Inform.URGENT,
-					Code.INFORM | Extra.Inform.PULSE | Extra.Inform.RESPOND,
-					Code.INFORM | Extra.Inform.PULSE | Extra.Inform.URGENT,
-					Code.INFORM | Extra.Inform.RESPOND | Extra.Inform.URGENT,
-					Code.INFORM | Extra.Inform.PULSE | Extra.Inform.RESPOND | Extra.Inform.URGENT,
-					Code.COMMAND,
-					Code.COMMAND | Extra.Command.LOCATE_NOW};
-			Status[] statuses = new Status[Status.values().length+1];
-			System.arraycopy(Status.values(), 0, statuses, 0, Status.values().length);
-			statuses[statuses.length-1] = null;
-			for(int i = 1 ; i <= 100 ; i++) {
-				mMockLog.add(new MessageLogRecord().setId((long)i).setContact(new Contact())
-						.setAddress("Address "+ i)
-						.setDate(new Date(System.currentTimeMillis() + i * 1000000))
-						.setStatus(statuses[i % statuses.length])
-						.setMessage(new Message().setCode(codes[i % codes.length])
-						.setBody("Body " + i)));
+	protected final LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderCallbacks<Cursor>() {
+		@Override
+		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			// This class only has one Loader, so we don't care about the ID.
+			// First, pick the base URI to use depending on whether we are
+			// currently filtering.
+			Uri baseUri = null;
+//			if (mFilter != null) {
+//				baseUri = Uri.withAppendedPath(People.CONTENT_FILTER_URI, Uri.encode(mFilter));
+//			} else {
+			baseUri = Contract.Messages.MESSAGES_URI;
+//			}
+
+			String sortOrder = Contract.Messages.COLUMN_NAME_TIME + " DESC";
+			// Now create and return a CursorLoader that will take care of
+			// creating a Cursor for the data being displayed.
+			return new CursorLoader(getActivity(), baseUri, null, null, null, sortOrder);
+		}
+
+		@Override
+		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+			// Swap the new cursor in.  (The framework will take care of closing the
+			// old cursor once we return.)
+			mAdapter.swapCursor(data);
+
+			// The list should now be shown.
+			if (isResumed()) {
+				setListShown(true);
+			} else {
+				setListShownNoAnimation(true);
 			}
 		}
 
-		private Context mContext;
-		private DateFormat mDateFormat;
-		private DateFormat mTimeFormat;
-		private LayoutInflater mInflater;
+		@Override
+		public void onLoaderReset(Loader<Cursor> loader) {
+			// This is called when the last Cursor provided to onLoadFinished()
+			// above is about to be closed.  We need to make sure we are no
+			// longer using it.
+			mAdapter.swapCursor(null);
+		}
+	};
 
-		public MockLogAdapter(Context context) {
-			// Cache the LayoutInflate to avoid asking for a new one each time.
+	protected class LogAdapter extends CursorAdapter {
+		private final Context mContext;
+		private final LayoutInflater mInflater;
+
+		public LogAdapter(Context context, Cursor c, int flags) {
+			super(context, c, flags);
 			mContext = context;
 			mInflater = LayoutInflater.from(context);
-			mDateFormat = android.text.format.DateFormat.getDateFormat(context);
-			mTimeFormat = android.text.format.DateFormat.getTimeFormat(context);
 		}
 
 		@Override
-		public int getCount() {
-			return mMockLog.size();
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			View rootView = mInflater.inflate(R.layout.fragment_log_list_item, parent, false);
+			// Creates a ViewHolder and store references to the two children views
+			// we want to bind data to.
+			ViewHolder holder = new ViewHolder();
+			holder.code = (TextView) rootView.findViewById(R.id.code);
+			holder.code_extra = (TextView) rootView.findViewById(R.id.code_extra);
+			holder.body = (TextView) rootView.findViewById(R.id.body);
+			holder.contact_name = (TextView) rootView.findViewById(R.id.contact_name);
+			holder.address = (TextView) rootView.findViewById(R.id.address);
+			holder.date = (TextView) rootView.findViewById(R.id.date);
+			holder.directon_icon = (ImageView) rootView.findViewById(R.id.direction_icon);
+			holder.unread_icon = (ImageView) rootView.findViewById(R.id.unread_icon);
+			rootView.setTag(holder);
+			return rootView;
 		}
 
 		@Override
-		public MessageLogRecord getItem(int position) {
-			return mMockLog.get(position);
-		}
+		public void bindView(View view, Context context, Cursor cursor) {
+			long contactId = cursor.getLong(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CONTACT_ID));
+			String address = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_ADDRESS));
+			long time = cursor.getLong(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_TIME));
+			Date date = null;
+			if(time != 0)
+				date = new Date(time);
+			String statusString = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_STATUS));
+			Status status = Status.valueOf(statusString);
+			String body = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_BODY));
+			int code = cursor.getInt(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE));
 
-		@Override
-		public long getItemId(int position) {
-			return mMockLog.get(position).getId();
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			// A ViewHolder keeps references to children views to avoid unneccessary calls
-			// to findViewById() on each row.
-			ViewHolder holder;
-			// When convertView is not null, we can reuse it directly, there is no need
-			// to reinflate it. We only inflate a new View when the convertView supplied
-			// by ListView is null.
-			if(convertView == null) {
-				convertView = mInflater.inflate(R.layout.fragment_log_list_item, parent, false);
-				// Creates a ViewHolder and store references to the two children views
-				// we want to bind data to.
-				holder = new ViewHolder();
-				holder.parent = convertView;
-				holder.code = (TextView) convertView.findViewById(R.id.code);
-				holder.code_extra = (TextView) convertView.findViewById(R.id.code_extra);
-				holder.body = (TextView) convertView.findViewById(R.id.body);
-				holder.contact_name = (TextView) convertView.findViewById(R.id.contact_name);
-				holder.address = (TextView) convertView.findViewById(R.id.address);
-				holder.date = (TextView) convertView.findViewById(R.id.date);
-				holder.directon_icon = (ImageView) convertView.findViewById(R.id.direction_icon);
-				holder.unread_icon = (ImageView) convertView.findViewById(R.id.unread_icon);
-
-				convertView.setTag(holder);
-			} else {
-				// Get the ViewHolder back to get fast access to the TextView
-				holder = (ViewHolder) convertView.getTag();
-			}
-			// Bind the data efficiently with the holder.
-			bindView(position, holder);
-			return convertView;
-		}
-		/**
-		 * 把每项记录的数据绑定到其视图上
-		 * @param position 记录位置
-		 * @param holder 视图的{@link ViewHolder}
-		 */
-		private void bindView(int position, ViewHolder holder) {
-			MessageLogRecord record = mMockLog.get(position);
+			ViewHolder holder = (ViewHolder) view.getTag();
 			// message code
-			holder.code.setText(valueOfCode(record.getMessageToSet().getCode()));
-			holder.code_extra.setText(valueOfCodeExtra(record.getMessageToSet().getCode(), " | "));
-			setViewColor(position, holder);
+			holder.code.setText(valueOfCode(code));
+			holder.code_extra.setText(valueOfCodeExtra(code, " | "));
+			setViewColor(code, view);
 			// message body
-			if(record.getMessageToSet().getBody() != null)
-				holder.body.setText(record.getMessageToSet().getBody());
+			if(body != null)
+				holder.body.setText(body);
 			else
 				holder.body.setText("");
 			//TODO 联系人
 //			holder.contact_name.setText(record.getContact().toString());
-			holder.contact_name.setText("People Name " + position);
+			holder.contact_name.setText("People ID " + contactId);
 			// address
-			if(record.getAddress() != null)
-				holder.address.setText(record.getAddress());
+			if(address != null)
+				holder.address.setText(address);
 			else
 				holder.address.setText(R.string.unknown);
 			// date
-			if(record.getDate() != null) {
+			if(date != null) {
 				holder.date.setVisibility(View.VISIBLE);
-				holder.date.setText(mDateFormat.format(record.getDate())
-						+ " " + mTimeFormat.format(record.getDate()));
+				holder.date.setText(DateFormat.getDateFormat(mContext).format(date)
+						+ " " + DateFormat.getTimeFormat(mContext).format(date));
 			} else {
 				holder.date.setVisibility(View.INVISIBLE);
 			}
 			// status (include direction)
-			if(record.getStatus() != null) {
+			if(status != null) {
 				//direction
 				holder.directon_icon.setVisibility(View.VISIBLE);
-				Direction dirct = record.getStatus().getDirection();
+				Direction dirct = status.getDirection();
 				if(dirct == Direction.SEND)
 					holder.directon_icon.setImageResource(R.drawable.left);
 				else if(dirct == Direction.RECEIVE)
@@ -262,25 +280,25 @@ public class LogFragment extends ListFragment {
 			} else {
 				holder.directon_icon.setVisibility(View.INVISIBLE);
 			}
-			holder.directon_icon.setContentDescription(valueOfDirection(record.getStatus()));
+			holder.directon_icon.setContentDescription(valueOfDirection(status));
 			// unread
-			if((record.getStatus() == Status.UNREAD)) {
+			if((status == Status.UNREAD)) {
 				holder.unread_icon.setVisibility(View.VISIBLE);
 				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem);
-				holder.parent.getBackground().setAlpha(255);
+				view.getBackground().setAlpha(255);
 			} else {
 				holder.unread_icon.setVisibility(View.INVISIBLE);
 				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem_Weak);
-				holder.parent.getBackground().setAlpha(100);
+				view.getBackground().setAlpha(100);
 			}
-			holder.unread_icon.setContentDescription(valueOfHasRead(record.getStatus()));
+			holder.unread_icon.setContentDescription(valueOfHasRead(status));
 		}
 		/**
 		 * 设置每项记录视图的颜色
 		 */
-		private void setViewColor(int position, ViewHolder holder) {
+		private void setViewColor(Integer code, View rootView) {
 			Integer colorResId = null;
-			switch(getImportantCode(mMockLog.get(position).getMessageToSet().getCode())) {
+			switch(getImportantCode(code)) {
 				case R.string.urgent:
 					colorResId = R.color.urgent;
 					break;
@@ -293,7 +311,7 @@ public class LogFragment extends ListFragment {
 				default:
 					colorResId = R.color.other_code;
 			}
-			holder.parent.setBackgroundColor(getResources().getColor(colorResId));
+			rootView.setBackgroundColor(getResources().getColor(colorResId));
 		}
 		/**
 		 * 设置文字显示效果（颜色、大小等）
@@ -315,8 +333,6 @@ public class LogFragment extends ListFragment {
 		 * @author Team Orange
 		 */
 		private class ViewHolder {
-			View parent;
-
 			TextView code;
 			TextView code_extra;
 			TextView body;

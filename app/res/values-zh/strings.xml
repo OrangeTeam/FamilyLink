@@ -13,6 +13,7 @@
     <string name="unknown">未知</string>
     <string name="undefined">未定义</string>
     <!-- Log -->
+    <string name="no_message_record">无过往消息记录</string>
     <string name="illegal_code">非法代码：%d</string>
     <string name="inform">通告</string>
     <string name="command">命令</string>
@@ -20,6 +21,7 @@
     <string name="pulse">定时消息</string>
     <string name="urgent">紧急消息</string>
     <string name="locate_now">现在定位</string>
+
     <string name="send">发送 </string>
     <string name="receive">接收</string>
     <string name="has_read">已读</string>
