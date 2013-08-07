@@ -3,7 +3,13 @@
  */
 package org.orange.familylink.data;
 
+import org.orange.familylink.database.Contract.Messages;
+import org.orange.familylink.sms.SmsSender;
 import org.orange.familylink.util.Objects;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.net.Uri;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -250,6 +256,29 @@ public class Message implements Cloneable{
 	 */
 	public static Message fromJson(String json) {
 		return new Gson().fromJson(json, Message.class);
+	}
+
+	/**
+	 * 发送本消息
+	 * <p>
+	 * <strong>注意：</strong><em>不</em> 应在UI线程调用本方法
+	 * @param context 上下文环境
+	 * @param contactId 联系人{@link Messages#COLUMN_NAME_CONTACT_ID ID}
+	 * @param dest 发送目的{@link Messages#COLUMN_NAME_ADDRESS 地址}
+	 * @param password 要发送信息的加密密码
+	 */
+	public void send(Context context, Long contactId , String dest, String password) {
+		Uri newUri = null;
+		ContentValues newMessage = new ContentValues();
+		newMessage.put(Messages.COLUMN_NAME_CONTACT_ID, contactId);
+		newMessage.put(Messages.COLUMN_NAME_ADDRESS, dest);
+		newMessage.put(Messages.COLUMN_NAME_TIME, System.currentTimeMillis());
+		newMessage.put(Messages.COLUMN_NAME_STATUS, MessageLogRecord.Status.SENDING.name());
+		newMessage.put(Messages.COLUMN_NAME_BODY, getBody());
+		newMessage.put(Messages.COLUMN_NAME_CODE, getCode());
+		newUri = context.getContentResolver().insert(Messages.MESSAGES_URI, newMessage);
+		//TODO 加密Body
+		SmsSender.sendMessage(context, newUri, toJson(), dest);
 	}
 
 	/**
