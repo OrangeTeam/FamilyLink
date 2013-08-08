@@ -3,7 +3,9 @@
  */
 package org.orange.familylink.fragment;
 
+
 import org.orange.familylink.R;
+import org.orange.familylink.data.Position;
 import org.orange.familylink.location.LocationInfo;
 
 import android.content.Context;
@@ -27,13 +29,15 @@ public class LocationFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_location_test, container, false);
 		text = (TextView) view.findViewById(R.id.locationText);
+		
 		Context cont = view.getContext();
 		//通过context的getSystemService来实例化LocationManager
 		LocationManager locationManager = (LocationManager) cont.getSystemService(Context.LOCATION_SERVICE);
 		//实例化定位的操作类LocationInfo，把LocationMnager当做参数传入。
-		LocationInfo locationInfo = new LocationInfo(locationManager, 10000);
+		LocationInfo locationInfo = new LocationInfo(locationManager, 1000);
+		Position po =locationInfo.getCurrentLocationInfo() ;
 		//通过locationInfo的getCurrentLocationInfo方法获得当前位置信息，返回Postion对象，转换为String输出
-		text.setText(locationInfo.getCurrentLocationInfo().toString());
+		text.setText(po.toString());
 		return view;
 	}
 
