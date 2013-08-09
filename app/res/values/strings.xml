@@ -21,9 +21,29 @@
     <string name="pulse">pulse</string>
     <string name="urgent">urgent</string>
     <string name="locate_now">locate now</string>
+    <string-array name="code">
+        <item>@string/inform</item>
+        <item>@string/pulse</item>
+        <item>@string/urgent</item>
+        <item>@string/command</item>
+    </string-array>
 
     <string name="send">send</string>
     <string name="receive">receive</string>
     <string name="has_read">read</string>
     <string name="unread">unread</string>
+    <string name="sending">sending</string>
+    <string name="sent">sent</string>
+    <string name="delivered">delivered</string>
+    <string name="failed_to_send">failed to send</string>
+    <string-array name="message_status">
+        <item>@string/receive</item>
+        <item>@string/unread</item>
+        <item>@string/has_read</item>
+        <item>@string/send</item>
+        <item>@string/sending</item>
+        <item>@string/sent</item>
+        <item>@string/delivered</item>
+        <item>@string/failed_to_send</item>
+    </string-array>
 </resources>

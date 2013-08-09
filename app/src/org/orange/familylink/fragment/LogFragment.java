@@ -25,8 +25,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.LayoutParams;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 /**
@@ -34,22 +37,44 @@ import android.widget.TextView;
  * @author Team Orange
  */
 public class LogFragment extends ListFragment {
-	// This is the Adapter being used to display the list's data.
-	CursorAdapter mAdapter;
+	/** the Adapter being used to display the list's data. */
+	private CursorAdapter mAdapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = super.onCreateView(inflater, container, savedInstanceState);
+		// 因为super.onCreateView没有使用android.R.layout.list_content布局文件，
+		// 我们也无法按此方法的文档说明来include list_content，
+		// 只能在这用代码继承布局，以保留其内建indeterminant progress state
+
+		// 创建自定义布局，把原来的root作为新布局的子元素
+		View originalRoot = super.onCreateView(inflater, container, savedInstanceState);
+
+		LinearLayout root = new LinearLayout(getActivity());
+		root.setOrientation(LinearLayout.VERTICAL);
+		// ------------------------------------------------------------------
+		// 添加 原来的root
+		root.addView(originalRoot, new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				1));
+		// ------------------------------------------------------------------
+		// 添加 筛选条件输入部件
+		root.addView(createFilterWidget(), new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				0));
+		// ------------------------------------------------------------------
+
 		// 按照Android设计指导，设置上下margin
 		// http://developer.android.com/design/style/metrics-grids.html
-		ListView listView = (ListView) view.findViewById(android.R.id.list);
+		ListView listView = (ListView) originalRoot.findViewById(android.R.id.list);
 		int margin = getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
 		View space = new View(getActivity());
 		space.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, margin));
 		listView.addHeaderView(space, null, false);
 		listView.addFooterView(space, null, false);
-		return view;
+		return root;
 	}
 
 	/* (non-Javadoc)
@@ -75,6 +100,59 @@ public class LogFragment extends ListFragment {
 		// Prepare the loader.  Either re-connect with an existing one,
 		// or start a new one.
 		getLoaderManager().initLoader(0, null, mLoaderCallbacks);
+	}
+
+	/**
+	 * 创建筛选条件输入部件
+	 * @return 新创建的筛选条件输入部件
+	 */
+	protected View createFilterWidget() {
+		LinearLayout spinnersContainer = new LinearLayout(getActivity());
+		spinnersContainer.setOrientation(LinearLayout.HORIZONTAL);
+
+		Spinner spinner1 = new Spinner(getActivity());
+		// Create an ArrayAdapter using the string array and a default spinner layout
+		String[] status = getResources().getStringArray(R.array.message_status);
+		if(status.length != 8)
+			throw new IllegalStateException("Unexpected number of status. " +
+					"Maybe because you only update on one place");
+		for(int i = 1 ; i < status.length ; i++)
+			if(i != 3) status[i] = "\t" + status[i];
+		ArrayAdapter<String> adapter =
+				new ArrayAdapter<String>(getActivity(),
+						android.R.layout.simple_spinner_item,
+						status);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner1.setAdapter(adapter);
+		spinnersContainer.addView(spinner1, new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.MATCH_PARENT,
+				1));
+
+		Spinner spinner2 = new Spinner(getActivity());
+		String[] code = getResources().getStringArray(R.array.code);
+		if(code.length != 4)
+			throw new IllegalStateException("Unexpected number of code. " +
+					"Maybe because you only update on one place");
+		code[1] = "\t" + code[1];
+		code[2] = "\t" + code[2];
+		adapter = new ArrayAdapter<String>(getActivity(),
+						android.R.layout.simple_spinner_item,
+						code);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner2.setAdapter(adapter);
+		spinnersContainer.addView(spinner2, new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.MATCH_PARENT,
+				1));
+
+		Spinner spinner3 = new Spinner(getActivity());
+		//TODO apinner3的Adapter
+		spinnersContainer.addView(spinner3, new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.MATCH_PARENT,
+				1));
+		return spinnersContainer;
 	}
 
 	private int getImportantCode(Integer code) {
