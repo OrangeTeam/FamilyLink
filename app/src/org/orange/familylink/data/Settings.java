@@ -13,9 +13,15 @@ import android.preference.RingtonePreference;
  */
 public class Settings {
 	/**
+	 * 设置项key：密码
+	 * <p>
+	 * Type：String
+	 */
+	public static final String PREF_KEY_PASSWORD = "password";
+	/**
 	 * 设置项key：角色
 	 * <p>
-	 * Type：Sting
+	 * Type：String
 	 * <p>
 	 * "1" for Carer, "0" for Caree
 	 */
@@ -68,6 +74,15 @@ public class Settings {
 		CAREE
 	}
 
+	/**
+	 * 获取 密码
+	 * @param context 应用全局信息
+	 * @return 密码；null表示尚未设置密码
+	 */
+	public static String getPassword(Context context) {
+		return PreferenceManager.getDefaultSharedPreferences(context)
+				.getString(PREF_KEY_PASSWORD, null);
+	}
 	/**
 	 * 获取 用户角色
 	 * @param context 上下文环境
