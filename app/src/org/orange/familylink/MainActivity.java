@@ -6,6 +6,7 @@ import org.orange.familylink.fragment.LocationFragment;
 import org.orange.familylink.fragment.LogFragment;
 import org.orange.familylink.fragment.NavigateFragment;
 import org.orange.familylink.fragment.SeekHelpFragment;
+import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -26,6 +27,14 @@ import android.support.v7.app.ActionBar.Tab;
  * @author Team Orange
  */
 public class MainActivity extends BaseActivity {
+	// 用string ID表示页面及其顺序
+	/** 照料者的页面及其顺序 */
+	private static final int[] PAGERS_ORDER_CARER =
+			new int[]{R.string.log, R.string.seek_help, R.string.navigate,R.string.location};
+	/** 受顾者的页面及其顺序 */
+	private static final int[] PAGERS_ORDER_CAREE =
+			new int[]{R.string.seek_help, R.string.log, R.string.navigate,R.string.location};
+
 	private ViewPager mViewPager;
 	private Role mRole;
 	private int[] mPagersOrder;
@@ -53,9 +62,23 @@ public class MainActivity extends BaseActivity {
 	 */
 	protected void setPagersOrder(Role role) {
 		if(role == Role.CARER)
-			mPagersOrder = new int[]{R.string.log, R.string.seek_help, R.string.navigate,R.string.location};
+			mPagersOrder = PAGERS_ORDER_CARER;
 		else if(role == Role.CAREE)
-			mPagersOrder = new int[]{R.string.seek_help, R.string.log, R.string.navigate,R.string.location};
+			mPagersOrder = PAGERS_ORDER_CAREE;
+		else if(role == null) {
+			// 还没有配置用户角色， 现在配置
+			mPagersOrder = PAGERS_ORDER_CAREE;	// 设置默认的临时页面顺序
+			// 弹出对话框
+			InitialSetupDialogFragment dialog = new InitialSetupDialogFragment();
+			dialog.setOnClickListener(new InitialSetupDialogFragment.OnClickListener() {
+				@Override
+				public void onClickPositiveButton(InitialSetupDialogFragment dialog,
+						Role newRole, String newPassword) {
+					changePagersOrderIfNecessary();
+				}
+			});
+			dialog.show(getSupportFragmentManager(), null);
+		}
 		else
 			throw new IllegalArgumentException("ilegal role: " + role);
 		mRole = role;
@@ -122,7 +145,7 @@ public class MainActivity extends BaseActivity {
 	 */
 	protected boolean changePagersOrderIfNecessary() {
 		Role role = Settings.getRole(this);
-		if(mRole.equals(role))
+		if(mRole == role)
 			return false;
 		// 更新Pagers的顺序设置
 		setPagersOrder(role);

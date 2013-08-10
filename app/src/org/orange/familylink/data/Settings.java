@@ -4,6 +4,7 @@
 package org.orange.familylink.data;
 
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 
@@ -99,6 +100,26 @@ public class Settings {
 			return null;
 		else
 			throw new IllegalStateException("Illegal role value: "+role);
+	}
+	/**
+	 * 设置用户角色
+	 * @param context 应用全局信息
+	 * @param role 用户角色
+	 * @return 如果成功保存了新设置，返回true
+	 * @see Editor#commit()
+	 */
+	public static boolean setRole(Context context, Role role) {
+		String value = null;
+		switch(role){
+		case CARER:
+			value = "1";
+			break;
+		case CAREE:
+			value = "0";
+			break;
+		}
+		return PreferenceManager.getDefaultSharedPreferences(context).edit()
+			.putString(PREF_KEY_ROLE, value).commit();
 	}
 	/**
 	 * 取得同步频率。用更新间隔表示，单位微秒。如3 600 000表示每1小时更新一次。

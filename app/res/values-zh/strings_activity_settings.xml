@@ -5,10 +5,11 @@
 
     <!-- General settings -->
     <string name="pref_title_password">密码</string>
-    <string name="pref_summary_password">用于加密发送的消息或者解密收到的消息</string>
+    <string name="pref_summary_password">用于加密发送的消息</string>
     <string name="pref_title_role">角色</string>
     <string name="pref_title_sync_frequency">同步频率</string>
 
+    <!-- 这一个string-array也在InitialSetupDialogFragment使用 -->
     <string-array name="pref_role_titles">
         <item>照料者</item>
         <item>受顾者</item>

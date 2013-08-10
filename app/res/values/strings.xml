@@ -46,4 +46,8 @@
         <item>@string/delivered</item>
         <item>@string/failed_to_send</item>
     </string-array>
+
+    <!-- InitialSetupDialogFragment -->
+    <string name="initial_Setup">Initial Setup</string>
+
 </resources>

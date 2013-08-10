@@ -30,4 +30,8 @@
     <string name="sent">已发送</string>
     <string name="delivered">已送达</string>
     <string name="failed_to_send">发送失败</string>
+
+    <!-- InitialSetupDialogFragment -->
+    <string name="initial_Setup">初始设置</string>
+
 </resources>
