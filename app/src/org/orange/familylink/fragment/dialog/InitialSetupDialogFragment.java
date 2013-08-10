@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -67,7 +68,10 @@ public class InitialSetupDialogFragment extends DialogFragment {
 						mListener.onClickPositiveButton(InitialSetupDialogFragment.this, role, password);
 				}
 			});
-		return builder.create();
+		Dialog dialog = builder.create();
+		// 自动打开软键盘
+		dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+		return dialog;
 	}
 
 	/**
