@@ -45,6 +45,15 @@
             android:name="org.orange.familylink.SettingsActivity"
             android:label="@string/settings" >
         </activity>
+        <activity
+            android:name="org.orange.familylink.StatusActivity"
+            android:label="@string/status_activity_label"
+            android:parentActivityName="org.orange.familylink.SettingsActivity" >
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.orange.familylink.SettingsActivity" />
+        </activity>
 
     </application>
 

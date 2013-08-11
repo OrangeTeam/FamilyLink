@@ -67,4 +67,16 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/pref_title_others">
+
+        <Preference
+            android:title="@string/status_activity_label">
+            <intent
+                android:targetPackage="org.orange.familylink"
+                android:targetClass="org.orange.familylink.StatusActivity" />
+        </Preference>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
