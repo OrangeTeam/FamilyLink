@@ -101,10 +101,24 @@ public class Message implements Cloneable{
 			 */
 			public abstract static class Command {
 				/**
+				 * 回显。主要用于测试
+				 */
+				public static final int ECHO		 = 0x01;
+				/**
 				 * 现在定位
 				 */
-				public static final int LOCATE_NOW = 0x01;
+				public static final int LOCATE_NOW	 = 0x02;
 
+				/**
+				 * 检测指定code是不是设置了{@link #ECHO}位
+				 * @param code 待检测code
+				 * @return 如果code是{@link Code#COMMAND}并且设置了{@link #ECHO}位，返回true；否则返回false
+				 */
+				public static boolean hasSetEcho(int code) {
+					if(!isCommand(code))
+						return false;
+					return (code & ECHO) == ECHO;
+				}
 				/**
 				 * 检测指定code是不是设置了{@link #LOCATE_NOW}位
 				 * @param code 待检测code
