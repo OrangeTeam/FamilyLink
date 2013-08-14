@@ -1,5 +1,6 @@
 package org.orange.familylink.database;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 /**
@@ -110,22 +113,33 @@ public class FamilyLinkDBAdapter {
 	}
 
 	/**
-	 * 用于向contacts表中插入数据
-	 * @param systemId
-	 * @param systemLookupKey
+	 * 把Bitmap转换为字节数组进行存储
+	 * @param bitmap
+	 * @return byte[]
 	 */
-	public void insertContact(long systemId, String systemLookupKey){
-		//如果提供的LOOKUPKEY为空就结束插入
-		if(systemLookupKey == null)return;
+	private byte[] codePhoto(Bitmap bitmap){
+		//计算位图的大小
+		int bytes = bitmap.getRowBytes() * bitmap.getHeight();
+		//分配缓存
+		ByteBuffer buffer = ByteBuffer.allocate(bytes);
+		//把位图加载到缓存中
+		bitmap.copyPixelsToBuffer(buffer);
+		byte[] array = buffer.array();
+		return array;
+	}
+
+	/**
+	 * 用于向contacts表中插入数据
+	 * @param name 要存储的联系人的姓名
+	 * @param phoneNumber 要存储的联系人的电话号码
+	 * @param photo 是Bitmap对象，要存储的联系人的照片
+	 */
+	public void insertContact(String name, String phoneNumber, Bitmap photo){
 		ContentValues contentValues = new ContentValues();
-		contentValues.put(Contract.Contacts.COLUMN_NAME_SYSTEM_ID, systemId);
-		contentValues.put(Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY, systemLookupKey);
-		//先查询一下contacts表中是否已经有这个LOOKUPKEY，有就不再插入
-		Cursor cursor = db.query(Contract.DATABASE_CONTACTS_TABLE, null,
-				Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY + " = '" + systemLookupKey + "'",
-				null, null, null, null);
-		if(cursor.getCount() == 0)
-			db.insert(Contract.DATABASE_CONTACTS_TABLE, null, contentValues);
+		contentValues.put(Contract.Contacts.COLUMN_NAME_NAME, name);
+		contentValues.put(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER, phoneNumber);
+		contentValues.put(Contract.Contacts.COLUMN_NAME_PHOTO, codePhoto(photo));
+		db.insert(Contract.DATABASE_CONTACTS_TABLE, null, contentValues);
 	}
 
 	/**
@@ -136,14 +150,10 @@ public class FamilyLinkDBAdapter {
 		//如果提供的联系人是空就结束插入
 		if(contact == null)return;
 		ContentValues contentValues = new ContentValues();
-		contentValues.put(Contract.Contacts.COLUMN_NAME_SYSTEM_ID, contact.getSystemId());
-		contentValues.put(Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY, contact.getSystemLookupKey());
-		//先查询一下contacts表中是否已经有这个LOOKUPKEY，有就不再插入
-		Cursor cursor = db.query(Contract.DATABASE_CONTACTS_TABLE, null,
-				Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY + " = '" + contact.getSystemLookupKey() + "'",
-				null, null, null, null);
-		if(cursor.getCount() == 0)
-			db.insert(Contract.DATABASE_CONTACTS_TABLE, null, contentValues);
+		contentValues.put(Contract.Contacts.COLUMN_NAME_NAME, contact.getName());
+		contentValues.put(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER, contact.getPhoneNumber());
+		contentValues.put(Contract.Contacts.COLUMN_NAME_PHOTO, codePhoto(contact.getPhoto()));
+		db.insert(Contract.DATABASE_CONTACTS_TABLE, null, contentValues);
 	}
 
 	/***
@@ -153,16 +163,12 @@ public class FamilyLinkDBAdapter {
 	public void inserListsContacts(List<Contact> contacts){
 		//如果联系人是空就停止插入操作
 		if(contacts == null || contacts.isEmpty())return;
-		Cursor cursor = null;
 		ContentValues contentValues = new ContentValues();
 		for(Contact aContact : contacts){
-			contentValues.put(Contract.Contacts.COLUMN_NAME_SYSTEM_ID, aContact.getSystemId());
-			contentValues.put(Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY, aContact.getSystemLookupKey());
-			cursor = db.query(Contract.DATABASE_CONTACTS_TABLE, null,
-					Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY + " = '" + aContact.getSystemLookupKey() + "'",
-					null, null, null, null);
-			if(cursor.getCount() == 0)
-				db.insert(Contract.DATABASE_CONTACTS_TABLE, null, contentValues);
+			contentValues.put(Contract.Contacts.COLUMN_NAME_NAME, aContact.getName());
+			contentValues.put(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER, aContact.getPhoneNumber());
+			contentValues.put(Contract.Contacts.COLUMN_NAME_PHOTO, codePhoto(aContact.getPhoto()));
+			db.insert(Contract.DATABASE_CONTACTS_TABLE, null, contentValues);
 		}
 	}
 
@@ -266,17 +272,27 @@ public class FamilyLinkDBAdapter {
 		Cursor cursor = db.query(Contract.DATABASE_CONTACTS_TABLE, null,
 				Contract.Contacts._ID + " = " + mId, null, null, null, null);
 		cursor.moveToFirst();
-		//对应的字段如果不相同就更新
-		if(cursor.getLong(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_SYSTEM_ID)) != contact.getSystemId()){
-			contentValues.put(Contract.Contacts.COLUMN_NAME_SYSTEM_ID, contact.getSystemId());
+		//名字字段如果不相同就进行更新
+		if(!cursor.getString(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME))
+				.equals(contact.getName())){
+			contentValues.put(Contract.Contacts.COLUMN_NAME_NAME, contact.getName());
 			db.update(Contract.DATABASE_CONTACTS_TABLE, contentValues, Contract.Contacts._ID + " = " + mId, null);
 			contentValues.clear();
 		}
-		if(!cursor.getString(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY))
-				.equals(contact.getSystemLookupKey())){
-			contentValues.put(Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY, contact.getSystemLookupKey());
+		//电话号码字段如果不相同就进行更新
+		if(!cursor.getString(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER))
+				.equals(contact.getPhoneNumber())){
+			contentValues.put(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER, contact.getPhoneNumber());
 			db.update(Contract.DATABASE_CONTACTS_TABLE, contentValues, Contract.Contacts._ID + " = " + mId, null);
 			contentValues.clear();
+		}
+		//从数据库中获取照片，解码成Bitmap
+		if(!BitmapFactory.decodeByteArray(
+				cursor.getBlob(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHOTO)),
+				0,
+				cursor.getBlob(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHOTO)).length)
+				.equals(contact.getPhoto())){
+			contentValues.put(Contract.Contacts.COLUMN_NAME_PHOTO, codePhoto(contact.getPhoto()));
 		}
 	}
 
@@ -360,11 +376,16 @@ public class FamilyLinkDBAdapter {
 			for(int i = 0; i <= cursor.getCount(); i++){
 				cursor.moveToPosition(i);
 				long mId = cursor.getLong(cursor.getColumnIndex(Contract.Contacts._ID));
-				long mSystemId = cursor.getLong(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_SYSTEM_ID));
-				String mSystemLookupKey = cursor.getString(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY));
+				String mName = cursor.getString(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME));
+				String mPhoneNumber = cursor.getString(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER));
+				Bitmap mBitmap = BitmapFactory.decodeByteArray(
+						cursor.getBlob(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHOTO)),
+						0,
+						cursor.getBlob(cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHOTO)).length);
 				contact.setId(mId);
-				contact.setSystemId(mSystemId);
-				contact.setSystemLookupKey(mSystemLookupKey);
+				contact.setName(mName);
+				contact.setPhoneNumber(mPhoneNumber);
+				contact.setPhoto(mBitmap);
 				contacts.add(contact.clone());
 			}
 		}

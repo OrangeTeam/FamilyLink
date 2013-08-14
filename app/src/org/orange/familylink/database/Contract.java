@@ -46,16 +46,17 @@ public class Contract {
 		/*
 		 * contacts表中的字段
 		 */
-		public static final String COLUMN_NAME_SYSTEM_ID = "system_id";
-		public static final String COLUMN_NAME_SYSTEM_LOOKUP_KEY = "system_lookup_key";
+		public static final String COLUMN_NAME_NAME = "name";
+		public static final String COLUMN_NAME_PHONE_NUMBER = "phone_number";
+		public static final String COLUMN_NAME_PHOTO = "photo";
 
 
-		public static final String CONTACTS_DEFAULT_SORT_ORDER = COLUMN_NAME_SYSTEM_ID + " DESC";
+		public static final String CONTACTS_DEFAULT_SORT_ORDER = COLUMN_NAME_PHONE_NUMBER + " DESC";
 
 		//这个常量字符串是创建contacts表的sql语句
 		public static final String CONTACTS_TABLE_CREATE = "create table " + DATABASE_CONTACTS_TABLE + " (" + 
-		_ID + " integer primary key," + COLUMN_NAME_SYSTEM_ID + " integer," + COLUMN_NAME_SYSTEM_LOOKUP_KEY + 
-		" varchar(100));";
+		_ID + " integer primary key," + COLUMN_NAME_NAME + " varchar(60)," + COLUMN_NAME_PHONE_NUMBER + 
+		" varchar(20)," + COLUMN_NAME_PHOTO + " blob);";
 	}
 
 	/**

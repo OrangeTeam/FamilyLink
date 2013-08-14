@@ -5,6 +5,8 @@ package org.orange.familylink.data;
 
 import org.orange.familylink.util.Objects;
 
+import android.graphics.Bitmap;
+
 /**
  * 联系人
  * @author Team Orange
@@ -12,15 +14,19 @@ import org.orange.familylink.util.Objects;
 public class Contact implements Cloneable {
 	public static final Contact mDefaultValue = new Contact(){
 		public Contact setId(Long id){
-			throw new IllegalStateException("you cannot chang default value.");
+			throw new IllegalStateException("you cannot change default value.");
 		}
 
-		public Contact setSystemId(Long systemId){
-			throw new IllegalStateException("you cannot chang default value.");
+		public Contact setName(String name){
+			throw new IllegalStateException("you cannot change default value.");
 		}
 
-		public Contact setSystemLookupKey(String systemLookupKey){
-			throw new IllegalStateException("you cannot chang default value.");
+		public Contact setPhoneNumber(String phoneNumber){
+			throw new IllegalStateException("you cannot change default value.");
+		}
+
+		public Contact setPhoto(Bitmap mPhoto){
+			throw new IllegalStateException("you cannot change default value.");
 		}
 
 		protected boolean isSameClass(Object o) {
@@ -30,10 +36,12 @@ public class Contact implements Cloneable {
 
 	//主键
 	private Long mId = null;
-	//系统联系人的id
-	private Long mSystemId = null;
-	//系统联系人提供的用来查找主键的一个字段
-	private String mSystemLookupKey = null;
+	//姓名
+	private String mName = null;
+	//电话号码
+	private String mPhoneNumber = null;
+	//位图
+	private Bitmap mPhoto = null;
 
 	/**
 	 * 构造方法
@@ -61,38 +69,56 @@ public class Contact implements Cloneable {
 	}
 
 	/**
-	 * 获取系统联系人提供的id
+	 * 获取姓名
 	 * @return
 	 */
-	public Long getSystemId(){
-		return mSystemId;
+	public String getName(){
+		return mName;
 	}
 
 	/**
-	 * 设置系统联系人id字段
-	 * @param systemId
+	 * 设置姓名
+	 * @param name
 	 * @return
 	 */
-	public Contact setSystemId(Long systemId){
-		mSystemId = systemId;
+	public Contact setName(String name){
+		mName = name;
 		return this;
 	}
 
 	/**
-	 * 获取系统联系人提供查找主键的字段
+	 * 获取电话号码
 	 * @return
 	 */
-	public String getSystemLookupKey(){
-		return mSystemLookupKey;
+	public String getPhoneNumber(){
+		return mPhoneNumber;
 	}
 
 	/**
-	 * 设置系统联系人提供的查找主键字段
-	 * @param systemLookupKey
+	 * 设置电话号码
+	 * @param phoneNumber
 	 * @return
 	 */
-	public Contact setSystemLookupKey(String systemLookupKey){
-		mSystemLookupKey = systemLookupKey;
+	public Contact setPhoneNumber(String phoneNumber){
+		mPhoneNumber = phoneNumber;
+		return this;
+	}
+
+	/**
+	 * 获取照片
+	 * @return
+	 */
+	public Bitmap getPhoto(){
+		return mPhoto;
+	}
+
+	/**
+	 * 设置照片
+	 * @param photo
+	 * @return
+	 */
+	public Contact setPhoto(Bitmap photo){
+		mPhoto = photo;
 		return this;
 	}
 
@@ -107,8 +133,9 @@ public class Contact implements Cloneable {
 		else {
 			Contact other = (Contact) o;
 			return Objects.compare(mId, other.mId)
-					&& Objects.compare(mSystemId, other.mSystemId)
-					&& Objects.compare(mSystemLookupKey, other.mSystemLookupKey);
+					&& Objects.compare(mName, other.mName)
+					&& Objects.compare(mPhoneNumber, other.mPhoneNumber)
+					&& Objects.compare(mPhoto, other.mPhoto);
 		}
 	}
 
@@ -128,6 +155,7 @@ public class Contact implements Cloneable {
 		Contact clone = null;
 		try {
 			clone = (Contact) super.clone();
+			clone.mPhoto = getPhoto();
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException("can't clone a Contact", e);
 		}

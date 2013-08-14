@@ -5,7 +5,6 @@ import java.util.Date;
 import org.orange.familylink.data.Contact;
 import org.orange.familylink.data.Message;
 import org.orange.familylink.data.Message.Code;
-import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.MessageLogRecord.Status;
 
 import android.content.ContentUris;
