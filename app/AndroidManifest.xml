@@ -54,6 +54,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.orange.familylink.SettingsActivity" />
         </activity>
+        <activity
+            android:name="org.orange.familylink.AlarmCountdownActivity"
+            android:label="@string/alarm_countdown_timer" >
+        </activity>
 
     </application>
 

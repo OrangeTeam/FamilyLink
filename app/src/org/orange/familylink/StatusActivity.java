@@ -6,6 +6,7 @@ package org.orange.familylink;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -151,6 +152,7 @@ public class StatusActivity extends ActionBarActivity {
 						+"gavi:"+gravity[0]+" "+gravity[1]+" "+gravity[2]+"\n"
 						+"liac:"+linear_acceleration[0]+" "+linear_acceleration[1]+" "+linear_acceleration[2]+"\n\n";
 					mMainTextView.setText(mMainTextView.getText()+info);
+					startActivity(new Intent(StatusActivity.this, AlarmCountdownActivity.class));
 				}
 				mStatusGraphView.update(GraphView.DataType.GRAVITY, gravity);
 				mStatusGraphView.update(GraphView.DataType.LINEAR_ACCELERATION, linear_acceleration);

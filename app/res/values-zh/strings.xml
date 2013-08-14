@@ -36,5 +36,7 @@
 
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">初始设置</string>
+    <!-- AlarmCountdownActivity -->
+    <string name="alarm_countdown_timer">警报倒计时器</string>
 
 </resources>

@@ -52,5 +52,7 @@
 
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">Initial Setup</string>
+    <!-- AlarmCountdownActivity -->
+    <string name="alarm_countdown_timer">Alarm Countdown Timer</string>
 
 </resources>
