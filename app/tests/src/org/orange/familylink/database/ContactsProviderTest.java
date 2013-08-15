@@ -112,7 +112,7 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
         final String SELECTION_COLUMNS =
             TITLE_SELECTION + " OR " + TITLE_SELECTION + " OR " + TITLE_SELECTION;
 
-        final String[] SELECTION_ARGS = { "one", "two", "three" };
+        final String[] SELECTION_ARGS = { "one", "two", "tree" };
 
         //sort
         final String SORT_ORDER = Contract.Contacts.COLUMN_NAME_NAME + " ASC";
@@ -173,9 +173,11 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
         assertEquals(SELECTION_ARGS.length, projectionCursor.getCount());
 
         int index = 0;
+        //因为查询结果进行了排序，所以进行对比的SELECTION_ARGS也要用相应的顺序
+        final String[] SORT_SELECTION_ARGS = {"one", "tree", "two"};
 
         while (projectionCursor.moveToNext()) {
-            assertEquals(SELECTION_ARGS[index], projectionCursor.getString(0));
+            assertEquals(SORT_SELECTION_ARGS[index], projectionCursor.getString(0));
             index++;
         }
 
@@ -269,7 +271,7 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
         int nameIndex = cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME);
         int phoneNumberIndex = cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER);
 
-        assertEquals(contact.name, cursor.getLong(nameIndex));
+        assertEquals(contact.name, cursor.getString(nameIndex));
         assertEquals(contact.phoneNumber, cursor.getString(phoneNumberIndex));
 
         ContentValues values = contact.getContentValues();
@@ -337,11 +339,11 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 
         final String SELECTION_COLUMNS = Contract.Contacts.COLUMN_NAME_NAME + " = " + "?";
 
-        final String[] selectionArgs = { "1" };
+        final String[] selectionArgs = { "one" };
 
         ContentValues values = new ContentValues();
 
-        values.put(Contract.Contacts.COLUMN_NAME_NAME, "eight");
+        values.put(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER, "110");
 
         int rowsUpdated = mMockResolver.update(
             Contract.Contacts.CONTACTS_URI,
