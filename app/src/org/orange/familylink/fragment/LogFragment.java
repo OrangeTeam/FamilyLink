@@ -4,6 +4,8 @@
 package org.orange.familylink.fragment;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.orange.familylink.R;
 import org.orange.familylink.data.Message.Code;
@@ -16,10 +18,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,8 +32,10 @@ import android.widget.AbsListView.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 /**
@@ -37,8 +43,15 @@ import android.widget.TextView;
  * @author Team Orange
  */
 public class LogFragment extends ListFragment {
-	/** the Adapter being used to display the list's data. */
-	private CursorAdapter mAdapter;
+	private static final int LOADER_ID_CONTACTS = 1;
+	private static final int LOADER_ID_LOG = 2;
+
+	/** 用于把联系人ID映射为联系人名称的{@link Map} */
+	private Map<Long, String> mContactIdToNameMap;
+	/** 用于显示联系人筛选条件的{@link Spinner}的{@link SpinnerAdapter} */
+	private SimpleCursorAdapter mAdapterForContactsSpinner;
+	/** 用于显示消息日志的{@link ListView}的{@link ListAdapter} */
+	private CursorAdapter mAdapterForLogList;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,15 +104,17 @@ public class LogFragment extends ListFragment {
 		setHasOptionsMenu(true);
 
 		// Create an empty adapter we will use to display the loaded data.
-		mAdapter = new LogAdapter(getActivity(), null, 0);
-		setListAdapter(mAdapter);
+		mAdapterForLogList = new LogAdapter(getActivity(), null, 0);
+		setListAdapter(mAdapterForLogList);
 
 		// Start out with a progress indicator.
 		setListShown(false);
 
 		// Prepare the loader.  Either re-connect with an existing one,
 		// or start a new one.
-		getLoaderManager().initLoader(0, null, mLoaderCallbacks);
+		LoaderManager loaderManager = getLoaderManager();
+		loaderManager.initLoader(LOADER_ID_CONTACTS, null, mLoaderCallbacksForContacts);
+		loaderManager.initLoader(LOADER_ID_LOG, null, mLoaderCallbacks);
 	}
 
 	/**
@@ -147,7 +162,15 @@ public class LogFragment extends ListFragment {
 				1));
 
 		Spinner spinner3 = new Spinner(getActivity());
-		//TODO apinner3的Adapter
+		mAdapterForContactsSpinner = new SimpleCursorAdapter(
+				getActivity(),
+				android.R.layout.simple_spinner_item,
+				null,
+				new String[]{Contract.Contacts.COLUMN_NAME_NAME},
+				new int[]{android.R.id.text1}, 0);
+		mAdapterForContactsSpinner.setDropDownViewResource(
+				android.R.layout.simple_spinner_dropdown_item);
+		spinner3.setAdapter(mAdapterForContactsSpinner);
 		spinnersContainer.addView(spinner3, new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.WRAP_CONTENT,
 				LinearLayout.LayoutParams.MATCH_PARENT,
@@ -235,6 +258,38 @@ public class LogFragment extends ListFragment {
 			return "";
 	}
 
+	protected final LoaderCallbacks<Cursor> mLoaderCallbacksForContacts =
+			new LoaderCallbacks<Cursor>(){
+		@Override
+		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+			// One callback only to one loader, so we don't care about the ID.
+			Uri baseUri = Contract.Contacts.CONTACTS_URI;
+			String[] projection = {Contract.Contacts._ID, Contract.Contacts.COLUMN_NAME_NAME};
+			return new CursorLoader(getActivity(), baseUri, projection, null, null, null);
+		}
+
+		@Override
+		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+			mAdapterForContactsSpinner.swapCursor(data);
+			// setup Map
+			Map<Long, String> id2nameNew = new HashMap<Long, String>(data.getCount());
+			int indexId = data.getColumnIndex(Contract.Contacts._ID);
+			int indexName = data.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME);
+			while(data.moveToNext()) {
+				id2nameNew.put(data.getLong(indexId), data.getString(indexName));
+			}
+			data.moveToPosition(-1);
+
+			mContactIdToNameMap = id2nameNew;
+			mAdapterForLogList.notifyDataSetChanged();
+		}
+
+		@Override
+		public void onLoaderReset(Loader<Cursor> loader) {
+			mAdapterForContactsSpinner.swapCursor(null);
+			mContactIdToNameMap = null;
+		}
+	};
 	protected final LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderCallbacks<Cursor>() {
 		@Override
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -258,7 +313,7 @@ public class LogFragment extends ListFragment {
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 			// Swap the new cursor in.  (The framework will take care of closing the
 			// old cursor once we return.)
-			mAdapter.swapCursor(data);
+			mAdapterForLogList.swapCursor(data);
 
 			// The list should now be shown.
 			if (isResumed()) {
@@ -273,7 +328,7 @@ public class LogFragment extends ListFragment {
 			// This is called when the last Cursor provided to onLoadFinished()
 			// above is about to be closed.  We need to make sure we are no
 			// longer using it.
-			mAdapter.swapCursor(null);
+			mAdapterForLogList.swapCursor(null);
 		}
 	};
 
@@ -314,7 +369,7 @@ public class LogFragment extends ListFragment {
 			if(time != 0)
 				date = new Date(time);
 			String statusString = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_STATUS));
-			Status status = Status.valueOf(statusString);
+			Status status = statusString != null ? Status.valueOf(statusString) : null;
 			String body = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_BODY));
 			int code = cursor.getInt(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE));
 
@@ -328,9 +383,9 @@ public class LogFragment extends ListFragment {
 				holder.body.setText(body);
 			else
 				holder.body.setText("");
-			//TODO 联系人
-//			holder.contact_name.setText(record.getContact().toString());
-			holder.contact_name.setText("People ID " + contactId);
+			// 联系人
+			if(mContactIdToNameMap != null)
+				holder.contact_name.setText(mContactIdToNameMap.get(contactId));
 			// address
 			if(address != null)
 				holder.address.setText(address);
