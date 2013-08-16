@@ -128,15 +128,19 @@ public class LogFragment extends ListFragment {
 		Spinner spinner1 = new Spinner(getActivity());
 		// Create an ArrayAdapter using the string array and a default spinner layout
 		String[] status = getResources().getStringArray(R.array.message_status);
-		if(status.length != 8)
+		if(status.length != 9)
 			throw new IllegalStateException("Unexpected number of status. " +
 					"Maybe because you only update on one place");
-		for(int i = 1 ; i < status.length ; i++)
-			if(i != 3) status[i] = "\t" + status[i];
-		ArrayAdapter<String> adapter =
-				new ArrayAdapter<String>(getActivity(),
-						android.R.layout.simple_spinner_item,
-						status);
+		ArrayAdapter<String> adapter = new MyHierarchicalArrayAdapter<String>(
+				getActivity(), android.R.layout.simple_spinner_item, status) {
+			@Override
+			protected int getLevel(int position) {
+				if(position != 0 && position != 1 && position != 4)
+					return 2;
+				else
+					return 1;
+			}
+		};
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner1.setAdapter(adapter);
 		spinnersContainer.addView(spinner1, new LinearLayout.LayoutParams(
@@ -146,14 +150,19 @@ public class LogFragment extends ListFragment {
 
 		Spinner spinner2 = new Spinner(getActivity());
 		String[] code = getResources().getStringArray(R.array.code);
-		if(code.length != 4)
+		if(code.length != 5)
 			throw new IllegalStateException("Unexpected number of code. " +
 					"Maybe because you only update on one place");
-		code[1] = "\t" + code[1];
-		code[2] = "\t" + code[2];
-		adapter = new ArrayAdapter<String>(getActivity(),
-						android.R.layout.simple_spinner_item,
-						code);
+		adapter = new MyHierarchicalArrayAdapter<String>(
+				getActivity(), android.R.layout.simple_spinner_item, code) {
+			@Override
+			protected int getLevel(int position) {
+				if(position == 2 || position == 3)
+					return 2;
+				else
+					return 1;
+			}
+		};
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner2.setAdapter(adapter);
 		spinnersContainer.addView(spinner2, new LinearLayout.LayoutParams(
@@ -162,14 +171,12 @@ public class LogFragment extends ListFragment {
 				1));
 
 		Spinner spinner3 = new Spinner(getActivity());
-		mAdapterForContactsSpinner = new SimpleCursorAdapter(
+		mAdapterForContactsSpinner = new MySimpleCursorAdapterWithHeader(
 				getActivity(),
-				android.R.layout.simple_spinner_item,
 				null,
 				new String[]{Contract.Contacts.COLUMN_NAME_NAME},
-				new int[]{android.R.id.text1}, 0);
-		mAdapterForContactsSpinner.setDropDownViewResource(
-				android.R.layout.simple_spinner_dropdown_item);
+				0,
+				new String[]{getString(R.string.all)});
 		spinner3.setAdapter(mAdapterForContactsSpinner);
 		spinnersContainer.addView(spinner3, new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -474,6 +481,126 @@ public class LogFragment extends ListFragment {
 			TextView date;
 			ImageView directon_icon;
 			ImageView unread_icon;
+		}
+	}
+
+	/**
+	 * 带有层次结构的{@link ArrayAdapter}。低层次的item会被缩进。
+	 * @author Team Orange
+	 * @see MyHierarchicalArrayAdapter#getLevel(int)
+	 */
+	protected abstract class MyHierarchicalArrayAdapter<T> extends ArrayAdapter<T> {
+		private Integer DefaultPaddingLeft, DefaultPaddingRight, DefaultPaddingTop, DefaultPaddingBottom;
+
+		public MyHierarchicalArrayAdapter(Context context, int resource, T[] objects) {
+			super(context, resource, objects);
+		}
+
+		@Override
+		public View getDropDownView(int position, View convertView,
+				ViewGroup parent) {
+			View view = super.getDropDownView(position, convertView, parent);
+			if(DefaultPaddingLeft == null) {
+				DefaultPaddingLeft = view.getPaddingLeft();
+				DefaultPaddingRight = view.getPaddingRight();
+				DefaultPaddingTop = view.getPaddingTop();
+				DefaultPaddingBottom = view.getPaddingBottom();
+			}
+			view.setPadding(DefaultPaddingLeft * getLevel(position),
+					DefaultPaddingTop, DefaultPaddingRight, DefaultPaddingBottom);
+			return view;
+		}
+
+		/**
+		 * 取得位置为position的item的层级
+		 * @param position 待判定层次的item的position
+		 * @return 如果此item是最高层（类似&lt;h1&gt;）返回1；第二层返回2。以此类推
+		 */
+		protected abstract int getLevel(int position);
+	}
+	/**
+	 * 带有标题的{@link SimpleCursorAdapter}
+	 * <p>
+	 * <strong>Note</strong>：这是一个特化的{@link SimpleCursorAdapter}，此类是用于{@link Spinner}的{@link SpinnerAdapter}，
+	 * 其layout已经设置为了<code>android.R.layout.simple_spinner_item</code>，
+	 * 其DropDownViewResource已设置为<code>android.R.layout.simple_spinner_dropdown_item</code>。
+	 * @author Team Orange
+	 * @see SimpleCursorAdapter#SimpleCursorAdapter(Context, int, Cursor, String[], int[], int)
+	 * @see SimpleCursorAdapter#setDropDownViewResource(int)
+	 */
+	protected class MySimpleCursorAdapterWithHeader extends SimpleCursorAdapter {
+		private final String[] mHeader;
+		private final LayoutInflater mInflater;
+
+		public MySimpleCursorAdapterWithHeader(Context context,
+				Cursor c, String[] from, int flags, String[] header) {
+			super(context, android.R.layout.simple_spinner_item, c, from,
+					new int[]{android.R.id.text1}, flags);
+			setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			mHeader = header;
+			mInflater = LayoutInflater.from(context);
+		}
+
+		@Override
+		public int getCount() {
+			return super.getCount() + mHeader.length;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			if(!isHeader(position))
+				return super.getItem(getPositionWithoutHeader(position));
+			else
+				return mHeader[position];
+		}
+
+		@Override
+		public long getItemId(int position) {
+			if(!isHeader(position))
+				return super.getItemId(getPositionWithoutHeader(position));
+			else
+				return position - mHeader.length;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if(!isHeader(position))
+				return super.getView(getPositionWithoutHeader(position), convertView, parent);
+			else {
+				if(convertView == null)
+					convertView = mInflater.inflate(android.R.layout.simple_spinner_item, parent, false);
+				((TextView)convertView.findViewById(android.R.id.text1)).setText(mHeader[position]);
+				return convertView;
+			}
+		}
+
+		@Override
+		public View getDropDownView(int position, View convertView,
+				ViewGroup parent) {
+			if(!isHeader(position))
+				return super.getDropDownView(getPositionWithoutHeader(position), convertView, parent);
+			else {
+				if(convertView == null)
+					convertView = mInflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+				((TextView)convertView.findViewById(android.R.id.text1)).setText(mHeader[position]);
+				return convertView;
+			}
+		}
+
+		@Override
+		public int getViewTypeCount() {
+			return 1;
+		}
+		@Override
+		public int getItemViewType(int position) {
+			return 0;
+		}
+
+		public boolean isHeader(int position) {
+			return position < mHeader.length;
+		}
+		public int getPositionWithoutHeader(int rawPosition) {
+			return rawPosition - mHeader.length;
 		}
 	}
 }
