@@ -280,6 +280,7 @@ public class Message implements Cloneable{
 	 * @param context 应用全局信息
 	 * @param contactId 联系人{@link Messages#COLUMN_NAME_CONTACT_ID ID}
 	 * @param dest 发送目的{@link Messages#COLUMN_NAME_ADDRESS 地址}
+	 * @see #receive(Context, String)
 	 */
 	public void send(Context context, Long contactId , String dest) {
 		send(context, contactId, dest, Settings.getPassword(context));
@@ -292,6 +293,7 @@ public class Message implements Cloneable{
 	 * @param contactId 联系人{@link Messages#COLUMN_NAME_CONTACT_ID ID}
 	 * @param dest 发送目的{@link Messages#COLUMN_NAME_ADDRESS 地址}
 	 * @param password 要发送信息的加密密码
+	 * @see #receive(String, String)
 	 */
 	public void send(Context context, Long contactId , String dest, String password) {
 		Uri newUri = null;
@@ -309,6 +311,31 @@ public class Message implements Cloneable{
 		this.body = Crypto.encrypt(body, password);
 		SmsSender.sendMessage(context, newUri, toJson(), dest);
 		this.body = body;
+	}
+
+	/**
+	 * 接收消息。把接收到的消息解析为本类的实例。
+	 * @param context 应用全局信息
+	 * @param receivedMessage 接收到的消息
+	 * @return 解析后得到的本类的实例对象
+	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
+	 * @see #send(Context, Long, String)
+	 */
+	public static Message receive(Context context, String receivedMessage) {
+		return receive(receivedMessage, Settings.getPassword(context));
+	}
+	/**
+	 * 接收消息。把接收到的消息解析为本类的实例。
+	 * @param receivedMessage 接收到的消息
+	 * @param password 解密密钥
+	 * @return 解析后得到的本类的实例对象
+	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
+	 * @see #send(Context, Long, String, String)
+	 */
+	public static Message receive(String receivedMessage, String password) {
+		Message m = Message.fromJson(receivedMessage);
+		m.body = Crypto.decrypt(m.body, password);
+		return m;
 	}
 
 	/**
