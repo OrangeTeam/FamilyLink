@@ -29,6 +29,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -49,9 +51,14 @@ public class LogFragment extends ListFragment {
 	/** 用于把联系人ID映射为联系人名称的{@link Map} */
 	private Map<Long, String> mContactIdToNameMap;
 	/** 用于显示联系人筛选条件的{@link Spinner}的{@link SpinnerAdapter} */
-	private SimpleCursorAdapter mAdapterForContactsSpinner;
+	private MySimpleCursorAdapterWithHeader mAdapterForContactsSpinner;
 	/** 用于显示消息日志的{@link ListView}的{@link ListAdapter} */
 	private CursorAdapter mAdapterForLogList;
+	private Spinner mSpinnerForStatus;
+	private Spinner mSpinnerForCode;
+	private Spinner mSpinnerForContact;
+	private String[] mSelectionForStatus;
+	private String[] mSelectionForCode;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -125,12 +132,24 @@ public class LogFragment extends ListFragment {
 		LinearLayout spinnersContainer = new LinearLayout(getActivity());
 		spinnersContainer.setOrientation(LinearLayout.HORIZONTAL);
 
-		Spinner spinner1 = new Spinner(getActivity());
+		mSpinnerForStatus = new Spinner(getActivity());
 		// Create an ArrayAdapter using the string array and a default spinner layout
 		String[] status = getResources().getStringArray(R.array.message_status);
 		if(status.length != 9)
 			throw new IllegalStateException("Unexpected number of status. " +
 					"Maybe because you only update on one place");
+		String columnStatus = Contract.Messages.COLUMN_NAME_STATUS;
+		mSelectionForStatus = new String[status.length];
+		mSelectionForStatus[0] = "1";
+		mSelectionForStatus[2] = columnStatus + " = '" + Status.UNREAD.name() + "'";
+		mSelectionForStatus[3] = columnStatus + " = '" + Status.HAVE_READ.name() + "'";
+		mSelectionForStatus[1] = mSelectionForStatus[2] + " OR " + mSelectionForStatus[3];
+		mSelectionForStatus[5] = columnStatus + " = '" + Status.SENDING.name() + "'";
+		mSelectionForStatus[6] = columnStatus + " = '" + Status.SENT.name() + "'";
+		mSelectionForStatus[7] = columnStatus + " = '" + Status.DELIVERED.name() + "'";
+		mSelectionForStatus[8] = columnStatus + " = '" + Status.FAILED_TO_SEND.name() + "'";
+		mSelectionForStatus[4] = mSelectionForStatus[5] + " OR " + mSelectionForStatus[6]
+				+ " OR " + mSelectionForStatus[7] + " OR " + mSelectionForStatus[8];
 		ArrayAdapter<String> adapter = new MyHierarchicalArrayAdapter<String>(
 				getActivity(), android.R.layout.simple_spinner_item, status) {
 			@Override
@@ -142,17 +161,35 @@ public class LogFragment extends ListFragment {
 			}
 		};
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner1.setAdapter(adapter);
-		spinnersContainer.addView(spinner1, new LinearLayout.LayoutParams(
+		mSpinnerForStatus.setAdapter(adapter);
+		mSpinnerForStatus.setOnItemSelectedListener(mOnSpinnerItemSelectedListener);
+		spinnersContainer.addView(mSpinnerForStatus, new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.WRAP_CONTENT,
 				LinearLayout.LayoutParams.MATCH_PARENT,
 				1));
 
-		Spinner spinner2 = new Spinner(getActivity());
+		mSpinnerForCode = new Spinner(getActivity());
 		String[] code = getResources().getStringArray(R.array.code);
 		if(code.length != 5)
 			throw new IllegalStateException("Unexpected number of code. " +
 					"Maybe because you only update on one place");
+		String columnCode = Contract.Messages.COLUMN_NAME_CODE;
+		mSelectionForCode = new String[code.length];
+		mSelectionForCode[0] = "1";
+		// 通告
+		mSelectionForCode[1] = columnCode + " BETWEEN " + Code.INFORM + " AND " +
+								(Code.INFORM | Code.EXTRA_BITS);
+		// 通告 && 定时消息
+		mSelectionForCode[2] = mSelectionForCode[1] + " AND " +
+			columnCode + " & " + Code.Extra.Inform.PULSE + " = " + Code.Extra.Inform.PULSE;
+		// 通告 &&　紧急消息
+		mSelectionForCode[3] = mSelectionForCode[1] + " AND " +
+			columnCode + " & " + Code.Extra.Inform.URGENT + " = " + Code.Extra.Inform.URGENT;
+		// 命令 || ( 通告 && 命令响应 )
+		mSelectionForCode[4] = columnCode + " BETWEEN " + Code.COMMAND + " AND " +
+				(Code.COMMAND | Code.EXTRA_BITS) + " OR ( " +
+				mSelectionForCode[1] + " AND " +
+				columnCode + " & " + Code.Extra.Inform.RESPOND + " = " + Code.Extra.Inform.RESPOND + " )";
 		adapter = new MyHierarchicalArrayAdapter<String>(
 				getActivity(), android.R.layout.simple_spinner_item, code) {
 			@Override
@@ -164,21 +201,23 @@ public class LogFragment extends ListFragment {
 			}
 		};
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner2.setAdapter(adapter);
-		spinnersContainer.addView(spinner2, new LinearLayout.LayoutParams(
+		mSpinnerForCode.setAdapter(adapter);
+		mSpinnerForCode.setOnItemSelectedListener(mOnSpinnerItemSelectedListener);
+		spinnersContainer.addView(mSpinnerForCode, new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.WRAP_CONTENT,
 				LinearLayout.LayoutParams.MATCH_PARENT,
 				1));
 
-		Spinner spinner3 = new Spinner(getActivity());
+		mSpinnerForContact = new Spinner(getActivity());
 		mAdapterForContactsSpinner = new MySimpleCursorAdapterWithHeader(
 				getActivity(),
 				null,
 				new String[]{Contract.Contacts.COLUMN_NAME_NAME},
 				0,
 				new String[]{getString(R.string.all)});
-		spinner3.setAdapter(mAdapterForContactsSpinner);
-		spinnersContainer.addView(spinner3, new LinearLayout.LayoutParams(
+		mSpinnerForContact.setAdapter(mAdapterForContactsSpinner);
+		mSpinnerForContact.setOnItemSelectedListener(mOnSpinnerItemSelectedListener);
+		spinnersContainer.addView(mSpinnerForContact, new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.WRAP_CONTENT,
 				LinearLayout.LayoutParams.MATCH_PARENT,
 				1));
@@ -310,10 +349,20 @@ public class LogFragment extends ListFragment {
 			baseUri = Contract.Messages.MESSAGES_URI;
 //			}
 
+			String selection =
+					"( " + mSelectionForStatus[mSpinnerForStatus.getSelectedItemPosition()] +
+					" ) AND ( " + mSelectionForCode[mSpinnerForCode.getSelectedItemPosition()]
+					+ " )";
+			if(mAdapterForContactsSpinner.getPositionWithoutHeader(
+					mSpinnerForContact.getSelectedItemPosition()) >= 0) {
+				selection += " AND ( " + Contract.Messages.COLUMN_NAME_CONTACT_ID + " = " +
+					mSpinnerForContact.getSelectedItemId() + " )";
+			}
+
 			String sortOrder = Contract.Messages.COLUMN_NAME_TIME + " DESC";
 			// Now create and return a CursorLoader that will take care of
 			// creating a Cursor for the data being displayed.
-			return new CursorLoader(getActivity(), baseUri, null, null, null, sortOrder);
+			return new CursorLoader(getActivity(), baseUri, null, selection, null, sortOrder);
 		}
 
 		@Override
@@ -337,6 +386,19 @@ public class LogFragment extends ListFragment {
 			// longer using it.
 			mAdapterForLogList.swapCursor(null);
 		}
+	};
+
+	/** 用于接收 已修改筛选条件 的事件监听器*/
+	protected final OnItemSelectedListener mOnSpinnerItemSelectedListener =
+			new OnItemSelectedListener() {
+		@Override
+		public void onItemSelected(AdapterView<?> parent, View view,
+				int position, long id) {
+			// 重新加载日志
+			getLoaderManager().restartLoader(LOADER_ID_LOG, null, mLoaderCallbacks);
+		}
+		@Override
+		public void onNothingSelected(AdapterView<?> parent) {}
 	};
 
 	protected class LogAdapter extends CursorAdapter {
