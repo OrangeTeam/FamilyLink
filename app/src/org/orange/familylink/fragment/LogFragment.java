@@ -364,6 +364,7 @@ public class LogFragment extends ListFragment {
 			Map<Long, String> id2nameNew = new HashMap<Long, String>(data.getCount());
 			int indexId = data.getColumnIndex(Contract.Contacts._ID);
 			int indexName = data.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME);
+			data.moveToPosition(-1);
 			while(data.moveToNext()) {
 				id2nameNew.put(data.getLong(indexId), data.getString(indexName));
 			}
