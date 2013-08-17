@@ -13,9 +13,14 @@ import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.database.Contract;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -45,6 +50,10 @@ import android.widget.TextView;
  * @author Team Orange
  */
 public class LogFragment extends ListFragment {
+	private static final String PREF_NAME = "log_fragment";
+	private static final String PREF_KEY_STATUS = "status";
+	private static final String PREF_KEY_CODE = "code";
+	private static final String PREF_KEY_CONTACT_ID = "contact_id";
 	private static final int LOADER_ID_CONTACTS = 1;
 	private static final int LOADER_ID_LOG = 2;
 
@@ -103,6 +112,11 @@ public class LogFragment extends ListFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		// 恢复上次的筛选选项
+		SharedPreferences pref = getActivity()
+				.getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
+		mSpinnerForStatus.setSelection(pref.getInt(PREF_KEY_STATUS, 0));
+		mSpinnerForCode.setSelection(pref.getInt(PREF_KEY_CODE, 0));
 
 		// Give some text to display if there is no data.
 		setEmptyText(getResources().getText(R.string.no_message_record));
@@ -122,6 +136,22 @@ public class LogFragment extends ListFragment {
 		LoaderManager loaderManager = getLoaderManager();
 		loaderManager.initLoader(LOADER_ID_CONTACTS, null, mLoaderCallbacksForContacts);
 		loaderManager.initLoader(LOADER_ID_LOG, null, mLoaderCallbacks);
+	}
+
+	@SuppressLint("NewApi")
+	@Override
+	public void onStop() {
+		super.onStop();
+		// 保存筛选条件的当前选择
+		Editor editor =getActivity()
+				.getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE).edit();
+		editor.putInt(PREF_KEY_STATUS, mSpinnerForStatus.getSelectedItemPosition());
+		editor.putInt(PREF_KEY_CODE, mSpinnerForCode.getSelectedItemPosition());
+		editor.putLong(PREF_KEY_CONTACT_ID, mSpinnerForContact.getSelectedItemId());
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
+			editor.apply();
+		else
+			editor.commit();
 	}
 
 	/**
@@ -316,7 +346,20 @@ public class LogFragment extends ListFragment {
 
 		@Override
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-			mAdapterForContactsSpinner.swapCursor(data);
+			// 更新mAdapterForContactsSpinner的数据。如果是第一次更新，恢复上次的选择
+			if(mAdapterForContactsSpinner.swapCursor(data) == null) {
+				SharedPreferences pref = getActivity()
+						.getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
+				if(pref.contains(PREF_KEY_CONTACT_ID)) {
+					long selectedContactId = pref.getLong(PREF_KEY_CONTACT_ID, -9999999L);
+					for(int i = 0 ; i < mSpinnerForContact.getCount() ; i++) {
+						if(mSpinnerForContact.getItemIdAtPosition(i) == selectedContactId) {
+							mSpinnerForContact.setSelection(i);
+							break;
+						}
+					}
+				}
+			}
 			// setup Map
 			Map<Long, String> id2nameNew = new HashMap<Long, String>(data.getCount());
 			int indexId = data.getColumnIndex(Contract.Contacts._ID);
@@ -324,9 +367,8 @@ public class LogFragment extends ListFragment {
 			while(data.moveToNext()) {
 				id2nameNew.put(data.getLong(indexId), data.getString(indexName));
 			}
-			data.moveToPosition(-1);
-
 			mContactIdToNameMap = id2nameNew;
+
 			mAdapterForLogList.notifyDataSetChanged();
 		}
 
