@@ -16,8 +16,8 @@
     <string name="no_message_record">无过往消息记录</string>
     <string name="illegal_code">非法代码：%d</string>
     <string name="all">全部</string>
-    <string name="inform">通告</string>
-    <string name="command">命令</string>
+    <string name="inform">通知</string>
+    <string name="command">指令</string>
     <string name="respond">应答</string>
     <string name="pulse">定时消息</string>
     <string name="urgent">紧急消息</string>

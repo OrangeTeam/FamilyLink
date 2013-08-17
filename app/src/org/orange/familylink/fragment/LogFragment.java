@@ -333,6 +333,22 @@ public class LogFragment extends ListFragment {
 		else
 			return "";
 	}
+	private String valueOfSendStatus(Status status) {
+		if(status == null || status.getDirection() != Direction.SEND)
+			return "";
+		switch(status) {
+		case SENDING:
+			return getString(R.string.sending);
+		case SENT:
+			return getString(R.string.sent);
+		case DELIVERED:
+			return getString(R.string.delivered);
+		case FAILED_TO_SEND:
+			return getString(R.string.failed_to_send);
+		default:
+			throw new UnsupportedOperationException("unsupport "+status+" now.");
+		}
+	}
 
 	protected final LoaderCallbacks<Cursor> mLoaderCallbacksForContacts =
 			new LoaderCallbacks<Cursor>(){
@@ -465,6 +481,7 @@ public class LogFragment extends ListFragment {
 			holder.body = (TextView) rootView.findViewById(R.id.body);
 			holder.contact_name = (TextView) rootView.findViewById(R.id.contact_name);
 			holder.address = (TextView) rootView.findViewById(R.id.address);
+			holder.send_status = (TextView) rootView.findViewById(R.id.send_status);
 			holder.date = (TextView) rootView.findViewById(R.id.date);
 			holder.directon_icon = (ImageView) rootView.findViewById(R.id.direction_icon);
 			holder.unread_icon = (ImageView) rootView.findViewById(R.id.unread_icon);
@@ -476,14 +493,18 @@ public class LogFragment extends ListFragment {
 		public void bindView(View view, Context context, Cursor cursor) {
 			long contactId = cursor.getLong(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CONTACT_ID));
 			String address = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_ADDRESS));
-			long time = cursor.getLong(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_TIME));
 			Date date = null;
-			if(time != 0)
+			if(!cursor.isNull(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_TIME))) {
+				long time = cursor.getLong(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_TIME));
 				date = new Date(time);
+			}
 			String statusString = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_STATUS));
 			Status status = statusString != null ? Status.valueOf(statusString) : null;
 			String body = cursor.getString(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_BODY));
-			int code = cursor.getInt(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE));
+			Integer code = null;
+			if(!cursor.isNull(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE))) {
+				code = cursor.getInt(cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE));
+			}
 
 			ViewHolder holder = (ViewHolder) view.getTag();
 			// message code
@@ -496,11 +517,15 @@ public class LogFragment extends ListFragment {
 			else
 				holder.body.setText("");
 			// 联系人
-			if(mContactIdToNameMap != null)
-				holder.contact_name.setText(mContactIdToNameMap.get(contactId));
+			if(mContactIdToNameMap != null) {
+				String contactName = mContactIdToNameMap.get(contactId);
+				if(contactName == null)
+					contactName = "null";
+				holder.contact_name.setText(contactName);
+			}
 			// address
 			if(address != null)
-				holder.address.setText(address);
+				holder.address.setText(getString(R.string.address_formatter, address));
 			else
 				holder.address.setText(R.string.unknown);
 			// date
@@ -511,7 +536,7 @@ public class LogFragment extends ListFragment {
 			} else {
 				holder.date.setVisibility(View.INVISIBLE);
 			}
-			// status (include direction)
+			// direction (in status)
 			if(status != null) {
 				//direction
 				holder.directon_icon.setVisibility(View.VISIBLE);
@@ -526,17 +551,23 @@ public class LogFragment extends ListFragment {
 				holder.directon_icon.setVisibility(View.INVISIBLE);
 			}
 			holder.directon_icon.setContentDescription(valueOfDirection(status));
-			// unread
+			// is it unread
 			if((status == Status.UNREAD)) {
 				holder.unread_icon.setVisibility(View.VISIBLE);
-				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem);
-				view.getBackground().setAlpha(255);
-			} else {
+				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem_Strong);
+			} else {	 // 包括 就收 或 status==null 的情况
 				holder.unread_icon.setVisibility(View.INVISIBLE);
 				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem_Weak);
-				view.getBackground().setAlpha(100);
 			}
 			holder.unread_icon.setContentDescription(valueOfHasRead(status));
+			// is it sent
+			if(status == null || status.getDirection() != Direction.SEND)
+				holder.send_status.setVisibility(View.GONE);
+			else {
+				holder.send_status.setText(
+					getString(R.string.send_status_formatter, valueOfSendStatus(status)));
+				holder.send_status.setVisibility(View.VISIBLE);
+			}
 		}
 		/**
 		 * 设置每项记录视图的颜色
@@ -570,6 +601,7 @@ public class LogFragment extends ListFragment {
 			holder.body.setTextAppearance(mContext, resid);
 			holder.contact_name.setTextAppearance(mContext, resid);
 			holder.address.setTextAppearance(mContext, resid);
+			holder.send_status.setTextAppearance(mContext, resid);
 			holder.date.setTextAppearance(mContext, resid);
 		}
 
@@ -583,6 +615,7 @@ public class LogFragment extends ListFragment {
 			TextView body;
 			TextView contact_name;
 			TextView address;
+			TextView send_status;
 			TextView date;
 			ImageView directon_icon;
 			ImageView unread_icon;

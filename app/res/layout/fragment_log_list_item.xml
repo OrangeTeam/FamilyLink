@@ -38,21 +38,32 @@
         android:layout_below="@id/code_extra"
          />
     <TextView
-        android:id="@+id/address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/body"
-        android:layout_toRightOf="@id/direction_icon"
-         />
-    <TextView
         android:id="@+id/contact_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/body"
+        android:layout_toLeftOf="@+id/address"
+        android:layout_alignBaseline="@id/address"
+         />
+    <TextView
+        android:id="@id/address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/body"
         android:layout_toLeftOf="@id/unread_icon"
+        android:autoLink="phone|email"
          />
     <TextView
         android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contact_name"
+        android:layout_toLeftOf="@+id/send_status"
+        android:layout_alignBaseline="@id/send_status"
+        android:paddingBottom="4dp"
+         />
+    <TextView
+        android:id="@id/send_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/contact_name"

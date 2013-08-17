@@ -14,6 +14,7 @@
     <string name="undefined">undefined</string>
     <!-- Log -->
     <string name="no_message_record">No Message Record</string>
+    <string name="address_formatter" translatable="false">&#160;:&#160;%s</string>
     <string name="illegal_code">Illegal Code: %d</string>
     <string name="all">All</string>
     <string name="inform">inform</string>
@@ -30,6 +31,7 @@
         <item>@string/command</item>
     </string-array>
 
+    <string name="send_status_formatter" translatable="false">(%s)</string>
     <string name="send">send</string>
     <string name="receive">receive</string>
     <string name="has_read">read</string>

@@ -11,9 +11,11 @@
     <style name="TextAppearance.AppTheme.ListItem">
         <item name="android:textSize">16sp</item>
     </style>
+    <style name="TextAppearance.AppTheme.ListItem.Strong">
+        <item name="android:textStyle">bold</item>
+    </style>
     <style name="TextAppearance.AppTheme.ListItem.Weak">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/weak_text_color</item>
     </style>
 
 </resources>
