@@ -12,6 +12,8 @@
 
     <string name="unknown">unknown</string>
     <string name="undefined">undefined</string>
+    <!-- SmsStatusReceiver -->
+    <string name="failed_to_send_because_of_radio_off">Because of radio off, failed to send %s.</string>
     <!-- Log -->
     <string name="no_message_record">No Message Record</string>
     <string name="address_formatter" translatable="false">&#160;:&#160;%s</string>

@@ -209,10 +209,11 @@ public class Message implements Cloneable{
 	private String body = null;
 
 	/**
-	 * 使用默认值构造本类。
-	 * <p>Tips：可以类似这样使用链式调用
-	 * <pre><code>new Message().setBody(MessageTest.TEST_CASE_BODY)
-	 *     .setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);</code></pre></p>
+	 * 使用默认值构造本类
+	 * <p>
+	 * Tips：可以类似这样使用链式调用
+	 * <pre><code>new Message().setBody("Hello")
+	 *     .setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);</code></pre>
 	 */
 	public Message() {
 		super();
