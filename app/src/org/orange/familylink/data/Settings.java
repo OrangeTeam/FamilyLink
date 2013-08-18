@@ -3,10 +3,11 @@
  */
 package org.orange.familylink.data;
 
+import org.holoeverywhere.preference.PreferenceManager;
+import org.holoeverywhere.preference.RingtonePreference;
+import org.holoeverywhere.preference.SharedPreferences.Editor;
+
 import android.content.Context;
-import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
 
 /**
  * @author Team Orange

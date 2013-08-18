@@ -1,16 +1,18 @@
 package org.orange.familylink;
 
+import org.holoeverywhere.preference.EditTextPreference;
+import org.holoeverywhere.preference.ListPreference;
+import org.holoeverywhere.preference.Preference;
+import org.holoeverywhere.preference.PreferenceActivity;
+import org.holoeverywhere.preference.PreferenceManager;
+import org.holoeverywhere.preference.RingtonePreference;
 import org.orange.familylink.data.Settings;
 
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
+import android.text.InputType;
 import android.text.TextUtils;
 
 /**
@@ -39,6 +41,11 @@ public class SettingsActivity extends PreferenceActivity {
 
 		// Add 'general' preferences.
 		addPreferencesFromResource(R.xml.preferences);
+
+		// 因为HoloEverywhere的preferences.xml目前不支持android:inputType="textPassword"，so用代码实现
+		((EditTextPreference)findPreference(Settings.PREF_KEY_PASSWORD))
+			.getEditText()
+			.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
 		// Bind the summaries of EditText/List/Dialog/Ringtone preferences to
 		// their values. When their values change, their summaries are updated

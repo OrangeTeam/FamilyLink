@@ -1,5 +1,9 @@
 package org.orange.familylink;
 
+import org.holoeverywhere.app.Activity;
+import org.holoeverywhere.app.Fragment;
+import org.holoeverywhere.preference.PreferenceManager;
+import org.holoeverywhere.widget.ViewPager;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
 import org.orange.familylink.fragment.LocationFragment;
@@ -8,19 +12,16 @@ import org.orange.familylink.fragment.NavigateFragment;
 import org.orange.familylink.fragment.SeekHelpFragment;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 
-import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
 
 /**
  * 主{@link Activity}。应用的默认{@link Activity}
@@ -77,7 +78,7 @@ public class MainActivity extends BaseActivity {
 					changePagersOrderIfNecessary();
 				}
 			});
-			dialog.show(getSupportFragmentManager(), null);
+			dialog.show(getSupportFragmentManager());
 		}
 		else
 			throw new IllegalArgumentException("ilegal role: " + role);
