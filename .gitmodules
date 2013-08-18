@@ -1,0 +1,3 @@
+[submodule "HoloEverywhere"]
+	path = HoloEverywhere
+	url = https://github.com/Prototik/HoloEverywhere.git
