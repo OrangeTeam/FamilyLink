@@ -1,5 +1,6 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Application theme. -->
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
@@ -15,13 +16,6 @@
     </style>
     <style name="TextAppearance.AppTheme.ListItem.Weak">
         <item name="android:textSize">14sp</item>
-    </style>
-
-    <!-- Application theme. -->
-    
-    <style name="AppThemeLight" parent="android:Theme.Holo.Light">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="circularProgressBarStyle">@style/CircularProgressBarLight</item>
     </style>
 
 </resources>
