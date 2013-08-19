@@ -17,7 +17,6 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -46,8 +45,10 @@ public class StatusActivity extends ActionBarActivity {
 
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		//TODO 提高友好性，告知用户无相应传感器
 		if(mAccelerometer == null)
 			finish();
+		showSensorInformation();
 	}
 	/**
 	 * 初始化配置{@link ActionBar}
@@ -80,9 +81,22 @@ public class StatusActivity extends ActionBarActivity {
 	}
 
 	@Override
-	protected void onStart() {
-		super.onStart();
+	protected void onResume() {
+		super.onResume();
+		mSensorManager.registerListener(mAccelerometerListener, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+//		mSensorManager.registerListener(mSensorEventListener, mAccelerometer, 1000000);
+	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mSensorManager.unregisterListener(mAccelerometerListener);
+	}
+
+	/**
+	 * 显示使用的传感器的信息
+	 */
+	protected void showSensorInformation() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Accelerometers on Device:\n");
 		List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
@@ -103,23 +117,10 @@ public class StatusActivity extends ActionBarActivity {
 		mMainTextView.setText(sb.toString());
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		mSensorManager.registerListener(mAccelerometerListener, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-//		mSensorManager.registerListener(mSensorEventListener, mAccelerometer, 1000000);
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		mSensorManager.unregisterListener(mAccelerometerListener);
-	}
-
 	/**
 	 * 处理加速度传感器的事件，检测用户是否摔倒
 	 */
-	protected SensorEventListener mAccelerometerListener = new AccelerometerListener(null) {
+	protected AccelerometerListener mAccelerometerListener = new AccelerometerListener(null) {
 		@Override
 		public void onSensorChanged(SensorEvent event) {
 			super.onSensorChanged(event);
@@ -135,7 +136,7 @@ public class StatusActivity extends ActionBarActivity {
 					+"raw :"+event.values[0]+" "+event.values[1]+" "+event.values[2]+"\n"
 					+"gavi:"+gravity[0]+" "+gravity[1]+" "+gravity[2]+"\n"
 					+"liac:"+linearAcceleration[0]+" "+linearAcceleration[1]+" "+linearAcceleration[2]+"\n\n";
-			mMainTextView.setText(mMainTextView.getText()+info);
+			mMainTextView.append(info);
 		}
 	});
 
