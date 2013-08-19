@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.holoeverywhere.FontLoader;
 import org.holoeverywhere.LayoutInflater;
 import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.ListFragment;
@@ -594,6 +595,7 @@ public class LogFragment extends ListFragment {
 		 * @see TextView#setTextAppearance(Context, int)
 		 */
 		private void setTextAppearance(ViewHolder holder, int resid) {
+			resetFontStyle(holder);
 			holder.code.setTextAppearance(mContext, resid);
 			holder.code_extra.setTextAppearance(mContext, resid);
 			holder.body.setTextAppearance(mContext, resid);
@@ -601,6 +603,21 @@ public class LogFragment extends ListFragment {
 			holder.address.setTextAppearance(mContext, resid);
 			holder.send_status.setTextAppearance(mContext, resid);
 			holder.date.setTextAppearance(mContext, resid);
+		}
+		/**
+		 * a hack for {@link TextView#setTextAppearance(Context, int)}
+		 * can't cancel bold, when using
+		 * <a href="https://github.com/Prototik/HoloEverywhere">HoloEverywhere</a>
+		 * @see #setTextAppearance(ViewHolder, int)
+		 */
+		private void resetFontStyle(ViewHolder holder) {
+			holder.code.setFontStyle(null, FontLoader.TEXT_STYLE_NORMAL);
+			holder.code_extra.setFontStyle(null, FontLoader.TEXT_STYLE_NORMAL);
+			holder.body.setFontStyle(null, FontLoader.TEXT_STYLE_NORMAL);
+			holder.contact_name.setFontStyle(null, FontLoader.TEXT_STYLE_NORMAL);
+			holder.address.setFontStyle(null, FontLoader.TEXT_STYLE_NORMAL);
+			holder.send_status.setFontStyle(null, FontLoader.TEXT_STYLE_NORMAL);
+			holder.date.setFontStyle(null, FontLoader.TEXT_STYLE_NORMAL);
 		}
 
 		/**
