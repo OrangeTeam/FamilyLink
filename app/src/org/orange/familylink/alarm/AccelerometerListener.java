@@ -21,8 +21,8 @@ import android.util.Log;
 public class AccelerometerListener implements SensorEventListener {
 	private static final String TAG = AccelerometerListener.class.getSimpleName();
 
-	private final Context mContext;
-	private final Intent mAlarmIntent;
+	private Context mContext;
+	private Intent mAlarmIntent;
 	private OnFallListener mOnFallListener = null;
 	private SensorEvent mSensorEvent = null;
 	private float[] gravity = null;
@@ -37,11 +37,21 @@ public class AccelerometerListener implements SensorEventListener {
 	 */
 	public AccelerometerListener(Context context) {
 		super();
+		setAutoAlarm(context);
+	}
+
+	/**
+	 * 设置自动启动{@link AlarmCountdownActivity}（当检测到摔倒时）
+	 * @param context 上下文信息；如果设置为null，就不自动启动{@link AlarmCountdownActivity}
+	 * @return 用于链式调用的本对象的引用：this
+	 */
+	public AccelerometerListener setAutoAlarm(Context context) {
 		mContext = context;
-		if(mContext != null)
+		if(context != null)
 			mAlarmIntent = new Intent(context, AlarmCountdownActivity.class);
 		else
 			mAlarmIntent = null;
+		return this;
 	}
 
 	/**
@@ -114,11 +124,6 @@ public class AccelerometerListener implements SensorEventListener {
 				if(mOnFallListener != null)
 					mOnFallListener.onFall(this, event.values, gravity, linear_acceleration);
 			}
-
-//			String infor = "g:\t"+gravity[0]+" "+gravity[1]+" "+gravity[2]+"\n"
-//					+linear_acceleration[0]+" "+linear_acceleration[1]+" "+linear_acceleration[2]+"\n"
-//					+event.values[0]+" "+event.values[1]+" "+event.values[2]+"\n";
-//			Log.d(TAG, infor);
 		} else {
 			gravity = new float[3];
 			gravity[0] = event.values[0];
