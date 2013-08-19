@@ -56,7 +56,8 @@
         </activity>
         <activity
             android:name="org.orange.familylink.AlarmCountdownActivity"
-            android:label="@string/alarm_countdown_timer" >
+            android:theme="@style/AppThemeLight"
+            >
         </activity>
 
     </application>

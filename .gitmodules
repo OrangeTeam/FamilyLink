@@ -1,0 +1,3 @@
+[submodule "android-HoloCircularProgressBar"]
+	path = android-HoloCircularProgressBar
+	url = https://github.com/passsy/android-HoloCircularProgressBar.git
