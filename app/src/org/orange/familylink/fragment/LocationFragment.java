@@ -37,7 +37,11 @@ public class LocationFragment extends Fragment {
 		LocationInfo locationInfo = new LocationInfo(locationManager, 1000);
 		Position po =locationInfo.getCurrentLocationInfo() ;
 		//通过locationInfo的getCurrentLocationInfo方法获得当前位置信息，返回Postion对象，转换为String输出
-		text.setText(po.toString());
+		if(po != null){
+			text.setText(po.toString());
+		}else{
+			text.setText("");
+		}
 		return view;
 	}
 

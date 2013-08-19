@@ -45,6 +45,10 @@
             android:name="org.orange.familylink.SettingsActivity"
             android:label="@string/settings" >
         </activity>
+			<activity
+            android:name="org.orange.familylink.TumbleWarningActivity"
+            android:theme="@style/AppThemeLight" >
+        </activity>
 
     </application>
 
