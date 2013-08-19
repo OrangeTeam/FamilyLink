@@ -124,6 +124,8 @@ public class AccelerometerListener implements SensorEventListener {
 			gravity[0] = event.values[0];
 			gravity[1] = event.values[1];
 			gravity[2] = event.values[2];
+			linear_acceleration = new float[3];
+			linear_acceleration[0] = linear_acceleration[1] = linear_acceleration[2] = 0;
 		}
 		if(BuildConfig.DEBUG) {
 			Log.i(TAG, "use " + (System.currentTimeMillis()-start)
