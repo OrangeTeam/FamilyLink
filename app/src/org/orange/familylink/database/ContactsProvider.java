@@ -45,8 +45,9 @@ public class ContactsProvider extends ContentProvider {
 		//查询映射的添加
 		mContactsProjectionMap = new HashMap<String, String>();
 		mContactsProjectionMap.put(Contract.Contacts._ID, Contract.Contacts._ID);
-		mContactsProjectionMap.put(Contract.Contacts.COLUMN_NAME_SYSTEM_ID, Contract.Contacts.COLUMN_NAME_SYSTEM_ID);
-		mContactsProjectionMap.put(Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY, Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY);
+		mContactsProjectionMap.put(Contract.Contacts.COLUMN_NAME_NAME, Contract.Contacts.COLUMN_NAME_NAME);
+		mContactsProjectionMap.put(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER, Contract.Contacts.COLUMN_NAME_PHONE_NUMBER);
+		mContactsProjectionMap.put(Contract.Contacts.COLUMN_NAME_PHOTO, Contract.Contacts.COLUMN_NAME_PHOTO);
 	}
 
 	/**

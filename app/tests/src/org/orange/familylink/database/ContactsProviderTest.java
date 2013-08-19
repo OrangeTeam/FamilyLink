@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.test.ProviderTestCase2;
 import android.test.mock.MockContentResolver;
@@ -22,10 +23,12 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 
 	//测试联系人时用的一些记录
 	private final ContactInfo[] TEST_CONTACTS = {
-			new ContactInfo(0, "0"),
-			new ContactInfo(1, "1"),
-			new ContactInfo(2, "2"),
-			new ContactInfo(3, "3")
+			new ContactInfo("one", "10086"),
+			new ContactInfo("two", "10086"),
+			new ContactInfo("tree", "10010"),
+			new ContactInfo("four", "10010"),
+			new ContactInfo("five", "15111012019"),
+			new ContactInfo("six", "15111012019")
 	};
 
 	//匹配全部的mime
@@ -99,19 +102,20 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 	public void testQueriesOnContactsUri() {
 		//测试的字段
         final String[] TEST_PROJECTION = {
-            Contract.Contacts.COLUMN_NAME_SYSTEM_ID,
-            Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY
+            Contract.Contacts.COLUMN_NAME_NAME,
+            Contract.Contacts.COLUMN_NAME_PHONE_NUMBER,
+            Contract.Contacts.COLUMN_NAME_PHOTO
         };
         //测试的where条件
-        final String TITLE_SELECTION = Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY + " = " + "?";
+        final String TITLE_SELECTION = Contract.Contacts.COLUMN_NAME_NAME + " = " + "?";
 
         final String SELECTION_COLUMNS =
             TITLE_SELECTION + " OR " + TITLE_SELECTION + " OR " + TITLE_SELECTION;
 
-        final String[] SELECTION_ARGS = { "0", "1", "2" };
+        final String[] SELECTION_ARGS = { "one", "two", "tree" };
 
         //sort
-        final String SORT_ORDER = Contract.Contacts.COLUMN_NAME_SYSTEM_ID + " ASC";
+        final String SORT_ORDER = Contract.Contacts.COLUMN_NAME_NAME + " ASC";
 
         //查询contacts的集合型uri也就是查询contacts表
         Cursor cursor = mMockResolver.query(
@@ -169,9 +173,11 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
         assertEquals(SELECTION_ARGS.length, projectionCursor.getCount());
 
         int index = 0;
+        //因为查询结果进行了排序，所以进行对比的SELECTION_ARGS也要用相应的顺序
+        final String[] SORT_SELECTION_ARGS = {"one", "tree", "two"};
 
         while (projectionCursor.moveToNext()) {
-            assertEquals(SELECTION_ARGS[index], projectionCursor.getString(0));
+            assertEquals(SORT_SELECTION_ARGS[index], projectionCursor.getString(0));
             index++;
         }
 
@@ -183,15 +189,15 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 	 * 测试查询，这里查询用的uri是单项记录类型
 	 */
 	public void testQueriesOnContactIdUri() {
-	      final String SELECTION_COLUMNS = Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY + " = " + "?";
+	      final String SELECTION_COLUMNS = Contract.Contacts.COLUMN_NAME_NAME + " = " + "?";
 
-	      final String[] SELECTION_ARGS = { "1" };
+	      final String[] SELECTION_ARGS = { "one" };
 
-	      final String SORT_ORDER = Contract.Contacts.COLUMN_NAME_SYSTEM_ID + " ASC";
+	      final String SORT_ORDER = Contract.Contacts.COLUMN_NAME_NAME + " ASC";
 
 	      final String[] CONTACT_ID_PROJECTION = {
 	           Contract.Contacts._ID,
-	           Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY};
+	           Contract.Contacts.COLUMN_NAME_PHONE_NUMBER};
 
 	      Uri contactIdUri = ContentUris.withAppendedId(Contract.Contacts.CONTACTS_ID_URI, 1);
 
@@ -239,8 +245,8 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 
 	public void testInserts() {
         ContactInfo contact = new ContactInfo(
-            4, 
-            "4" 
+            "seven", 
+            "7" 
         );
 
         Uri rowUri = mMockResolver.insert(
@@ -262,11 +268,11 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 
         assertTrue(cursor.moveToFirst());
 
-        int systemIdIndex = cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_SYSTEM_ID);
-        int systemLookupKeyIndex = cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY);
+        int nameIndex = cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME);
+        int phoneNumberIndex = cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER);
 
-        assertEquals(contact.systemId, cursor.getLong(systemIdIndex));
-        assertEquals(contact.systemLookupKey, cursor.getString(systemLookupKeyIndex));
+        assertEquals(contact.name, cursor.getString(nameIndex));
+        assertEquals(contact.phoneNumber, cursor.getString(phoneNumberIndex));
 
         ContentValues values = contact.getContentValues();
 
@@ -286,9 +292,9 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 	public void testDeletes() {
 
 		//where条件
-        final String SELECTION_COLUMNS = Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY + " = " + "?";
+        final String SELECTION_COLUMNS = Contract.Contacts.COLUMN_NAME_NAME + " = " + "?";
 
-        final String[] SELECTION_ARGS = { "0" };
+        final String[] SELECTION_ARGS = { "one" };
 
         //进行删除
         int rowsDeleted = mMockResolver.delete(
@@ -331,13 +337,13 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 	 */
 	public void testUpdates() {
 
-        final String SELECTION_COLUMNS = Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY + " = " + "?";
+        final String SELECTION_COLUMNS = Contract.Contacts.COLUMN_NAME_NAME + " = " + "?";
 
-        final String[] selectionArgs = { "1" };
+        final String[] selectionArgs = { "one" };
 
         ContentValues values = new ContentValues();
 
-        values.put(Contract.Contacts.COLUMN_NAME_SYSTEM_ID, 11);
+        values.put(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER, "110");
 
         int rowsUpdated = mMockResolver.update(
             Contract.Contacts.CONTACTS_URI,
@@ -367,17 +373,18 @@ public class ContactsProviderTest extends ProviderTestCase2<ContactsProvider> {
 	 *
 	 */
 	private static class ContactInfo{
-		long systemId;
-		String systemLookupKey;
-		public ContactInfo(long mSystemId, String mSystemLookupKey){
-			systemId = mSystemId;
-			systemLookupKey = mSystemLookupKey;
+		String name;
+		String phoneNumber;
+		Bitmap bitmap;
+		public ContactInfo(String mName, String mPhoneNumber){
+			name = mName;
+			phoneNumber = mPhoneNumber;
 		}
 
 		public ContentValues getContentValues(){
 			ContentValues v = new ContentValues();
-			v.put(Contract.Contacts.COLUMN_NAME_SYSTEM_ID, systemId);
-			v.put(Contract.Contacts.COLUMN_NAME_SYSTEM_LOOKUP_KEY, systemLookupKey);
+			v.put(Contract.Contacts.COLUMN_NAME_NAME, name);
+			v.put(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER, phoneNumber);
 			return v;
 		}
 	}

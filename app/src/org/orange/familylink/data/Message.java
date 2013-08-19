@@ -101,10 +101,24 @@ public class Message implements Cloneable{
 			 */
 			public abstract static class Command {
 				/**
+				 * 回显。主要用于测试
+				 */
+				public static final int ECHO		 = 0x01;
+				/**
 				 * 现在定位
 				 */
-				public static final int LOCATE_NOW = 0x01;
+				public static final int LOCATE_NOW	 = 0x02;
 
+				/**
+				 * 检测指定code是不是设置了{@link #ECHO}位
+				 * @param code 待检测code
+				 * @return 如果code是{@link Code#COMMAND}并且设置了{@link #ECHO}位，返回true；否则返回false
+				 */
+				public static boolean hasSetEcho(int code) {
+					if(!isCommand(code))
+						return false;
+					return (code & ECHO) == ECHO;
+				}
 				/**
 				 * 检测指定code是不是设置了{@link #LOCATE_NOW}位
 				 * @param code 待检测code
@@ -195,10 +209,11 @@ public class Message implements Cloneable{
 	private String body = null;
 
 	/**
-	 * 使用默认值构造本类。
-	 * <p>Tips：可以类似这样使用链式调用
-	 * <pre><code>new Message().setBody(MessageTest.TEST_CASE_BODY)
-	 *     .setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);</code></pre></p>
+	 * 使用默认值构造本类
+	 * <p>
+	 * Tips：可以类似这样使用链式调用
+	 * <pre><code>new Message().setBody("Hello")
+	 *     .setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);</code></pre>
 	 */
 	public Message() {
 		super();
@@ -266,6 +281,7 @@ public class Message implements Cloneable{
 	 * @param context 应用全局信息
 	 * @param contactId 联系人{@link Messages#COLUMN_NAME_CONTACT_ID ID}
 	 * @param dest 发送目的{@link Messages#COLUMN_NAME_ADDRESS 地址}
+	 * @see #receive(Context, String)
 	 */
 	public void send(Context context, Long contactId , String dest) {
 		send(context, contactId, dest, Settings.getPassword(context));
@@ -278,6 +294,7 @@ public class Message implements Cloneable{
 	 * @param contactId 联系人{@link Messages#COLUMN_NAME_CONTACT_ID ID}
 	 * @param dest 发送目的{@link Messages#COLUMN_NAME_ADDRESS 地址}
 	 * @param password 要发送信息的加密密码
+	 * @see #receive(String, String)
 	 */
 	public void send(Context context, Long contactId , String dest, String password) {
 		Uri newUri = null;
@@ -295,6 +312,31 @@ public class Message implements Cloneable{
 		this.body = Crypto.encrypt(body, password);
 		SmsSender.sendMessage(context, newUri, toJson(), dest);
 		this.body = body;
+	}
+
+	/**
+	 * 接收消息。把接收到的消息解析为本类的实例。
+	 * @param context 应用全局信息
+	 * @param receivedMessage 接收到的消息
+	 * @return 解析后得到的本类的实例对象
+	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
+	 * @see #send(Context, Long, String)
+	 */
+	public static Message receive(Context context, String receivedMessage) {
+		return receive(receivedMessage, Settings.getPassword(context));
+	}
+	/**
+	 * 接收消息。把接收到的消息解析为本类的实例。
+	 * @param receivedMessage 接收到的消息
+	 * @param password 解密密钥
+	 * @return 解析后得到的本类的实例对象
+	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
+	 * @see #send(Context, Long, String, String)
+	 */
+	public static Message receive(String receivedMessage, String password) {
+		Message m = Message.fromJson(receivedMessage);
+		m.body = Crypto.decrypt(m.body, password);
+		return m;
 	}
 
 	/**

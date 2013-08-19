@@ -12,9 +12,13 @@
 
     <string name="unknown">unknown</string>
     <string name="undefined">undefined</string>
+    <!-- SmsStatusReceiver -->
+    <string name="failed_to_send_because_of_radio_off">Because of radio off, failed to send %s.</string>
     <!-- Log -->
     <string name="no_message_record">No Message Record</string>
-    <string name="illegal_code">Ilegal Code: %d</string>
+    <string name="address_formatter" translatable="false">&#160;:&#160;%s</string>
+    <string name="illegal_code">Illegal Code: %d</string>
+    <string name="all">All</string>
     <string name="inform">inform</string>
     <string name="command">command</string>
     <string name="respond">respond</string>
@@ -22,12 +26,14 @@
     <string name="urgent">urgent</string>
     <string name="locate_now">locate now</string>
     <string-array name="code">
+        <item>@string/all</item>
         <item>@string/inform</item>
         <item>@string/pulse</item>
         <item>@string/urgent</item>
         <item>@string/command</item>
     </string-array>
 
+    <string name="send_status_formatter" translatable="false">(%s)</string>
     <string name="send">send</string>
     <string name="receive">receive</string>
     <string name="has_read">read</string>
@@ -37,6 +43,7 @@
     <string name="delivered">delivered</string>
     <string name="failed_to_send">failed to send</string>
     <string-array name="message_status">
+        <item>@string/all</item>
         <item>@string/receive</item>
         <item>@string/unread</item>
         <item>@string/has_read</item>

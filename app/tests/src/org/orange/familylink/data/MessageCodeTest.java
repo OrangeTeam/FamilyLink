@@ -54,6 +54,11 @@ public class MessageCodeTest extends TestCase {
 				Code.Extra.Inform.class.getMethod("hasSetUrgent", int.class));
 	}
 	// ---------- Command ----------
+	public void testHasSetEcho()
+			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		testFlag(Code.COMMAND, Code.Extra.Command.ECHO,
+				Code.Extra.Command.class.getMethod("hasSetEcho", int.class));
+	}
 	public void testHasSetLocateNow()
 			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		testFlag(Code.COMMAND, Code.Extra.Command.LOCATE_NOW,
