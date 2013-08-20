@@ -42,7 +42,6 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
@@ -96,15 +95,6 @@ public class LogFragment extends ListFragment {
 				LinearLayout.LayoutParams.WRAP_CONTENT,
 				0));
 		// ------------------------------------------------------------------
-
-		// 按照Android设计指导，设置上下margin
-		// http://developer.android.com/design/style/metrics-grids.html
-		ListView listView = (ListView) originalRoot.findViewById(android.R.id.list);
-		int margin = getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
-		View space = new View(getActivity());
-		space.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, margin));
-		listView.addHeaderView(space, null, false);
-		listView.addFooterView(space, null, false);
 		return root;
 	}
 
