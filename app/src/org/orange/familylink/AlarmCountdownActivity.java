@@ -1,18 +1,21 @@
 package org.orange.familylink;
 
-import de.passsy.holocircularprogressbar.HoloCircularProgressBar;
-import android.animation.Animator;
-import android.animation.Animator.AnimatorListener;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.animation.ValueAnimator.AnimatorUpdateListener;
-import android.app.Activity;
+import org.holoeverywhere.app.Activity;
+import org.holoeverywhere.widget.TextView;
+import org.holoeverywhere.widget.Toast;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.MotionEvent;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import com.actionbarsherlock.internal.nineoldandroids.animation.Animator;
+import com.actionbarsherlock.internal.nineoldandroids.animation.Animator.AnimatorListener;
+import com.actionbarsherlock.internal.nineoldandroids.animation.ObjectAnimator;
+import com.actionbarsherlock.internal.nineoldandroids.animation.ValueAnimator;
+import com.actionbarsherlock.internal.nineoldandroids.animation.ValueAnimator.AnimatorUpdateListener;
+
+import de.passsy.holocircularprogressbar.HoloCircularProgressBar;
 
 public class AlarmCountdownActivity extends Activity {
 

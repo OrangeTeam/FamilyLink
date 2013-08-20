@@ -4,6 +4,9 @@
     <style name="AppTheme" parent="@style/Holo.Theme.Light.DarkActionBar">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
+    <style name="AppTheme.CircularProgress">
+        <item name="circularProgressBarStyle">@style/FamilyLink.CircularProgressBarLight</item>
+    </style>
 
     <style name="TextAppearance.AppTheme" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/default_text_color</item>
@@ -18,8 +21,8 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-     <style name="AppThemeLight" parent="android:Theme.Holo.Light">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="circularProgressBarStyle">@style/CircularProgressBarLight</item>
+    <style name="FamilyLink.CircularProgressBarLight" parent="@style/CircularProgressBarLight">
+        <item name="progress_color">@color/holo_red_light</item>
     </style>
+
 </resources>

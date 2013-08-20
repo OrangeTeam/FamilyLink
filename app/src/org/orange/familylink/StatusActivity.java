@@ -5,6 +5,9 @@ package org.orange.familylink;
 
 import java.util.List;
 
+import org.holoeverywhere.app.Activity;
+import org.holoeverywhere.widget.LinearLayout;
+import org.holoeverywhere.widget.TextView;
 import org.orange.familylink.alarm.AccelerometerListener;
 import org.orange.familylink.alarm.AccelerometerListener.OnFallListener;
 
@@ -19,18 +22,16 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
+
+import com.actionbarsherlock.app.ActionBar;
 
 /**
  * 显示应用的当前状态
  * @author Team Orange
  */
-public class StatusActivity extends ActionBarActivity {
+public class StatusActivity extends Activity {
 	private TextView mMainTextView;
 	private GraphView mStatusGraphView;
 
@@ -60,7 +61,7 @@ public class StatusActivity extends ActionBarActivity {
 	}
 	/**
 	 * 初始化配置主界面
-	 * @see #setContentView(android.view.View)
+	 * @see #setContentView(View)
 	 */
 	protected void setupContentView() {
 		LinearLayout mainContainer = new LinearLayout(this);
