@@ -34,6 +34,27 @@
         holo:positiveButtonText="@null" />
 
     <PreferenceCategory
+        holo:title="@string/pref_title_location_service" >
+
+        <CheckBoxPreference
+            holo:key="start_location_service"
+            holo:defaultValue="false"
+            holo:title="@string/pref_title_start_location_service" />
+
+        <ListPreference
+            holo:key="location_frequency"
+            holo:defaultValue="60"
+            holo:title="@string/pref_title_location_frequency"
+            holo:dependency="start_location_service"
+            holo:layout="?attr/preferenceLayoutChild"
+            holo:entries="@array/pref_location_frequency_titles"
+            holo:entryValues="@array/pref_location_frequency_values"
+            holo:negativeButtonText="@null"
+            holo:positiveButtonText="@null" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         holo:title="@string/pref_notifications" >
 
         <!--

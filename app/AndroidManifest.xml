@@ -8,7 +8,9 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="18" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <application
         android:name="org.holoeverywhere.app.Application"
         android:allowBackup="true"
@@ -29,6 +31,13 @@
 
         <!-- 短信发送状态Receiver -->
         <receiver android:name=".sms.SmsStatusReceiver" />
+        <!-- 开机启动的Receiver，用于开启Service -->
+        <receiver android:name=".location.BootBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
+            </intent-filter>
+        </receiver>
 
         <!-- The main/home activity (has no parent activity) -->
         <activity
@@ -46,6 +55,8 @@
             android:name="org.orange.familylink.SettingsActivity"
             android:label="@string/settings" >
         </activity>
+
+        <service android:name=".location.LocationService" />
 
     </application>
 

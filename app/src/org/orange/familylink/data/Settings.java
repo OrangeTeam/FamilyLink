@@ -37,6 +37,20 @@ public class Settings {
 	 */
 	public static final String PREF_KEY_SYNC_FREQUENCY ="sync_frequency";
 	/**
+	 * 设置项key：启动定位服务
+	 * Type: String
+	 * <p>
+	 * true 就启动这个服务
+	 */
+	public static final String PREF_KEY_START_LOCATION_SERVICE = "start_location_service";
+	/**
+	 * 设置项key：定位频率
+	 * Type:String
+	 * <p>
+	 * 定位的时间间隔值，单位：分钟
+	 */
+	public static final String PREF_KEY_LOCATIN_FREQUENCY = "location_frequency";
+	/**
 	 * 设置项key：新消息通知
 	 * <p>
 	 * Type：boolean
@@ -136,5 +150,29 @@ public class Settings {
 			return -1L;
 		else
 			return Long.parseLong(freq) * 60 * 1000;
+	}
+
+	/**
+	 * 获取‘开启定位服务’项是否被选中
+	 * @param context
+	 * @return 返回true则为需要开启定位服务
+	 */
+	public static boolean getStartLocationService(Context context){
+		return PreferenceManager.getDefaultSharedPreferences(context)
+				.getBoolean(PREF_KEY_START_LOCATION_SERVICE, false);
+	}
+
+	/**
+	 * 获取定位频率
+	 * @param context
+	 * @return 返回定位频率，定位频率为两次定位之间的时间间隔
+	 */
+	public static Long getLocationFrequency(Context context){
+		String locationFrequency = PreferenceManager.getDefaultSharedPreferences(context)
+				.getString(PREF_KEY_LOCATIN_FREQUENCY, null);
+		if(locationFrequency == null)
+			return null;
+		else
+			return Long.parseLong(locationFrequency) * 60 * 1000;
 	}
 }

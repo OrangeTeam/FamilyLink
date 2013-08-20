@@ -8,6 +8,10 @@
     <string name="pref_summary_password">用于加密发送的消息</string>
     <string name="pref_title_role">角色</string>
     <string name="pref_title_sync_frequency">同步频率</string>
+    <string name="pref_title_location_service">定位服务</string>
+    <string name="pref_title_start_location_service">开启后台定位服务</string>
+    <string name="pref_title_location_frequency">定位频率</string>
+    <string name="pref_title_times">定位的次数</string>
 
     <!-- 这一个string-array也在InitialSetupDialogFragment使用 -->
     <string-array name="pref_role_titles">
@@ -22,6 +26,15 @@
         <item>3 小时</item>
         <item>6 小时</item>
         <item>从不</item>
+    </string-array>
+
+    <string-array name="pref_location_frequency_titles">
+        <item>15分钟</item><item>30分钟</item>
+        <item>1小时</item><item>1.5小时</item>
+        <item>2小时</item><item>2.5小时</item>
+        <item>3小时</item><item>3.5小时</item>
+        <item>4小时</item><item>4.5小时</item>
+        <item>5小时</item><item>6小时</item>
     </string-array>
 
 

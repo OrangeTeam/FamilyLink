@@ -6,7 +6,6 @@ import org.holoeverywhere.preference.PreferenceManager;
 import org.holoeverywhere.widget.ViewPager;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
-import org.orange.familylink.fragment.LocationFragment;
 import org.orange.familylink.fragment.LogFragment;
 import org.orange.familylink.fragment.NavigateFragment;
 import org.orange.familylink.fragment.SeekHelpFragment;
@@ -31,10 +30,10 @@ public class MainActivity extends BaseActivity {
 	// 用string ID表示页面及其顺序
 	/** 照料者的页面及其顺序 */
 	private static final int[] PAGERS_ORDER_CARER =
-			new int[]{R.string.log, R.string.seek_help, R.string.navigate,R.string.location};
+			new int[]{R.string.log, R.string.seek_help, R.string.navigate};
 	/** 受顾者的页面及其顺序 */
 	private static final int[] PAGERS_ORDER_CAREE =
-			new int[]{R.string.seek_help, R.string.log, R.string.navigate,R.string.location};
+			new int[]{R.string.seek_help, R.string.log, R.string.navigate};
 
 	private ViewPager mViewPager;
 	private Role mRole;
@@ -178,8 +177,6 @@ public class MainActivity extends BaseActivity {
 				return new LogFragment();
 			case R.string.navigate:
 				return new NavigateFragment();
-			case R.string.location:
-				return new LocationFragment();
 			}
 			throw new IllegalArgumentException("illegal position: " + position);
 		}

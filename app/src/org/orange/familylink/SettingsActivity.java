@@ -1,5 +1,6 @@
 package org.orange.familylink;
 
+import org.holoeverywhere.preference.CheckBoxPreference;
 import org.holoeverywhere.preference.EditTextPreference;
 import org.holoeverywhere.preference.ListPreference;
 import org.holoeverywhere.preference.Preference;
@@ -7,13 +8,18 @@ import org.holoeverywhere.preference.PreferenceActivity;
 import org.holoeverywhere.preference.PreferenceManager;
 import org.holoeverywhere.preference.RingtonePreference;
 import org.orange.familylink.data.Settings;
+import org.orange.familylink.location.LocationService;
 
+import android.content.Context;
+import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
+
+
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -52,6 +58,8 @@ public class SettingsActivity extends PreferenceActivity {
 		// to reflect the new value, per the Android Design guidelines.
 		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_ROLE));
 		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_SYNC_FREQUENCY));
+		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_START_LOCATION_SERVICE));
+		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_LOCATIN_FREQUENCY));
 		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_NOTIFICATIONS_NEW_MESSAGE_RINGTONE));
 	}
 
@@ -63,6 +71,24 @@ public class SettingsActivity extends PreferenceActivity {
 			sync.setEnabled(true);
 		else
 			throw new IllegalArgumentException("Illegal role value");
+	}
+
+	/**
+	 * 调用此方法用于开启后台定位服务
+	 * @param context
+	 */
+	private void toStartLocationService(Context context){
+		Intent intent = new Intent(context, LocationService.class);
+		context.startService(intent);
+	}
+
+	/**
+	 * 调用此方法停止后台定位服务
+	 * @param context
+	 */
+	private void toEndLocationService(Context context){
+		Intent intent = new Intent(context, LocationService.class);
+		context.stopService(intent);
 	}
 
 	/**
@@ -87,7 +113,28 @@ public class SettingsActivity extends PreferenceActivity {
 
 				if(Settings.PREF_KEY_ROLE.equals(listPreference.getKey()))
 					onRoleChanged(listPreference, stringValue);
-			} else if (preference instanceof RingtonePreference) {
+
+				//如果用户更改了定位的频率，就会重新启动定位服务
+				if(Settings.PREF_KEY_LOCATIN_FREQUENCY.equals(listPreference.getKey())){
+					//这里是一旦用户更改了定位的时间间隔，就要从新更改服务中的定位的时间计划任务，也就是也先停用服务在开启
+					//这样避免了计划任务再次被调用而出现异常，这里不要判断服务是否被开启就可以停用这个服务，是因为
+					//stopService方法，这个方法如果服务没被启动，那么停止它将不会有任何影响
+					toEndLocationService(preference.getContext());
+					toStartLocationService(preference.getContext());
+				}
+
+			} else if(preference instanceof CheckBoxPreference){
+
+				CheckBoxPreference checkBoxPreference = (CheckBoxPreference)preference;
+
+				//判断是否开启了后台定位服务，如果选择了开启就启动后台定位服务
+				if(Settings.PREF_KEY_START_LOCATION_SERVICE.equals(checkBoxPreference.getKey())){
+					if("true".equals(stringValue))
+						toStartLocationService(preference.getContext());
+					if("false".equals(stringValue))
+						toEndLocationService(preference.getContext());
+				}
+			}else if (preference instanceof RingtonePreference) {
 				// For ringtone preferences, look up the correct display value
 				// using RingtoneManager.
 				if (TextUtils.isEmpty(stringValue)) {
@@ -135,10 +182,18 @@ public class SettingsActivity extends PreferenceActivity {
 
 		// Trigger the listener immediately with the preference's
 		// current value.
-		sBindPreferenceSummaryToValueListener.onPreferenceChange(
-				preference,
-				PreferenceManager.getDefaultSharedPreferences(
-						preference.getContext()).getString(preference.getKey(),
-						""));
+		if(preference instanceof CheckBoxPreference){
+			sBindPreferenceSummaryToValueListener.onPreferenceChange(
+					preference,
+					PreferenceManager.getDefaultSharedPreferences(
+							preference.getContext()).getBoolean(preference.getKey(),
+							false));
+		}else{
+			sBindPreferenceSummaryToValueListener.onPreferenceChange(
+					preference,
+					PreferenceManager.getDefaultSharedPreferences(
+							preference.getContext()).getString(preference.getKey(),
+							""));
+		}
 	}
 }
