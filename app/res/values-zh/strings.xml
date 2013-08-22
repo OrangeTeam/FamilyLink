@@ -12,10 +12,17 @@
 
     <string name="unknown">未知</string>
     <string name="undefined">未定义</string>
+
+    <!-- menu -->
+    <string name="delete">删除</string>
+
     <!-- SmsStatusReceiver -->
     <string name="failed_to_send_because_of_radio_off">由于无线被关闭，发送  %s 失败。</string>
     <!-- Log -->
     <string name="no_message_record">无过往消息记录</string>
+    <string name="checked_one_message">1 条消息</string>
+    <string name="checked_n_messages">%d 条消息</string>
+
     <string name="illegal_code">非法代码：%d</string>
     <string name="all">全部</string>
     <string name="inform">通知</string>

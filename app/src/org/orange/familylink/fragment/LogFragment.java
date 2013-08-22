@@ -19,6 +19,7 @@ import org.holoeverywhere.widget.ArrayAdapter;
 import org.holoeverywhere.widget.CheckedTextView;
 import org.holoeverywhere.widget.LinearLayout;
 import org.holoeverywhere.widget.ListView;
+import org.holoeverywhere.widget.ListView.MultiChoiceModeListener;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
 import org.orange.familylink.R;
@@ -46,6 +47,11 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
 
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
 /**
  * 日志{@link ListFragment}
  * @author Team Orange
@@ -58,6 +64,8 @@ public class LogFragment extends ListFragment {
 	private static final int LOADER_ID_CONTACTS = 1;
 	private static final int LOADER_ID_LOG = 2;
 
+	/** 当前启动的{@link ActionMode}；如果没有启动，则为null */
+	private ActionMode mActionMode;
 	/** 用于把联系人ID映射为联系人名称的{@link Map} */
 	private Map<Long, String> mContactIdToNameMap;
 	/** 用于显示联系人筛选条件的{@link Spinner}的{@link SpinnerAdapter} */
@@ -112,6 +120,12 @@ public class LogFragment extends ListFragment {
 		// Give some text to display if there is no data.
 		setEmptyText(getResources().getText(R.string.no_message_record));
 
+		// 设置ListView为多选模式
+		ListView listView = getListView();
+		listView.setItemsCanFocus(false);
+		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		listView.setMultiChoiceModeListener(mMultiChoiceModeListener);
+
 		// We have a menu item to show in action bar.
 		setHasOptionsMenu(true);
 
@@ -142,6 +156,13 @@ public class LogFragment extends ListFragment {
 			editor.apply();
 		else
 			editor.commit();
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		if(mActionMode == null)
+			l.setItemChecked(position, true); //触发ActionModes
 	}
 
 	/**
@@ -448,6 +469,47 @@ public class LogFragment extends ListFragment {
 		@Override
 		public void onNothingSelected(AdapterView<?> parent) {}
 	};
+	protected final MultiChoiceModeListener mMultiChoiceModeListener =
+			new MultiChoiceModeListener() {
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			mActionMode = mode;
+			// Inflate the menu for the contextual action bar
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.fragment_log_action_mode, menu);
+			return true;
+		}
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			// Here you can perform updates to the CAB due to
+			// an invalidate() request
+			return false;
+		}
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			return false;
+		}
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			// Here you can make any necessary updates to the activity when
+			// the CAB is removed. By default, selected items are deselected/unchecked.
+			mActionMode = null;
+		}
+
+		@Override
+		public void onItemCheckedStateChanged(ActionMode mode, int position,
+				long id, boolean checked) {
+			updateTitle(mode);
+		}
+		@SuppressLint("NewApi")
+		protected void updateTitle(ActionMode mode) {
+			int count = getListView().getCheckedItemCount();
+			String title = getString(
+					count > 1 ? R.string.checked_n_messages : R.string.checked_one_message,
+					count);
+			mode.setTitle(title);
+		}
+	};
 
 	protected class LogAdapter extends CursorAdapter {
 		private final Context mContext;
@@ -472,6 +534,7 @@ public class LogFragment extends ListFragment {
 			holder.address = (TextView) rootView.findViewById(R.id.address);
 			holder.send_status = (TextView) rootView.findViewById(R.id.send_status);
 			holder.date = (TextView) rootView.findViewById(R.id.date);
+			holder.type_icon = (ImageView) rootView.findViewById(R.id.type_icon);
 			holder.directon_icon = (ImageView) rootView.findViewById(R.id.direction_icon);
 			holder.unread_icon = (ImageView) rootView.findViewById(R.id.unread_icon);
 			rootView.setTag(holder);
@@ -499,7 +562,7 @@ public class LogFragment extends ListFragment {
 			// message code
 			holder.code.setText(valueOfCode(code));
 			holder.code_extra.setText(valueOfCodeExtra(code, " | "));
-			setViewColor(code, view);
+			setViewColor(code, holder.type_icon);
 			// message body
 			if(body != null)
 				holder.body.setText(body);
@@ -574,7 +637,7 @@ public class LogFragment extends ListFragment {
 					colorResId = R.color.command;
 					break;
 				default:
-					colorResId = R.color.other_code;
+					colorResId = android.R.color.transparent;
 			}
 			rootView.setBackgroundColor(getResources().getColor(colorResId));
 		}
@@ -622,6 +685,7 @@ public class LogFragment extends ListFragment {
 			TextView address;
 			TextView send_status;
 			TextView date;
+			ImageView type_icon;
 			ImageView directon_icon;
 			ImageView unread_icon;
 		}
