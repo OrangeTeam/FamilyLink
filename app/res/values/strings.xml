@@ -64,4 +64,12 @@
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">Initial Setup</string>
 
+    <!-- network -->
+    <string name="no_connection_title">No Connection</string>
+    <string name="no_connection_message">Whether to open the network Settings now</string>
+
+    <!-- navigation -->
+    <string name="no_maps_app_title">Install GOOGLE MAPS Application</string>
+    <string name="no_maps_app_message">Whether to open android market to install GOOGLE MAPS now?</string>
+
 </resources>

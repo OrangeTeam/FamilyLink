@@ -11,7 +11,6 @@
     <string name="pref_title_location_service">定位服务</string>
     <string name="pref_title_start_location_service">开启后台定位服务</string>
     <string name="pref_title_location_frequency">定位频率</string>
-    <string name="pref_title_times">定位的次数</string>
 
     <!-- 这一个string-array也在InitialSetupDialogFragment使用 -->
     <string-array name="pref_role_titles">
