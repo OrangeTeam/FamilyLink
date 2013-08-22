@@ -14,8 +14,13 @@ public class Contract {
 
 	//数据库名字
 	public static final String DATABASE_NAME = "familylink.db";
-	//以下两个为联系人和信息表的表名
+	/**
+	 * 联系人表名“contacts"
+	 */
 	public static final String DATABASE_CONTACTS_TABLE = "contacts";
+	/**
+	 * 信息表名“messages”
+	 */
 	public static final String DATABASE_MESSAGES_TABLE = "messages";
 	//数据库的版本
 	public static final int DATABASE_VERSION = 1;
@@ -43,11 +48,17 @@ public class Contract {
 		public static final String CONTACTS_TYPE = "vnd.android.cursor.dir/vnd.familylink.contacts";
 		//contacts表中单个项类型的mime
 		public static final String CONTACTS_ITEM_TYPE = "vnd.android.cursor.item/vnd.familylink.contacts";
-		/*
-		 * contacts表中的字段
+		/**
+		 * 联系人表中的联系人名字  String
 		 */
 		public static final String COLUMN_NAME_NAME = "name";
+		/**
+		 * 联系人表中的联系人电话号码  String
+		 */
 		public static final String COLUMN_NAME_PHONE_NUMBER = "phone_number";
+		/**
+		 * 联系人表中的联系人照片，存储是blob，但用数据库操作类进行操作时是传入bitmap
+		 */
 		public static final String COLUMN_NAME_PHOTO = "photo";
 
 
@@ -79,14 +90,29 @@ public class Contract {
 		public static final String MESSAGES_TYPE = "vnd.android.cursor.dir/vnd.familylink.messages";
 		//messages表中单项类型的mime
 		public static final String MESSAGES_ITEM_TYPE = "vnd.android.cursor.item/vnd.familylink.messages";
-		/*
-		 * messages表中各个字段
+		/**
+		 * 信息表中的‘联系人记录的id’，也就是这个字段是跟联系人表关联，来自联系人表的id字段  long
 		 */
 		public static final String COLUMN_NAME_CONTACT_ID = "contact_id";
+		/**
+		 * 信息表中的地址也就是手机号  String
+		 */
 		public static final String COLUMN_NAME_ADDRESS = "address";
+		/**
+		 * 信息表中的时间字段用于存储发送或接受短信的时间，存储是用long，但如果用数据库操作类进行操作时是用Date
+		 */
 		public static final String COLUMN_NAME_TIME = "time";
+		/**
+		 * 信息表中的状态存储信息是‘正在发送’、‘已发送’、‘已送达’、‘发送失败’等情况  String
+		 */
 		public static final String COLUMN_NAME_STATUS = "status";
+		/**
+		 * 信息表中的信息所发送的内容就是短信内容  String
+		 */
 		public static final String COLUMN_NAME_BODY = "body";
+		/**
+		 * 信息表中的代表短信级别的码  int
+		 */
 		public static final String COLUMN_NAME_CODE = "CODE";
 
 		//这个常量字符串是创建messages表的sql语句
