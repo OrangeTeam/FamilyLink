@@ -43,10 +43,7 @@
         <!-- The main/home activity (has no parent activity) -->
         <activity
             android:name="org.orange.familylink.MainActivity"
-            android:label="@string/app_name"
-            android:uiOptions="splitActionBarWhenNarrow" >
-            <meta-data android:name="android.support.UI_OPTIONS"
-                   android:value="splitActionBarWhenNarrow" />
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

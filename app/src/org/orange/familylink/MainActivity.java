@@ -11,7 +11,6 @@ import org.orange.familylink.fragment.NavigateFragment;
 import org.orange.familylink.fragment.SeekHelpFragment;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -103,12 +102,6 @@ public class MainActivity extends BaseActivity {
 		ActionBar actionBar = getSupportActionBar();
 		// Specify that the Home/Up button should not be enabled, since there is no hierarchical parent.
 		actionBar.setHomeButtonEnabled(false);
-		if(getResources().getConfiguration().orientation ==
-				Configuration.ORIENTATION_PORTRAIT) {
-			//Let navigation tabs to collapse into the main action bar
-			actionBar.setDisplayShowHomeEnabled(false);
-			actionBar.setDisplayShowTitleEnabled(false);
-		}
 		// Specify that tabs should be displayed in the action bar.
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		// Create a tab listener that is called when the user changes tabs.
