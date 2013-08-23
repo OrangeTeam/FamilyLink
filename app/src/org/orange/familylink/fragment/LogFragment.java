@@ -6,6 +6,7 @@ package org.orange.familylink.fragment;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,7 @@ import org.orange.familylink.database.Contract;
 import org.orange.familylink.fragment.LogFragment.MessagesSender.MessageWrapper;
 
 import android.annotation.SuppressLint;
+import android.content.AsyncQueryHandler;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -483,6 +485,7 @@ public class LogFragment extends ListFragment {
 			new MultiChoiceModeListener() {
 		private int mUnretransmittableCount = 0;
 		private MessagesSender mMessagesSender = null;
+		private List<AsyncQueryHandler> mDeletehandlers = new LinkedList<AsyncQueryHandler>();
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -521,6 +524,9 @@ public class LogFragment extends ListFragment {
 						.show();
 					return true;
 				}
+				break;
+			case R.id.delete:
+				deletetSelectedItems();
 				break;
 			default:
 				return false;
@@ -601,6 +607,39 @@ public class LogFragment extends ListFragment {
 				}
 			};
 			mMessagesSender.execute(messages);
+		}
+
+		protected void deletetSelectedItems() {
+			// 构造删除条件（where子句）
+			long[] ids = getListView().getCheckedItemIds();
+			if(ids == null)
+				throw new NullPointerException("ids is null");
+			if(ids.length == 0)
+				return;
+			StringBuilder sb = new StringBuilder();
+			for(long id : ids)
+				sb.append(id + ",");
+			sb.deleteCharAt(sb.length() - 1);
+			String selection = Contract.Messages._ID + " IN ( " + sb.toString() + " )";
+
+			AsyncQueryHandler handler = new AsyncQueryHandler(
+					getActivity().getContentResolver()) {
+				@Override
+				protected void onDeleteComplete(int token,
+						Object cookie, int result) {
+					mDeletehandlers.remove(this);
+					if(mDeletehandlers.isEmpty())
+						getSupportActivity().setSupportProgressBarIndeterminateVisibility(false);
+					Toast.makeText(
+							getActivity(),
+							getString(R.string.prompt_delete_messages_successfully, result),
+							Toast.LENGTH_LONG)
+						.show();
+				}
+			};
+			mDeletehandlers.add(handler);
+			getSupportActivity().setSupportProgressBarIndeterminateVisibility(true);
+			handler.startDelete(-1, null, Contract.Messages.MESSAGES_URI, selection, null);
 		}
 
 		protected List<Integer> getCheckedItemPositions() {

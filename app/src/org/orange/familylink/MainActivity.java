@@ -21,6 +21,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.view.Window;
 
 /**
  * 主{@link Activity}。应用的默认{@link Activity}
@@ -43,8 +44,11 @@ public class MainActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+		// LogFragment在删除消息时使用
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		setSupportProgressBarIndeterminateVisibility(false);
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 
 		setup();

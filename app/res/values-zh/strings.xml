@@ -24,6 +24,7 @@
     <string name="checked_one_message">1 条消息</string>
     <string name="checked_n_messages">%d 条消息</string>
     <string name="prompt_one_retransmission_at_a_time">请在上一次重发完成后再试</string>
+    <string name="prompt_delete_messages_successfully">成功删除了 %d 条消息记录</string>
 
     <string name="illegal_code">非法代码：%d</string>
     <string name="all">全部</string>
