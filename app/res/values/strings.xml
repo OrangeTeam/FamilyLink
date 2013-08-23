@@ -14,6 +14,7 @@
     <string name="undefined">undefined</string>
 
     <!-- menu -->
+    <string name="retransmit">Retransmit</string>
     <string name="delete">Delete</string>
 
     <!-- SmsStatusReceiver -->
@@ -22,6 +23,7 @@
     <string name="no_message_record">No Message Record</string>
     <string name="checked_one_message">One message</string>
     <string name="checked_n_messages">%d messages</string>
+    <string name="prompt_one_retransmission_at_a_time">Please do this after last retransmission finished</string>
 
     <string name="address_formatter" translatable="false">&#160;:&#160;%s</string>
     <string name="illegal_code">Illegal Code: %d</string>

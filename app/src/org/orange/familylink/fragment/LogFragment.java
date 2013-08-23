@@ -3,8 +3,10 @@
  */
 package org.orange.familylink.fragment;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.holoeverywhere.FontLoader;
@@ -22,16 +24,22 @@ import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.ListView.MultiChoiceModeListener;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
+import org.holoeverywhere.widget.Toast;
 import org.orange.familylink.R;
+import org.orange.familylink.data.Message;
 import org.orange.familylink.data.Message.Code;
+import org.orange.familylink.data.MessageLogRecord;
 import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.database.Contract;
+import org.orange.familylink.fragment.LogFragment.MessagesSender.MessageWrapper;
 
 import android.annotation.SuppressLint;
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -41,6 +49,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.format.DateFormat;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -469,8 +478,12 @@ public class LogFragment extends ListFragment {
 		@Override
 		public void onNothingSelected(AdapterView<?> parent) {}
 	};
+	//TODO 筛选条件改变导致数据集变化的处理
 	protected final MultiChoiceModeListener mMultiChoiceModeListener =
 			new MultiChoiceModeListener() {
+		private int mUnretransmittableCount = 0;
+		private MessagesSender mMessagesSender = null;
+
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			mActionMode = mode;
@@ -483,11 +496,37 @@ public class LogFragment extends ListFragment {
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			// Here you can perform updates to the CAB due to
 			// an invalidate() request
-			return false;
+			MenuItem retransmit = menu.findItem(R.id.retransmit);
+			if(canRetransmit()) {
+				retransmit.setVisible(true);
+				retransmit.setEnabled(true);
+			} else {
+				retransmit.setVisible(false);
+				retransmit.setEnabled(false);
+			}
+			return true;
 		}
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			return false;
+			// Respond to clicks on the actions in the CAB
+			switch (item.getItemId()) {
+			case R.id.retransmit:
+				if(mMessagesSender == null)
+					retransmitSelectedItems();
+				else {
+					Toast.makeText(
+							getActivity(),
+							R.string.prompt_one_retransmission_at_a_time,
+							Toast.LENGTH_LONG)
+						.show();
+					return true;
+				}
+				break;
+			default:
+				return false;
+			}
+			mode.finish();
+			return true;
 		}
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
@@ -500,6 +539,20 @@ public class LogFragment extends ListFragment {
 		public void onItemCheckedStateChanged(ActionMode mode, int position,
 				long id, boolean checked) {
 			updateTitle(mode);
+			Cursor cursor = (Cursor) getListView().getItemAtPosition(position);
+			String statusString = cursor.getString(
+					cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_STATUS));
+			Status status = statusString != null ? Status.valueOf(statusString) : null;
+			if(!isRetransmittable(status)) {
+				boolean oldCanRetransmit = canRetransmit();
+				if(checked)
+					mUnretransmittableCount++;
+				else
+					mUnretransmittableCount--;
+				boolean newCanRetransmit = canRetransmit();
+				if(oldCanRetransmit != newCanRetransmit)
+					mode.invalidate();
+			}
 		}
 		@SuppressLint("NewApi")
 		protected void updateTitle(ActionMode mode) {
@@ -508,6 +561,61 @@ public class LogFragment extends ListFragment {
 					count > 1 ? R.string.checked_n_messages : R.string.checked_one_message,
 					count);
 			mode.setTitle(title);
+		}
+
+		protected boolean isRetransmittable(Status status) {
+			return status == Status.FAILED_TO_SEND;
+		}
+		protected boolean canRetransmit() {
+			return mUnretransmittableCount == 0;
+		}
+		protected void retransmitSelectedItems() {
+			List<Integer> items = this.getCheckedItemPositions();
+			MessageWrapper[] messages = new MessageWrapper[items.size()];
+			int index = 0;
+			for(int position : items) {
+				MessageWrapper message = new MessageWrapper();
+				Cursor cursor = (Cursor) mAdapterForLogList.getItem(position);
+				int indexId = cursor.getColumnIndex(Contract.Messages._ID);
+				int indexCode = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE);
+				int indexBody = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_BODY);
+				int indexContactId = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CONTACT_ID);
+				int indexDest = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_ADDRESS);
+				if(!cursor.isNull(indexCode))
+					message.setCode(cursor.getInt(indexCode));
+				message.setBody(cursor.getString(indexBody));
+				message.contactId = cursor.getLong(indexContactId);
+				message.dest = cursor.getString(indexDest);
+				messages[index++] = message;
+				// 设置Uri
+				long _id = cursor.getLong(indexId);
+				Uri uri = Contract.Messages.MESSAGES_ID_URI;
+				uri = ContentUris.withAppendedId(uri, _id);
+				message.uri = uri;
+			}
+			mMessagesSender = new MessagesSender(getActivity()) {
+				@Override
+				protected void onPostExecute(Void result) {
+					super.onPostExecute(result);
+					mMessagesSender = null;
+				}
+			};
+			mMessagesSender.execute(messages);
+		}
+
+		protected List<Integer> getCheckedItemPositions() {
+			List<Integer> checkeditems = new ArrayList<Integer>();
+			ListView listView = getListView();
+			if(listView == null)
+				return checkeditems;
+
+			SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
+			for (int i = 0; i < checkedPositionsBool.size(); i++) {
+				if (checkedPositionsBool.valueAt(i)) {
+					checkeditems.add(checkedPositionsBool.keyAt(i));
+				}
+			}
+			return checkeditems;
 		}
 	};
 
@@ -808,6 +916,51 @@ public class LogFragment extends ListFragment {
 		}
 		public int getPositionWithoutHeader(int rawPosition) {
 			return rawPosition - mHeader.length;
+		}
+	}
+
+	/**
+	 * 用于发送消息的{@link AsyncTask}。支持批量发送。
+	 * @author Team Orange
+	 */
+	protected static class MessagesSender extends
+					AsyncTask<MessagesSender.MessageWrapper, Integer, Void> {
+		private final Context mContext;
+
+		public MessagesSender(Context context) {
+			super();
+			mContext = context;
+		}
+
+		@Override
+		protected Void doInBackground(MessageWrapper... messages) {
+			if(messages == null)
+				return null;
+			final int total = messages.length;
+			int finished = 0;
+			for(MessageWrapper message : messages) {
+				message.send(mContext, message.contactId, message.dest);
+				publishProgress(total, ++finished);
+				if(isCancelled())
+					break;
+			}
+			return null;
+		}
+
+		public static class MessageWrapper extends Message {
+			public long contactId;
+			public String dest;
+			/** 如果用于重发，此属性为原消息的{@link Uri}；如果发送新消息，此属性应设置为null */
+			public Uri uri;
+
+			@Override
+			protected Uri saveMessage(Context context, Long contactId,
+					String address, MessageLogRecord.Status status) {
+				if(uri != null)
+					return uri;
+				else
+					return super.saveMessage(context, contactId, address, status);
+			}
 		}
 	}
 }

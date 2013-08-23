@@ -9,6 +9,5 @@
     <color name="urgent">#1f00</color>
     <color name="respond">#20f0</color>
     <color name="command">#3ff0</color>
-    <color name="other_code">#0fff</color>
 
 </resources>

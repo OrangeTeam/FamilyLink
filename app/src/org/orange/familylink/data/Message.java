@@ -3,6 +3,7 @@
  */
 package org.orange.familylink.data;
 
+import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.database.Contract.Messages;
 import org.orange.familylink.sms.SmsSender;
 import org.orange.familylink.util.Crypto;
@@ -297,21 +298,31 @@ public class Message implements Cloneable{
 	 * @see #receive(String, String)
 	 */
 	public void send(Context context, Long contactId , String dest, String password) {
-		Uri newUri = null;
-		// 在Content Provider中记录发送日志
-		ContentValues newMessage = new ContentValues();
-		newMessage.put(Messages.COLUMN_NAME_CONTACT_ID, contactId);
-		newMessage.put(Messages.COLUMN_NAME_ADDRESS, dest);
-		newMessage.put(Messages.COLUMN_NAME_TIME, System.currentTimeMillis());
-		newMessage.put(Messages.COLUMN_NAME_STATUS, MessageLogRecord.Status.SENDING.name());
-		newMessage.put(Messages.COLUMN_NAME_BODY, getBody());
-		newMessage.put(Messages.COLUMN_NAME_CODE, getCode());
-		newUri = context.getContentResolver().insert(Messages.MESSAGES_URI, newMessage);
+		Uri newUri = saveMessage(context, contactId, dest, Status.SENDING);
 		// 加密body
 		String body = this.body;
 		this.body = Crypto.encrypt(body, password);
 		SmsSender.sendMessage(context, newUri, toJson(), dest);
 		this.body = body;
+	}
+	/**
+	 * 保存消息并返回其{@link Uri}
+	 * @param context 应用上下文环境
+	 * @param contactId 联系人ID
+	 * @param address 地址
+	 * @param status 状态
+	 * @return 保存的消息的{@link Uri}
+	 */
+	protected Uri saveMessage(Context context, Long contactId , String address, Status status) {
+		// 在Content Provider中记录发送日志
+		ContentValues newMessage = new ContentValues();
+		newMessage.put(Messages.COLUMN_NAME_CONTACT_ID, contactId);
+		newMessage.put(Messages.COLUMN_NAME_ADDRESS, address);
+		newMessage.put(Messages.COLUMN_NAME_TIME, System.currentTimeMillis());
+		newMessage.put(Messages.COLUMN_NAME_STATUS, status.name());
+		newMessage.put(Messages.COLUMN_NAME_BODY, getBody());
+		newMessage.put(Messages.COLUMN_NAME_CODE, getCode());
+		return context.getContentResolver().insert(Messages.MESSAGES_URI, newMessage);
 	}
 
 	/**

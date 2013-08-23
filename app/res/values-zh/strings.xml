@@ -14,6 +14,7 @@
     <string name="undefined">未定义</string>
 
     <!-- menu -->
+    <string name="retransmit">重发</string>
     <string name="delete">删除</string>
 
     <!-- SmsStatusReceiver -->
@@ -22,6 +23,7 @@
     <string name="no_message_record">无过往消息记录</string>
     <string name="checked_one_message">1 条消息</string>
     <string name="checked_n_messages">%d 条消息</string>
+    <string name="prompt_one_retransmission_at_a_time">请在上一次重发完成后再试</string>
 
     <string name="illegal_code">非法代码：%d</string>
     <string name="all">全部</string>
