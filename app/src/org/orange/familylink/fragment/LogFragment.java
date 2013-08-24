@@ -4,11 +4,16 @@
 package org.orange.familylink.fragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.holoeverywhere.FontLoader;
 import org.holoeverywhere.LayoutInflater;
@@ -77,6 +82,8 @@ public class LogFragment extends ListFragment {
 
 	/** 当前启动的{@link ActionMode}；如果没有启动，则为null */
 	private ActionMode mActionMode;
+	/** 最近选中的消息的IDs，用于恢复之前的选中状态。仅在{@link #mActionMode} != null时有效 */
+	private long[] mCheckedItemids;
 	/** 用于把联系人ID映射为联系人名称的{@link Map} */
 	private Map<Long, String> mContactIdToNameMap;
 	/** 用于显示联系人筛选条件的{@link Spinner}的{@link SpinnerAdapter} */
@@ -276,6 +283,118 @@ public class LogFragment extends ListFragment {
 		return spinnersContainer;
 	}
 
+	/**
+	 * 选中指定ID的日志消息记录
+	 * <p>
+	 * <strong>Note</strong>：此方法 <em>不会</em> 自动清除以前选中的内容，只会选中指定的消息（如果有的话）
+	 * @param ids 应当选中的消息（如果有的话）的ID
+	 * @return 实际选中的消息的个数
+	 * @see #setItemsCheckedByIds(long[])
+	 */
+	public int checkItemsByIds(long[] ids) {
+		ListView listView = getListView();
+		if(listView == null || mAdapterForLogList == null || mAdapterForLogList.isEmpty()
+				|| ids == null || ids.length == 0)
+			return 0;
+		int counter = 0;
+		// 对ids、LogItems排序
+		SortedMap<Long, Integer> items = new TreeMap<Long, Integer>();
+		for(int i = 0 ; i < mAdapterForLogList.getCount() ; i++) {
+			items.put(mAdapterForLogList.getItemId(i), i);
+		}
+		Arrays.sort(ids);
+		// 依次序比较ids和items中的元素
+		int idIndex = 0;
+		Iterator<Entry<Long, Integer>> iterator = items.entrySet().iterator();
+		long id = ids[idIndex++];	// idIndex和iterator类似指针，id和item类似上个元素的值
+		Entry<Long, Integer> item = iterator.next();
+		while(idIndex < ids.length && iterator.hasNext()) {
+			if(id == item.getKey()) {
+				listView.setItemChecked(item.getValue(), true);
+				counter++;
+				id = ids[idIndex++];
+				item = iterator.next();
+			} else if(id > item.getKey()) {
+				item = iterator.next();
+			} else {	// id < item.getKey()
+				id = ids[idIndex++];
+			}
+		}
+		// id或者item是最后一个元素，比较一下这个边界元素（如果另一个还有，可能还需比较后续元素）
+		if(id == item.getKey()) {
+			listView.setItemChecked(item.getValue(), true);
+			counter++;
+		} else if(id > item.getKey()) {
+			// 尝试后移item
+			while(id > item.getKey() && iterator.hasNext()) {
+				item = iterator.next();
+				if(id == item.getKey()) {
+					listView.setItemChecked(item.getValue(), true);
+					counter++;
+				}
+			}
+		} else {	// id < item.getKey()
+			while(id < item.getKey() && idIndex < ids.length) {
+				id = ids[idIndex++];
+				if(id == item.getKey()) {
+					listView.setItemChecked(item.getValue(), true);
+					counter++;
+				}
+			}
+		}
+		return counter;
+	}
+	/**
+	 * 选中指定ID的日志消息记录，并移动到第一个选中的消息处
+	 * <p>
+	 * <strong>Note</strong>：此方法 <em>会</em> 自动清除以前选中的内容，再选中指定的消息（如果有的话）
+	 * @param ids 应当选中的消息（如果有的话）的ID
+	 * @return 实际选中的消息的个数
+	 * @see #checkItemsByIds(long[])
+	 */
+	@SuppressLint("NewApi")
+	public int setItemsCheckedByIds(long[] ids) {
+		ListView listView = getListView();
+		if(listView == null)
+			return 0;
+		listView.clearChoices();
+		int checkedCount = checkItemsByIds(ids);
+		if(mActionMode != null)
+			mMultiChoiceModeListener.updateTitle(mActionMode);
+
+		if(checkedCount >= 1) {
+			List<Integer> positions = getCheckedItemPositions();
+			int min = positions.get(0);
+			for(Integer position : positions) {
+				if(min > position)
+					min = position;
+			}
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+				listView.smoothScrollToPositionFromTop(min, 0);
+			else
+				listView.smoothScrollToPosition(min);
+		}
+		return checkedCount;
+	}
+
+	/** 取得选中的Items的位置 */
+	public List<Integer> getCheckedItemPositions() {
+		List<Integer> checkeditems = new ArrayList<Integer>();
+		ListView listView = getListView();
+		if(listView == null)
+			return checkeditems;
+		SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
+		if(checkedPositionsBool == null)
+			return checkeditems;
+
+		for (int i = 0; i < checkedPositionsBool.size(); i++) {
+			if (checkedPositionsBool.valueAt(i)) {
+				checkeditems.add(checkedPositionsBool.keyAt(i));
+			}
+		}
+		return checkeditems;
+	}
+
 	private int getImportantCode(Integer code) {
 		if(code == null) {
 			return R.string.undefined;
@@ -457,6 +576,10 @@ public class LogFragment extends ListFragment {
 			} else {
 				setListShownNoAnimation(true);
 			}
+			// 如果处于多选状态，尝试恢复以前的状态
+			if(mActionMode != null) {
+				setItemsCheckedByIds(mCheckedItemids);
+			}
 		}
 
 		@Override
@@ -474,15 +597,18 @@ public class LogFragment extends ListFragment {
 		@Override
 		public void onItemSelected(AdapterView<?> parent, View view,
 				int position, long id) {
+			// 如果正处于多选状态，保存现在的选择状态
+			if(mActionMode != null)
+				mCheckedItemids = getListView().getCheckedItemIds();
 			// 重新加载日志
 			getLoaderManager().restartLoader(LOADER_ID_LOG, null, mLoaderCallbacks);
 		}
 		@Override
 		public void onNothingSelected(AdapterView<?> parent) {}
 	};
-	//TODO 筛选条件改变导致数据集变化的处理
-	protected final MultiChoiceModeListener mMultiChoiceModeListener =
-			new MultiChoiceModeListener() {
+	protected final LogMultiChoiceModeListener mMultiChoiceModeListener =
+			new LogMultiChoiceModeListener();
+	protected class LogMultiChoiceModeListener implements MultiChoiceModeListener {
 		private int mUnretransmittableCount = 0;
 		private MessagesSender mMessagesSender = null;
 		private List<AsyncQueryHandler> mDeletehandlers = new LinkedList<AsyncQueryHandler>();
@@ -561,10 +687,10 @@ public class LogFragment extends ListFragment {
 			}
 		}
 		@SuppressLint("NewApi")
-		protected void updateTitle(ActionMode mode) {
+		public void updateTitle(ActionMode mode) {
 			int count = getListView().getCheckedItemCount();
 			String title = getString(
-					count > 1 ? R.string.checked_n_messages : R.string.checked_one_message,
+					count != 1 ? R.string.checked_n_messages : R.string.checked_one_message,
 					count);
 			mode.setTitle(title);
 		}
@@ -576,7 +702,7 @@ public class LogFragment extends ListFragment {
 			return mUnretransmittableCount == 0;
 		}
 		protected void retransmitSelectedItems() {
-			List<Integer> items = this.getCheckedItemPositions();
+			List<Integer> items = getCheckedItemPositions();
 			MessageWrapper[] messages = new MessageWrapper[items.size()];
 			int index = 0;
 			for(int position : items) {
@@ -641,22 +767,7 @@ public class LogFragment extends ListFragment {
 			getSupportActivity().setSupportProgressBarIndeterminateVisibility(true);
 			handler.startDelete(-1, null, Contract.Messages.MESSAGES_URI, selection, null);
 		}
-
-		protected List<Integer> getCheckedItemPositions() {
-			List<Integer> checkeditems = new ArrayList<Integer>();
-			ListView listView = getListView();
-			if(listView == null)
-				return checkeditems;
-
-			SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
-			for (int i = 0; i < checkedPositionsBool.size(); i++) {
-				if (checkedPositionsBool.valueAt(i)) {
-					checkeditems.add(checkedPositionsBool.keyAt(i));
-				}
-			}
-			return checkeditems;
-		}
-	};
+	}
 
 	protected class LogAdapter extends CursorAdapter {
 		private final Context mContext;
