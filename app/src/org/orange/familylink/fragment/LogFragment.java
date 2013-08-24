@@ -77,6 +77,7 @@ public class LogFragment extends ListFragment {
 	private static final String PREF_KEY_STATUS = "status";
 	private static final String PREF_KEY_CODE = "code";
 	private static final String PREF_KEY_CONTACT_ID = "contact_id";
+	private static final String STATE_CHECKED_ITEM_IDS = "checked_item_ids";
 	private static final int LOADER_ID_CONTACTS = 1;
 	private static final int LOADER_ID_LOG = 2;
 
@@ -145,6 +146,12 @@ public class LogFragment extends ListFragment {
 		listView.setItemsCanFocus(false);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		listView.setMultiChoiceModeListener(mMultiChoiceModeListener);
+		// 尝试恢复选中状态
+		if(savedInstanceState != null) {
+			long[] ids = savedInstanceState.getLongArray(STATE_CHECKED_ITEM_IDS);
+			if(ids != null)
+				mCheckedItemids = ids;
+		}
 		// 设置ListView的FastScrollBar
 		listView.setFastScrollEnabled(true);
 		listView.setFastScrollAlwaysVisible(false);
@@ -180,6 +187,15 @@ public class LogFragment extends ListFragment {
 			editor.apply();
 		else
 			editor.commit();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		if(mActionMode != null)
+			outState.putLongArray(STATE_CHECKED_ITEM_IDS, getListView().getCheckedItemIds());
+		else
+			outState.putLongArray(STATE_CHECKED_ITEM_IDS, null);
 	}
 
 	@Override
@@ -578,7 +594,7 @@ public class LogFragment extends ListFragment {
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 			// Swap the new cursor in.  (The framework will take care of closing the
 			// old cursor once we return.)
-			mAdapterForLogList.swapCursor(data);
+			Cursor oldCursor = mAdapterForLogList.swapCursor(data);
 
 			// The list should now be shown.
 			if (isResumed()) {
@@ -586,9 +602,10 @@ public class LogFragment extends ListFragment {
 			} else {
 				setListShownNoAnimation(true);
 			}
-			// 如果处于多选状态，尝试恢复以前的状态
-			if(mActionMode != null) {
+			// 如果处于多选状态或第一次获得日志信息，尝试恢复以前的状态
+			if((mActionMode != null || oldCursor == null) && mCheckedItemids != null) {
 				setItemsCheckedByIds(mCheckedItemids);
+				mCheckedItemids = null;
 			}
 		}
 
