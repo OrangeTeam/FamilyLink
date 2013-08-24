@@ -164,7 +164,7 @@ public class LogFragment extends ListFragment {
 		// or start a new one.
 		LoaderManager loaderManager = getLoaderManager();
 		loaderManager.initLoader(LOADER_ID_CONTACTS, null, mLoaderCallbacksForContacts);
-		loaderManager.initLoader(LOADER_ID_LOG, null, mLoaderCallbacks);
+		loaderManager.initLoader(LOADER_ID_LOG, null, mLoaderCallbacksForLogList);
 	}
 
 	@SuppressLint("NewApi")
@@ -499,12 +499,14 @@ public class LogFragment extends ListFragment {
 
 	protected final LoaderCallbacks<Cursor> mLoaderCallbacksForContacts =
 			new LoaderCallbacks<Cursor>(){
+		private final Uri baseUri = Contract.Contacts.CONTACTS_URI;;
+		private final String[] projection = {Contract.Contacts._ID, Contract.Contacts.COLUMN_NAME_NAME};
+		private static final String sortOrder = Contract.Contacts.COLUMN_NAME_NAME;
+
 		@Override
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 			// One callback only to one loader, so we don't care about the ID.
-			Uri baseUri = Contract.Contacts.CONTACTS_URI;
-			String[] projection = {Contract.Contacts._ID, Contract.Contacts.COLUMN_NAME_NAME};
-			return new CursorLoader(getActivity(), baseUri, projection, null, null, null);
+			return new CursorLoader(getActivity(), baseUri, projection, null, null, sortOrder);
 		}
 
 		@Override
@@ -541,19 +543,23 @@ public class LogFragment extends ListFragment {
 			mContactIdToNameMap = null;
 		}
 	};
-	protected final LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderCallbacks<Cursor>() {
+	protected final LoaderCallbacks<Cursor> mLoaderCallbacksForLogList =
+			new LoaderCallbacks<Cursor>() {
+		private final Uri baseUri = Contract.Messages.MESSAGES_URI;
+		private final String[] projection = {
+				Contract.Messages._ID,
+				Contract.Messages.COLUMN_NAME_ADDRESS,
+				Contract.Messages.COLUMN_NAME_BODY,
+				Contract.Messages.COLUMN_NAME_CODE,
+				Contract.Messages.COLUMN_NAME_CONTACT_ID,
+				Contract.Messages.COLUMN_NAME_STATUS,
+				Contract.Messages.COLUMN_NAME_TIME };
+		private final String sortOrder = Contract.Messages.COLUMN_NAME_TIME + " DESC";
+
 		@Override
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 			// This class only has one Loader, so we don't care about the ID.
-			// First, pick the base URI to use depending on whether we are
-			// currently filtering.
-			Uri baseUri = null;
-//			if (mFilter != null) {
-//				baseUri = Uri.withAppendedPath(People.CONTENT_FILTER_URI, Uri.encode(mFilter));
-//			} else {
-			baseUri = Contract.Messages.MESSAGES_URI;
-//			}
-
+			// 根据当前筛选条件，构造where子句
 			String selection =
 					"( " + mSelectionForStatus[mSpinnerForStatus.getSelectedItemPosition()] +
 					" ) AND ( " + mSelectionForCode[mSpinnerForCode.getSelectedItemPosition()]
@@ -563,11 +569,9 @@ public class LogFragment extends ListFragment {
 				selection += " AND ( " + Contract.Messages.COLUMN_NAME_CONTACT_ID + " = " +
 					mSpinnerForContact.getSelectedItemId() + " )";
 			}
-
-			String sortOrder = Contract.Messages.COLUMN_NAME_TIME + " DESC";
 			// Now create and return a CursorLoader that will take care of
 			// creating a Cursor for the data being displayed.
-			return new CursorLoader(getActivity(), baseUri, null, selection, null, sortOrder);
+			return new CursorLoader(getActivity(), baseUri, projection, selection, null, sortOrder);
 		}
 
 		@Override
@@ -607,7 +611,7 @@ public class LogFragment extends ListFragment {
 			if(mActionMode != null)
 				mCheckedItemids = getListView().getCheckedItemIds();
 			// 重新加载日志
-			getLoaderManager().restartLoader(LOADER_ID_LOG, null, mLoaderCallbacks);
+			getLoaderManager().restartLoader(LOADER_ID_LOG, null, mLoaderCallbacksForLogList);
 		}
 		@Override
 		public void onNothingSelected(AdapterView<?> parent) {}
