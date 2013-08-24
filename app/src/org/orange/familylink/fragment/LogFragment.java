@@ -127,6 +127,7 @@ public class LogFragment extends ListFragment {
 	/* (non-Javadoc)
 	 * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
 	 */
+	@SuppressLint("NewApi")
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -138,11 +139,16 @@ public class LogFragment extends ListFragment {
 		// Give some text to display if there is no data.
 		setEmptyText(getResources().getText(R.string.no_message_record));
 
-		// 设置ListView为多选模式
+		// 设置ListView
 		ListView listView = getListView();
+		// 设置ListView为多选模式
 		listView.setItemsCanFocus(false);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		listView.setMultiChoiceModeListener(mMultiChoiceModeListener);
+		// 设置ListView的FastScrollBar
+		listView.setFastScrollEnabled(true);
+		listView.setFastScrollAlwaysVisible(false);
+		listView.setVerticalScrollbarPosition(View.SCROLLBAR_POSITION_LEFT);
 
 		// We have a menu item to show in action bar.
 		setHasOptionsMenu(true);
