@@ -19,6 +19,10 @@
 
     <!-- SmsStatusReceiver -->
     <string name="failed_to_send_because_of_radio_off">由于无线被关闭，发送  %s 失败。</string>
+    <!-- Seek Help -->
+    <string name="name_label">姓名：</string>
+    <string name="phone_label">电话：</string>
+    <string name="edit">编辑</string>
     <!-- Log -->
     <string name="no_message_record">无过往消息记录</string>
     <string name="checked_one_message">1 条消息</string>

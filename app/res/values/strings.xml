@@ -19,6 +19,10 @@
 
     <!-- SmsStatusReceiver -->
     <string name="failed_to_send_because_of_radio_off">Because of radio off, failed to send %s.</string>
+    <!-- Seek Help -->
+    <string name="name_label">Name:</string>
+    <string name="phone_label">Phone:</string>
+    <string name="edit">Edit</string>
     <!-- Log -->
     <string name="no_message_record">No Message Record</string>
     <string name="checked_one_message">One message</string>
