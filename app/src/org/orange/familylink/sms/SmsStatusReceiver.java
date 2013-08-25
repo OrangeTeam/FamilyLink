@@ -91,8 +91,10 @@ public class SmsStatusReceiver extends BroadcastReceiver {
 		resultIntent.setAction(Intent.ACTION_VIEW);
 		resultIntent.setType(Messages.MESSAGES_TYPE);
 		long id = ContentUris.parseId(intent.getData());
-		if(id >= 1)
+		if(id >= 1) {
 			resultIntent.putExtra(MainActivity.EXTRA_IDS, new long[]{id});
+			resultIntent.putExtra(MainActivity.EXTRA_STATUS, R.string.failed_to_send);
+		}
 		PendingIntent resultPendingIntent = PendingIntent.getActivity(
 				context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);

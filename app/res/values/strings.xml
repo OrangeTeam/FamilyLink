@@ -35,7 +35,7 @@
     <string name="pulse">pulse</string>
     <string name="urgent">urgent</string>
     <string name="locate_now">locate now</string>
-    <string-array name="code">
+    <string-array name="message_code">
         <item>@string/all</item>
         <item>@string/inform</item>
         <item>@string/pulse</item>

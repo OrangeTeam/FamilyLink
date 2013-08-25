@@ -35,6 +35,18 @@ public class MainActivity extends BaseActivity {
 	 * Type: long[]
 	 */
 	public static final String EXTRA_IDS = MainActivity.class.getName() + ".extra.IDS";
+	/**
+	 * 意图设置的消息状态筛选条件，用R.string.*表示
+	 * <p>
+	 * Type: int
+	 */
+	public static final String EXTRA_STATUS = MainActivity.class.getName() + ".extra.STATUS";
+	/**
+	 * 意图设置的消息代码筛选条件，用R.string.*表示
+	 * <p>
+	 * Type: int
+	 */
+	public static final String EXTRA_CODE = MainActivity.class.getName() + ".extra.CODE";
 
 	// 用string ID表示页面及其顺序
 	/** 照料者的页面及其顺序 */
@@ -191,6 +203,38 @@ public class MainActivity extends BaseActivity {
 		return fragmentId;
 	}
 	/**
+	 * 根据{@link Intent}，创建{@link Fragment}的参数
+	 * @return 创建的参数；如果{@link Intent}没有指定Pager或参数，返回null
+	 * @see #getIntent()
+	 * @see #getIntentPager()
+	 */
+	protected Bundle buildFragmentArgumentsByIntent() {
+		Integer pagerId = getIntentPager();
+		if(pagerId == null)
+			return null;
+		Intent intent = getIntent();
+		long[] ids = intent.getLongArrayExtra(EXTRA_IDS);
+		int status = intent.getIntExtra(EXTRA_STATUS, R.string.undefined);
+		int code = intent.getIntExtra(EXTRA_CODE, R.string.undefined);
+		if(ids == null && status == R.string.undefined && code == R.string.undefined)
+			return null;
+		Bundle args = new Bundle();
+		switch(pagerId) {
+		case R.string.log:
+			if(ids != null)
+				args.putLongArray(LogFragment.ARGUMENT_KEY_IDS, ids);
+			if(status != R.string.undefined)
+				args.putInt(LogFragment.ARGUMENT_KEY_STATUS, status);
+			if(code != R.string.undefined)
+				args.putInt(LogFragment.ARGUMENT_KEY_CODE, code);
+			break;
+		default:
+			throw new UnsupportedOperationException("unsupported pager");
+		}
+		return args;
+	}
+
+	/**
 	 * 处理{@link Intent}，跳转到意图的页面。
 	 * @see #getIntent()
 	 */
@@ -216,19 +260,14 @@ public class MainActivity extends BaseActivity {
 		@Override
 		public Fragment getItem(int position) {
 			Integer intentPager = getIntentPager();
+			Bundle args = buildFragmentArgumentsByIntent();
 			switch(mPagersOrder[position]){
 			case R.string.seek_help:
 				return new SeekHelpFragment();
 			case R.string.log:
 				Fragment logFragment = new LogFragment();
-				if(intentPager != null && intentPager == R.string.log) {
-					long[] ids = getIntent().getLongArrayExtra(EXTRA_IDS);
-					if(ids != null) {
-						Bundle args = new Bundle();
-						args.putLongArray(LogFragment.ARGUMENT_KEY_MESSAGE_IDS, ids);
-						logFragment.setArguments(args);
-					}
-				}
+				if(intentPager != null && intentPager == R.string.log)
+					logFragment.setArguments(args);
 				return logFragment;
 			case R.string.navigate:
 				return new NavigateFragment();

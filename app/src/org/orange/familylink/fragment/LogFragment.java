@@ -74,23 +74,24 @@ import com.actionbarsherlock.view.MenuItem;
  */
 public class LogFragment extends ListFragment {
 	/** 参数Key：需要选中的消息IDs */
-	public static final String ARGUMENT_KEY_MESSAGE_IDS =
-			LogFragment.class.getName() + ".message_id";
+	public static final String ARGUMENT_KEY_IDS =
+			LogFragment.class.getName() + ".argument.IDS";
 	/** 参数Key：需要设置的 <em>消息状态</em> 筛选条件，用R.string.*设置 */
 	public static final String ARGUMENT_KEY_STATUS =
-			LogFragment.class.getName() + ".status";
+			LogFragment.class.getName() + ".argument.STATUS";
 	/** 参数Key：需要设置的 <em>消息代码</em> 筛选条件 ，用R.string.*设置*/
 	public static final String ARGUMENT_KEY_CODE =
-			LogFragment.class.getName() + ".code";
+			LogFragment.class.getName() + ".argument.CODE";
 	/** 参数Key：需要设置的 <em>对方联系人ID</em> 筛选条件 ，用R.string.*设置*/
 	public static final String ARGUMENT_KEY_CONTACT_ID =
-			LogFragment.class.getName() + ".contact_id";
+			LogFragment.class.getName() + ".argument.CONTACT_ID";
 
 	private static final String PREF_NAME = "log_fragment";
 	private static final String PREF_KEY_STATUS = "status";
 	private static final String PREF_KEY_CODE = "code";
 	private static final String PREF_KEY_CONTACT_ID = "contact_id";
-	private static final String STATE_CHECKED_ITEM_IDS = "checked_item_ids";
+	private static final String STATE_CHECKED_ITEM_IDS =
+			LogFragment.class.getName() + ".state.CHECKED_ITEM_IDS";
 	private static final int LOADER_ID_CONTACTS = 1;
 	private static final int LOADER_ID_LOG = 2;
 
@@ -165,11 +166,26 @@ public class LogFragment extends ListFragment {
 			if(ids != null)
 				mCheckedItemids = ids;
 		}
+		// 处理Fragment的参数
 		Bundle arguments = getArguments();
 		if(arguments != null) {
-			long[] argumentIds = arguments.getLongArray(ARGUMENT_KEY_MESSAGE_IDS);
+			long[] argumentIds = arguments.getLongArray(ARGUMENT_KEY_IDS);
 			if(argumentIds != null) {
 				mCheckedItemids = argumentIds;
+				mSpinnerForCode.setSelection(0);
+				mSpinnerForStatus.setSelection(0);
+			}
+			int status = arguments.getInt(ARGUMENT_KEY_STATUS, R.string.undefined);
+			if(status != R.string.undefined) {
+				Integer position = getStatusSpinnerPosition(status);
+				if(position != null)
+					mSpinnerForStatus.setSelection(position);
+			}
+			int code = arguments.getInt(ARGUMENT_KEY_CODE, R.string.undefined);
+			if(code != R.string.undefined) {
+				Integer position = getCodeSpinnerPosition(code);
+				if(position != null)
+					mSpinnerForCode.setSelection(position);
 			}
 		}
 		// 设置ListView的FastScrollBar
@@ -270,7 +286,7 @@ public class LogFragment extends ListFragment {
 				1));
 
 		mSpinnerForCode = new Spinner(getActivity());
-		String[] code = getResources().getStringArray(R.array.code);
+		String[] code = getResources().getStringArray(R.array.message_code);
 		if(code.length != 5)
 			throw new IllegalStateException("Unexpected number of code. " +
 					"Maybe because you only update on one place");
@@ -323,6 +339,46 @@ public class LogFragment extends ListFragment {
 				LinearLayout.LayoutParams.MATCH_PARENT,
 				1));
 		return spinnersContainer;
+	}
+	/**
+	 * 取得指定消息状态在其{@link Spinner}中的位置
+	 * @param status 需要查询的消息状态，用R.string.*表示
+	 * @return 指定状态在其{@link Spinner}中的位置；如果没有其位置，返回null
+	 */
+	protected Integer getStatusSpinnerPosition(int status) {
+		String[] statuses = getResources().getStringArray(R.array.message_status);
+		String target = getString(status);
+		int position = -1;
+		for(int i = 0 ; i < statuses.length ; i++) {
+			if(statuses[i].equals(target)) {
+				position = i;
+				break;
+			}
+		}
+		if(position == -1)
+			return null;
+		else
+			return position;
+	}
+	/**
+	 * 取得指定消息代码在其{@link Spinner}中的位置
+	 * @param code 需要查询的消息代码，用R.string.*表示
+	 * @return 指定代码在其{@link Spinner}中的位置；如果没有其位置，返回null
+	 */
+	protected Integer getCodeSpinnerPosition(int code) {
+		String[] codes = getResources().getStringArray(R.array.message_code);
+		String target = getString(code);
+		int position = -1;
+		for(int i = 0 ; i < codes.length ; i++) {
+			if(codes[i].equals(target)) {
+				position = i;
+				break;
+			}
+		}
+		if(position == -1)
+			return null;
+		else
+			return position;
 	}
 
 	/**
