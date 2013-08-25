@@ -73,6 +73,19 @@ import com.actionbarsherlock.view.MenuItem;
  * @author Team Orange
  */
 public class LogFragment extends ListFragment {
+	/** 参数Key：需要选中的消息IDs */
+	public static final String ARGUMENT_KEY_MESSAGE_IDS =
+			LogFragment.class.getName() + ".message_id";
+	/** 参数Key：需要设置的 <em>消息状态</em> 筛选条件，用R.string.*设置 */
+	public static final String ARGUMENT_KEY_STATUS =
+			LogFragment.class.getName() + ".status";
+	/** 参数Key：需要设置的 <em>消息代码</em> 筛选条件 ，用R.string.*设置*/
+	public static final String ARGUMENT_KEY_CODE =
+			LogFragment.class.getName() + ".code";
+	/** 参数Key：需要设置的 <em>对方联系人ID</em> 筛选条件 ，用R.string.*设置*/
+	public static final String ARGUMENT_KEY_CONTACT_ID =
+			LogFragment.class.getName() + ".contact_id";
+
 	private static final String PREF_NAME = "log_fragment";
 	private static final String PREF_KEY_STATUS = "status";
 	private static final String PREF_KEY_CODE = "code";
@@ -151,6 +164,13 @@ public class LogFragment extends ListFragment {
 			long[] ids = savedInstanceState.getLongArray(STATE_CHECKED_ITEM_IDS);
 			if(ids != null)
 				mCheckedItemids = ids;
+		}
+		Bundle arguments = getArguments();
+		if(arguments != null) {
+			long[] argumentIds = arguments.getLongArray(ARGUMENT_KEY_MESSAGE_IDS);
+			if(argumentIds != null) {
+				mCheckedItemids = argumentIds;
+			}
 		}
 		// 设置ListView的FastScrollBar
 		listView.setFastScrollEnabled(true);

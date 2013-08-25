@@ -6,11 +6,13 @@ import org.holoeverywhere.preference.PreferenceManager;
 import org.holoeverywhere.widget.ViewPager;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
+import org.orange.familylink.database.Contract;
 import org.orange.familylink.fragment.LogFragment;
 import org.orange.familylink.fragment.NavigateFragment;
 import org.orange.familylink.fragment.SeekHelpFragment;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -27,6 +29,13 @@ import com.actionbarsherlock.view.Window;
  * @author Team Orange
  */
 public class MainActivity extends BaseActivity {
+	/**
+	 * 应当显示的消息的ID列表
+	 * <p>
+	 * Type: long[]
+	 */
+	public static final String EXTRA_IDS = MainActivity.class.getName() + ".extra.IDS";
+
 	// 用string ID表示页面及其顺序
 	/** 照料者的页面及其顺序 */
 	private static final int[] PAGERS_ORDER_CARER =
@@ -51,6 +60,7 @@ public class MainActivity extends BaseActivity {
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 
 		setup();
+		handleIntent();
 	}
 
 	@Override
@@ -86,6 +96,18 @@ public class MainActivity extends BaseActivity {
 			throw new IllegalArgumentException("ilegal role: " + role);
 		mRole = role;
 	}
+	/**
+	 * 取得指定pager的位置
+	 * @param pagerId 要查找位置的Pager的Id。用R.string.*表示
+	 * @return 指定Pager的位置；如果无指定Pager的位置，返回-1
+	 * @see #mPagersOrder
+	 */
+	protected int getPagerPosition(int pagerId) {
+		for(int position = 0 ; position < mPagersOrder.length ; position++)
+			if(mPagersOrder[position] == pagerId)
+				return position;
+		return -1;
+	}
 
 	/**
 	 * 初始化各项配置。典型情况下在{@link #onCreate(Bundle)}调用
@@ -108,7 +130,7 @@ public class MainActivity extends BaseActivity {
 		ActionBar.TabListener tabListener = new ActionBar.TabListener() {
 			@Override
 			public void onTabSelected(Tab tab, FragmentTransaction ft) {
-				mViewPager.setCurrentItem(tab.getPosition());
+				mViewPager.setCurrentItem(tab.getPosition(), true);
 			}
 			@Override
 			public void onTabUnselected(Tab tab, FragmentTransaction ft) {}
@@ -155,6 +177,32 @@ public class MainActivity extends BaseActivity {
 	}
 
 	/**
+	 * 取得启动本{@link Activity}的意图（{@link Intent}）Pager
+	 * @return 意图（{@link Intent}）打开的Pager，用R.string.*表示；如果没有指定，返回null
+	 * @see #EXTRA_IDS
+	 * @see #getIntent()
+	 */
+	protected Integer getIntentPager() {
+		Intent intent = getIntent();
+		Integer fragmentId = null;
+		if(Contract.Messages.MESSAGES_TYPE.equals(intent.getType())) {
+			fragmentId = R.string.log;
+		}
+		return fragmentId;
+	}
+	/**
+	 * 处理{@link Intent}，跳转到意图的页面。
+	 * @see #getIntent()
+	 */
+	protected void handleIntent() {
+		Integer fragmentId = getIntentPager();
+		if(fragmentId != null) {
+			int position = getPagerPosition(fragmentId);
+			mViewPager.setCurrentItem(position, true);
+		}
+	}
+
+	/**
 	 * {@link MainActivity}中{@link ViewPager}的{@link PagerAdapter}，
 	 * 为{@link MainActivity}提供内容{@link Fragment}。
 	 * @see FragmentPagerAdapter
@@ -167,11 +215,21 @@ public class MainActivity extends BaseActivity {
 
 		@Override
 		public Fragment getItem(int position) {
+			Integer intentPager = getIntentPager();
 			switch(mPagersOrder[position]){
 			case R.string.seek_help:
 				return new SeekHelpFragment();
 			case R.string.log:
-				return new LogFragment();
+				Fragment logFragment = new LogFragment();
+				if(intentPager != null && intentPager == R.string.log) {
+					long[] ids = getIntent().getLongArrayExtra(EXTRA_IDS);
+					if(ids != null) {
+						Bundle args = new Bundle();
+						args.putLongArray(LogFragment.ARGUMENT_KEY_MESSAGE_IDS, ids);
+						logFragment.setArguments(args);
+					}
+				}
+				return logFragment;
 			case R.string.navigate:
 				return new NavigateFragment();
 			}
@@ -194,12 +252,12 @@ public class MainActivity extends BaseActivity {
 				id = R.string.navigate;
 			else
 				throw new IllegalStateException("encounter unknown item");
-			for(int position = 0 ; position < mPagersOrder.length ; position++)
-				if(mPagersOrder[position] == id)
-					return position;
-			if(id == -1)
-				throw new IllegalStateException("this method is bad.");
-			return PagerAdapter.POSITION_NONE;
+
+			int position = getPagerPosition(id);
+			if(position >= 0)
+				return position;
+			else
+				throw new IllegalStateException("Unknown pager or position");
 		}
 
 		@Override

@@ -15,6 +15,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -87,6 +88,11 @@ public class SmsStatusReceiver extends BroadcastReceiver {
 	//TODO 改进友好性
 	protected void onFailedToSend(Context context, Intent intent) {
 		Intent resultIntent = new Intent(context, MainActivity.class);
+		resultIntent.setAction(Intent.ACTION_VIEW);
+		resultIntent.setType(Messages.MESSAGES_TYPE);
+		long id = ContentUris.parseId(intent.getData());
+		if(id >= 1)
+			resultIntent.putExtra(MainActivity.EXTRA_IDS, new long[]{id});
 		PendingIntent resultPendingIntent = PendingIntent.getActivity(
 				context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
