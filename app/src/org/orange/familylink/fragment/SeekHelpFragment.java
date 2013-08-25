@@ -10,6 +10,7 @@ import org.holoeverywhere.widget.Button;
 import org.holoeverywhere.widget.ListView;
 import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
+import org.holoeverywhere.widget.Toast;
 import org.orange.familylink.ContactDetailActivity;
 import org.orange.familylink.R;
 import org.orange.familylink.database.Contract;
@@ -32,6 +33,10 @@ import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.SpinnerAdapter;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
 /**
  * 求助{@link Fragment}
  * @author Team Orange
@@ -51,7 +56,6 @@ public class SeekHelpFragment extends ListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = super.onCreateView(inflater, container, savedInstanceState);
-		setListAdapter(new MockSeekAdapter(getActivity(), null, 0));
 		return view;
 	}
 
@@ -79,6 +83,24 @@ public class SeekHelpFragment extends ListFragment {
 		loaderManager.initLoader(LOADER_ID_LOG, null,
 				mLoaderCallbacksForContacts);
 	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.fragment_seek_help, menu);
+	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch(item.getItemId()) {
+		case R.id.add_contact:
+			Toast.makeText(getActivity(), item.getTitle(), Toast.LENGTH_LONG).show();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
 
 	protected final LoaderCallbacks<Cursor> mLoaderCallbacksForContacts = new LoaderCallbacks<Cursor>() {
 		@Override

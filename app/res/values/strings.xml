@@ -14,6 +14,7 @@
     <string name="undefined">undefined</string>
 
     <!-- menu -->
+    <string name="add_contact">Add Contact</string>
     <string name="retransmit">Retransmit</string>
     <string name="delete">Delete</string>
 
