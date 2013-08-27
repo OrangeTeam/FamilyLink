@@ -4,14 +4,15 @@
 package org.orange.familylink.data;
 
 import org.orange.familylink.data.MessageLogRecord.Status;
+import org.orange.familylink.database.Contract;
 import org.orange.familylink.database.Contract.Messages;
-import org.orange.familylink.sms.SmsSender;
-import org.orange.familylink.util.Crypto;
 import org.orange.familylink.util.Objects;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
+import android.telephony.PhoneNumberUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -21,7 +22,7 @@ import com.google.gson.JsonSyntaxException;
  * <p><em>本类的Setters允许链式调用（Method chaining）</em></p>
  * @author Team Orange
  */
-public class Message implements Cloneable{
+public abstract class Message implements Cloneable{
 	/**
 	 * 消息代码。指明消息主体的语义，明确命令。
 	 * @author Team Orange
@@ -171,33 +172,6 @@ public class Message implements Cloneable{
 			return (code & (~EXTRA_BITS)) == COMMAND;
 		}
 	}
-	/**
-	 * 本类的默认值，你可以通过它取得本类各字段的默认值。
-	 * <p><em>禁用此对象的Setters</em></p>
-	 */
-	public static final Message mDefaultValue = new Message(){
-		/**
-		 * 禁用此方法
-		 */
-		@Override
-		public Message setCode(Integer code) {
-			throw new IllegalStateException("you cannot chang default value.");
-		}
-		/**
-		 * 禁用此方法
-		 */
-		@Override
-		public Message setBody(String body) {
-			throw new IllegalStateException("you cannot chang default value.");
-		}
-		/* (non-Javadoc)
-		 * @see org.orange.familylink.data.Message#isSameClass(java.lang.Object)
-		 */
-		@Override
-		protected boolean isSameClass(Object o) {
-			return o.getClass() == getClass().getSuperclass() || o.getClass() == getClass();
-		}
-	};
 
 	/**
 	 * 消息代码
@@ -266,13 +240,15 @@ public class Message implements Cloneable{
 		return new Gson().toJson(this);
 	}
 	/**
-	 * 把Json反序列化为本类的一个实例。
+	 * 把Json反序列化。结果保存到本对象中。
 	 * @param json Json表示法的本类的对象
-	 * @return 与json对应的，本类的一个实例对象
+	 * @return this（为了链式调用）
 	 * @throws JsonSyntaxException 当给定的Json不表示本类时
 	 */
-	public static Message fromJson(String json) {
-		return new Gson().fromJson(json, Message.class);
+	public Message fromJson(String json) {
+		Message m = new Gson().fromJson(json, getClass());
+		setCode(m.getCode()).setBody(m.getBody());
+		return this;
 	}
 
 	/**
@@ -282,10 +258,11 @@ public class Message implements Cloneable{
 	 * @param context 应用全局信息
 	 * @param contactId 联系人{@link Messages#COLUMN_NAME_CONTACT_ID ID}
 	 * @param dest 发送目的{@link Messages#COLUMN_NAME_ADDRESS 地址}
-	 * @see #receive(Context, String)
+	 * @return 保存后的本消息的{@link Uri}
+	 * @see #receiveAndSave(Context, String)
 	 */
-	public void send(Context context, Long contactId , String dest) {
-		send(context, contactId, dest, Settings.getPassword(context));
+	public Uri sendAndSave(Context context, Long contactId , String dest) {
+		return sendAndSave(context, contactId, dest, Settings.getPassword(context));
 	}
 	/**
 	 * 发送本消息
@@ -295,16 +272,84 @@ public class Message implements Cloneable{
 	 * @param contactId 联系人{@link Messages#COLUMN_NAME_CONTACT_ID ID}
 	 * @param dest 发送目的{@link Messages#COLUMN_NAME_ADDRESS 地址}
 	 * @param password 要发送信息的加密密码
+	 * @return 保存后的本消息的{@link Uri}
+	 * @see #receiveAndSave(String, String)
+	 */
+	public Uri sendAndSave(Context context, Long contactId , String dest, String password) {
+		Uri newUri = saveMessage(context, contactId, dest, Status.SENDING);
+		send(context, newUri, dest, password);
+		return newUri;
+	}
+	/**
+	 * 发送本消息
+	 * @param context 应用包环境信息
+	 * @param messageUri 本消息的存储{@link Uri}
+	 * @param dest 发送目的地址
+	 * @param password 发送时的加密密钥
+	 */
+	public abstract void send(Context context, Uri messageUri, String dest, String password);
+
+	/**
+	 * 接收并保存消息。接收到的消息存到本{@link Message}对象
+	 * <p>
+	 * <strong>注意：</strong><em>不</em> 应在UI线程调用本方法
+	 * @param context 应用全局信息
+	 * @param receivedMessage 接收到的消息原始内容
+	 * @param srcAddr 消息来源地址
+	 * @return 保存后的本消息的{@link Uri}
+	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
+	 * @see #sendAndSave(Context, Long, String)
+	 */
+	public Uri receiveAndSave(Context context, String receivedMessage, String srcAddr) {
+		// remove spaces and dashes from destination number
+		// (e.g. "801 555 1212" -> "8015551212")
+		// (e.g. "+8211-123-4567" -> "+82111234567")
+		srcAddr = PhoneNumberUtils.stripSeparators(srcAddr);
+		return receiveAndSave(context, receivedMessage, queryContactId(context, srcAddr),
+				srcAddr, Settings.getPassword(context));
+	}
+	/**
+	 * 接收并保存消息。接收到的消息存到本{@link Message}对象
+	 * <p>
+	 * <strong>注意：</strong><em>不</em> 应在UI线程调用本方法
+	 * @param context 应用全局信息
+	 * @param receivedMessage 接收到的消息原始内容
+	 * @param contactId 消息来源联系人ID
+	 * @param srcAddr 消息来源地址
+	 * @param password 解密密钥
+	 * @return 保存后的本消息的{@link Uri}
+	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
+	 * @see #sendAndSave(Context, Long, String, String)
 	 * @see #receive(String, String)
 	 */
-	public void send(Context context, Long contactId , String dest, String password) {
-		Uri newUri = saveMessage(context, contactId, dest, Status.SENDING);
-		// 加密body
-		String body = this.body;
-		this.body = Crypto.encrypt(body, password);
-		SmsSender.sendMessage(context, newUri, toJson(), dest);
-		this.body = body;
+	public Uri receiveAndSave(Context context, String receivedMessage,
+			Long contactId, String srcAddr, String password) {
+		receive(receivedMessage, password);
+		return saveMessage(context, contactId, srcAddr, Status.UNREAD);
 	}
+	protected Long queryContactId(Context context, String contactAddress) {
+		Long contactId = null;
+		Uri baseUri = Contract.Contacts.CONTACTS_URI;
+		String[] projection = {Contract.Contacts._ID};
+		String selection = Contract.Contacts.COLUMN_NAME_PHONE_NUMBER + " = '?'";
+		String[] args = {contactAddress};
+		Cursor c = context.getContentResolver()
+				.query(baseUri, projection, selection, args, null);
+		if(c.moveToFirst()) {
+			int column = c.getColumnIndex(Contract.Contacts._ID);
+			if(!c.isNull(column))
+				contactId = c.getLong(column);
+		}
+		return contactId;
+	}
+	/**
+	 * 接收消息。接收到的消息存到本{@link Message}对象
+	 * @param receivedMessage 接收到的消息原始内容
+	 * @param password 解密密钥
+	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
+	 */
+	public abstract void receive(String receivedMessage, String password);
+
 	/**
 	 * 保存消息并返回其{@link Uri}
 	 * @param context 应用上下文环境
@@ -323,31 +368,6 @@ public class Message implements Cloneable{
 		newMessage.put(Messages.COLUMN_NAME_BODY, getBody());
 		newMessage.put(Messages.COLUMN_NAME_CODE, getCode());
 		return context.getContentResolver().insert(Messages.MESSAGES_URI, newMessage);
-	}
-
-	/**
-	 * 接收消息。把接收到的消息解析为本类的实例。
-	 * @param context 应用全局信息
-	 * @param receivedMessage 接收到的消息
-	 * @return 解析后得到的本类的实例对象
-	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
-	 * @see #send(Context, Long, String)
-	 */
-	public static Message receive(Context context, String receivedMessage) {
-		return receive(receivedMessage, Settings.getPassword(context));
-	}
-	/**
-	 * 接收消息。把接收到的消息解析为本类的实例。
-	 * @param receivedMessage 接收到的消息
-	 * @param password 解密密钥
-	 * @return 解析后得到的本类的实例对象
-	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
-	 * @see #send(Context, Long, String, String)
-	 */
-	public static Message receive(String receivedMessage, String password) {
-		Message m = Message.fromJson(receivedMessage);
-		m.body = Crypto.decrypt(m.body, password);
-		return m;
 	}
 
 	/**
@@ -387,6 +407,6 @@ public class Message implements Cloneable{
 	 * @return 如果是本类（或{@link #mDefaultValue}）的实例，返回true；不是，返回false
 	 */
 	protected boolean isSameClass(Object o) {
-		return getClass() == o.getClass() || mDefaultValue.getClass() == o.getClass();
+		return getClass() == o.getClass();
 	}
 }

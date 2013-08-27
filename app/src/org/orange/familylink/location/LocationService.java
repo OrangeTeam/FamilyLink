@@ -6,6 +6,8 @@ import java.util.TimerTask;
 
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.Settings;
+import org.orange.familylink.sms.SmsMessage;
+
 import android.app.Service;
 import android.content.Intent;
 import android.location.Address;
@@ -76,11 +78,11 @@ public class LocationService extends Service {
 					mAddress.getLocality(), mAddress.getSubLocality());
 
 			if(mLocationTracker.canGetLocation()){
-				localMessage = new org.orange.familylink.data.Message();
+				localMessage = new SmsMessage();
 				localMessage.setBody(resultAddress);
 				localMessage.setCode(Code.INFORM);
 				//从设置中得到短信加密用的密码，发送短信
-				localMessage.send(LocationService.this, 0L, "",
+				localMessage.sendAndSave(LocationService.this, 0L, "",
 						Settings.getPassword(LocationService.this));
 			}
 		}

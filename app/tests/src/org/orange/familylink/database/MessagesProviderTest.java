@@ -6,6 +6,7 @@ import org.orange.familylink.data.Contact;
 import org.orange.familylink.data.Message;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.MessageLogRecord.Status;
+import org.orange.familylink.sms.SmsMessage;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -75,7 +76,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 		for(int i = 0; i < TEST_MESSAGES.length; i++){
 			Contact mContact = new Contact();
 			mContact.setId((long)i);
-			Message mMessage = new Message();
+			Message mMessage = new SmsMessage();
 			mMessage.setBody("here" + i);
 			mMessage.setCode(Code.EXTRA_BITS);
 			TEST_MESSAGES[i].setContactId(mContact);
@@ -269,7 +270,7 @@ public class MessagesProviderTest extends ProviderTestCase2<MessagesProvider> {
 
         Contact mContact = new Contact();
         mContact.setId((long)10);
-        Message mMessage = new Message();
+        Message mMessage = new SmsMessage();
         mMessage.setBody("here" + "10");
         mMessage.setCode(Code.EXTRA_BITS);
         message.setContactId(mContact);

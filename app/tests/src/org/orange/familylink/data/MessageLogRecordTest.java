@@ -2,10 +2,15 @@ package org.orange.familylink.data;
 
 import java.util.Date;
 
+import junit.framework.TestCase;
+
 import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.MessageLogRecord.Status;
+import org.orange.familylink.data.MessageTest.MockMessage;
+import org.orange.familylink.sms.SmsMessage;
 
-import junit.framework.TestCase;
+import android.content.Context;
+import android.net.Uri;
 
 public class MessageLogRecordTest extends TestCase {
 	MessageLogRecord mMessageLogRecord;
@@ -72,7 +77,7 @@ public class MessageLogRecordTest extends TestCase {
 			System.out.println(e.getMessage());
 		}
 		try {
-			defaultValue.setMessage(new Message());
+			defaultValue.setMessage(new SmsMessage());
 			fail( "Missing exception" );
 		} catch(Exception e) {
 			// Optionally make sure you get the correct Exception, too
@@ -183,8 +188,13 @@ public class MessageLogRecordTest extends TestCase {
 		assertNull(mMessageLogRecord.getStatus());
 	}
 	public void testMessage() {
-		Message m;
-		m = Message.mDefaultValue;
+		Message m = new Message() {
+			@Override
+			public void send(Context context, Uri messageUri, String dest,
+					String password) {}
+			@Override
+			public void receive(String receivedMessage, String password) {}
+		};
 		mMessageLogRecord.setMessage(m);
 		assertEquals(m, mMessageLogRecord.getMessage());
 
@@ -192,11 +202,11 @@ public class MessageLogRecordTest extends TestCase {
 		mMessageLogRecord.setMessage(null);
 		assertNull(mMessageLogRecord.getMessage());
 
-		m = new Message();
+		m = new MockMessage();
 		mMessageLogRecord.setMessage(m);
 		assertEquals(m, mMessageLogRecord.getMessage());
 
-		m = new Message();
+		m = new MockMessage();
 		m.setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE
 				| Message.Code.Extra.Inform.RESPOND);
 		assertFalse(m.equals(mMessageLogRecord.getMessage()));
@@ -232,7 +242,7 @@ public class MessageLogRecordTest extends TestCase {
 		String address = "baijie1991@gmail.com";
 		Date date = new Date();
 		Status status = Status.DELIVERED;
-		Message message = new Message().setCode(Message.Code.INFORM).setBody(MessageTest.TEST_CASE_BODY);
+		Message message = new MockMessage().setCode(Message.Code.INFORM).setBody(MessageTest.TEST_CASE_BODY);
 		mMessageLogRecord = new MessageLogRecord().setId(id).setContact(contact)
 				.setAddress(address).setDate(date)
 				.setStatus(status).setMessage(message);
@@ -281,7 +291,7 @@ public class MessageLogRecordTest extends TestCase {
 		assertFalse(mMessageLogRecord.equals(MessageLogRecord.mDefaultValue));
 
 		mMessageLogRecord = new MessageLogRecord();
-		mMessageLogRecord.setMessage(new Message());
+		mMessageLogRecord.setMessage(new MockMessage());
 		assertFalse(mMessageLogRecord.equals(MessageLogRecord.mDefaultValue));
 
 		mMessageLogRecord.setMessage(MessageLogRecord.mDefaultValue.getMessage());
@@ -306,7 +316,7 @@ public class MessageLogRecordTest extends TestCase {
 		String address = "baijie1991@gmail.com";
 		Date date = new Date();
 		Status status = Status.HAVE_READ;
-		Message message = new Message().setBody(MessageTest.TEST_CASE_BODY)
+		Message message = new MockMessage().setBody(MessageTest.TEST_CASE_BODY)
 				.setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);
 		mMessageLogRecord.setId(id).setContact(contact)
 				.setAddress(address).setDate(date)

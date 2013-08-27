@@ -32,13 +32,13 @@ import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 import org.orange.familylink.R;
-import org.orange.familylink.data.Message;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.MessageLogRecord;
 import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.database.Contract;
 import org.orange.familylink.fragment.LogFragment.MessagesSender.MessageWrapper;
+import org.orange.familylink.sms.SmsMessage;
 
 import android.annotation.SuppressLint;
 import android.content.AsyncQueryHandler;
@@ -1192,7 +1192,8 @@ public class LogFragment extends ListFragment {
 			final int total = messages.length;
 			int finished = 0;
 			for(MessageWrapper message : messages) {
-				message.send(mContext, message.contactId, message.dest);
+				//TODO is this right?
+				message.sendAndSave(mContext, message.contactId, message.dest);
 				publishProgress(total, ++finished);
 				if(isCancelled())
 					break;
@@ -1200,7 +1201,7 @@ public class LogFragment extends ListFragment {
 			return null;
 		}
 
-		public static class MessageWrapper extends Message {
+		public static class MessageWrapper extends SmsMessage {
 			public long contactId;
 			public String dest;
 			/** 如果用于重发，此属性为原消息的{@link Uri}；如果发送新消息，此属性应设置为null */

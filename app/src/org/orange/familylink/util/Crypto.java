@@ -39,7 +39,7 @@ public class Crypto {
 	private static final String PBKDF2_DERIVATION_ALGORITHM = "PBKDF2WithHmacSHA1";
 	private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
 
-	private static String DELIMITER = "]";
+	private static String DELIMITER = "!";
 
 	private static int KEY_LENGTH = 256;
 	// minimum values recommended by PKCS#5, increase as necessary
@@ -165,11 +165,11 @@ public class Crypto {
 	}
 
 	private static String toBase64(byte[] bytes) {
-		return Base64.encodeToString(bytes, Base64.NO_WRAP);
+		return Base64.encodeToString(bytes, Base64.NO_WRAP | Base64.URL_SAFE | Base64.NO_PADDING);
 	}
 
 	private static byte[] fromBase64(String base64) {
-		return Base64.decode(base64, Base64.NO_WRAP);
+		return Base64.decode(base64, Base64.NO_WRAP | Base64.URL_SAFE | Base64.NO_PADDING);
 	}
 
 }

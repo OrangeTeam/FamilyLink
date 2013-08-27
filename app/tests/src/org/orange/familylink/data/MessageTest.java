@@ -3,6 +3,8 @@
  */
 package org.orange.familylink.data;
 
+import android.content.Context;
+import android.net.Uri;
 import junit.framework.TestCase;
 
 /**
@@ -28,33 +30,12 @@ public class MessageTest extends TestCase {
 	protected void setUp() throws Exception {
 		// Call the super constructor (required by JUnit)
 		super.setUp();
-		mMessage = new Message();
+		mMessage = new MockMessage();
 	}
 
 	public void testPreconditions() {
-		assertEquals(Message.mDefaultValue.getCode(), mMessage.getCode());
-		assertEquals(Message.mDefaultValue.getBody(), mMessage.getBody());
-	}
-	public void testDefaultValue() {
-		assertNull(Message.mDefaultValue.getCode());
-		assertNull(Message.mDefaultValue.getBody());
-		Message defaultValue = Message.mDefaultValue;
-		try {
-			defaultValue.setCode(Message.Code.COMMAND | Message.Code.Extra.Command.LOCATE_NOW);
-			fail( "Missing exception" );
-		} catch(Exception e) {
-			// Optionally make sure you get the correct Exception, too
-			assertTrue(e instanceof IllegalStateException);
-			System.out.println(e.getMessage());
-		}
-		try {
-			defaultValue.setBody(TEST_CASE_BODY);
-			fail( "Missing exception" );
-		} catch(Exception e) {
-			// Optionally make sure you get the correct Exception, too
-			assertTrue(e instanceof IllegalStateException);
-			System.out.println(e.getMessage());
-		}
+		assertNull(mMessage.getCode());
+		assertNull(mMessage.getBody());
 	}
 	public void testCode() {
 		mMessage.setCode(Message.Code.COMMAND);
@@ -101,17 +82,15 @@ public class MessageTest extends TestCase {
 		assertNull(mMessage.getBody());
 	}
 	public void testConstructor() {
-		mMessage = new Message();
-		assertTrue(mMessage.equals(Message.mDefaultValue));
 
 		Integer code = Message.Code.INFORM |Message.Code.Extra.Inform.PULSE
 				| Message.Code.Extra.Inform.RESPOND | Message.Code.Extra.Inform.URGENT;
-		mMessage = new Message().setCode(code).setBody(TEST_CASE_BODY);
+		mMessage = new MockMessage().setCode(code).setBody(TEST_CASE_BODY);
 		assertEquals(code, mMessage.getCode());
 		assertEquals(TEST_CASE_BODY, mMessage.getBody());
 
 		try {
-			mMessage = new Message().setCode(0x200).setBody(TEST_CASE_BODY);
+			mMessage = new MockMessage().setCode(0x200).setBody(TEST_CASE_BODY);
 			fail( "Missing exception" );
 		} catch(Exception e) {
 			// Optionally make sure you get the correct Exception, too
@@ -119,7 +98,7 @@ public class MessageTest extends TestCase {
 			System.out.println(e.getMessage());
 		}
 		try {
-			mMessage = new Message().setCode(-2).setBody(TEST_CASE_BODY);
+			mMessage = new MockMessage().setCode(-2).setBody(TEST_CASE_BODY);
 			fail( "Missing exception" );
 		} catch(Exception e) {
 			// Optionally make sure you get the correct Exception, too
@@ -128,34 +107,29 @@ public class MessageTest extends TestCase {
 		}
 	}
 	public void testEquals() {
+		Message defaultValue = new MockMessage();
+
 		assertFalse(mMessage.equals(null));
 		assertFalse(mMessage.equals(new Object()));
-		assertTrue(mMessage.equals(new Message()));
-		assertTrue(mMessage.equals(Message.mDefaultValue));
+		assertTrue(mMessage.equals(new MockMessage()));
 
 		mMessage.setBody("a");
-		assertFalse(mMessage.equals(Message.mDefaultValue));
+		assertFalse(mMessage.equals(defaultValue));
 
-		mMessage.setBody(Message.mDefaultValue.getBody());
-		assertTrue(mMessage.equals(Message.mDefaultValue));
+		mMessage.setBody(defaultValue.getBody());
+		assertTrue(mMessage.equals(defaultValue));
 
 		mMessage.setCode(Message.Code.COMMAND | Message.Code.Extra.Command.LOCATE_NOW);
-		assertFalse(mMessage.equals(Message.mDefaultValue));
+		assertFalse(mMessage.equals(defaultValue));
 
 		mMessage.setCode(null);
-		assertTrue(Message.mDefaultValue.equals(mMessage));
+		assertTrue(defaultValue.equals(mMessage));
 	}
 	public void testClone() {
-		assertTrue(mMessage.equals(Message.mDefaultValue));
-		assertTrue(mMessage.equals(Message.mDefaultValue.clone()));
-		try{
-			Message.mDefaultValue.clone().setBody(TEST_CASE_BODY);
-			fail( "Missing exception" );
-		} catch(Exception e) {
-			// Optionally make sure you get the correct Exception, too
-			assertTrue(e instanceof IllegalStateException);
-			System.out.println(e.getMessage());
-		}
+		Message defaultValue = new MockMessage();
+
+		assertTrue(mMessage.equals(defaultValue));
+		assertTrue(mMessage.equals(defaultValue.clone()));
 
 		mMessage.setBody(TEST_CASE_BODY)
 			.setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);
@@ -173,14 +147,26 @@ public class MessageTest extends TestCase {
 		Message message2 = null;
 		json = mMessage.toJson();
 		System.out.println(json);
-		message2 = Message.fromJson(json);
+		message2 = new MockMessage().fromJson(json);
 		assertTrue(mMessage.equals(message2));
 
 		mMessage.setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE);
 		mMessage.setBody(TEST_CASE_BODY);
 		json = mMessage.toJson();
 		System.out.println(json);
-		message2 = Message.fromJson(json);
+		message2 = new MockMessage().fromJson(json);
 		assertTrue(mMessage.equals(message2));
+	}
+
+	public static class MockMessage extends Message {
+		@Override
+		public void send(Context context, Uri messageUri, String dest,
+				String password) {
+			throw new UnsupportedOperationException();
+		}
+		@Override
+		public void receive(String receivedMessage, String password) {
+			throw new UnsupportedOperationException();
+		}
 	}
 }
