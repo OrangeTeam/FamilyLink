@@ -604,19 +604,7 @@ public class LogFragment extends ListFragment {
 
 		@Override
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-			// 更新mAdapterForContactsSpinner的数据。如果是第一次更新，恢复上次的选择
-			if(mAdapterForContactsSpinner.swapCursor(data) == null) {
-				SharedPreferences pref = getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
-				if(pref.contains(PREF_KEY_CONTACT_ID)) {
-					long selectedContactId = pref.getLong(PREF_KEY_CONTACT_ID, -9999999L);
-					for(int i = 0 ; i < mSpinnerForContact.getCount() ; i++) {
-						if(mSpinnerForContact.getItemIdAtPosition(i) == selectedContactId) {
-							mSpinnerForContact.setSelection(i);
-							break;
-						}
-					}
-				}
-			}
+			Cursor old = mAdapterForContactsSpinner.swapCursor(data);
 			// setup Map
 			Map<Long, String> id2nameNew = new HashMap<Long, String>(data.getCount());
 			int indexId = data.getColumnIndex(Contract.Contacts._ID);
@@ -626,8 +614,35 @@ public class LogFragment extends ListFragment {
 				id2nameNew.put(data.getLong(indexId), data.getString(indexName));
 			}
 			mContactIdToNameMap = id2nameNew;
-
 			mAdapterForLogList.notifyDataSetChanged();
+
+			if(old == null)
+				onFirstLoadFinished();
+		}
+
+		private void onFirstLoadFinished() {
+			// 如果是第一次更新，使用Arguments指定的联系人或恢复上次的选择
+			Long contactId = null;
+			Bundle args = getArguments();
+			if(args != null) {
+				if(args.containsKey(ARGUMENT_KEY_IDS))
+					contactId = -1L;	// 暂设置为Header：ALL，其ID应该为0-1
+				if(args.containsKey(ARGUMENT_KEY_CONTACT_ID))
+					contactId = args.getLong(ARGUMENT_KEY_CONTACT_ID);
+			}
+			if(contactId == null) {
+				SharedPreferences pref = getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
+				if(pref.contains(PREF_KEY_CONTACT_ID))
+					contactId = pref.getLong(PREF_KEY_CONTACT_ID, 0);
+			}
+			if(contactId != null) {
+				for(int i = 0 ; i < mSpinnerForContact.getCount() ; i++) {
+					if(mSpinnerForContact.getItemIdAtPosition(i) == contactId) {
+						mSpinnerForContact.setSelection(i);
+						break;
+					}
+				}
+			}
 		}
 
 		@Override

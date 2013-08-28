@@ -47,6 +47,13 @@ public class MainActivity extends BaseActivity {
 	 * Type: int
 	 */
 	public static final String EXTRA_CODE = MainActivity.class.getName() + ".extra.CODE";
+	/**
+	 * 意图设置的消息联系人筛选条件，用联系人ID表示
+	 * <p>
+	 * Type: long
+	 */
+	public static final String EXTRA_CONTACT_ID =
+			MainActivity.class.getName() + ".extra.CONTACT_ID";
 
 	// 用string ID表示页面及其顺序
 	/** 照料者的页面及其顺序 */
@@ -212,21 +219,31 @@ public class MainActivity extends BaseActivity {
 		Integer pagerId = getIntentPager();
 		if(pagerId == null)
 			return null;
-		Intent intent = getIntent();
-		long[] ids = intent.getLongArrayExtra(EXTRA_IDS);
-		int status = intent.getIntExtra(EXTRA_STATUS, R.string.undefined);
-		int code = intent.getIntExtra(EXTRA_CODE, R.string.undefined);
-		if(ids == null && status == R.string.undefined && code == R.string.undefined)
+		Bundle extra = getIntent().getExtras();
+		if(extra == null)
+			return null;
+		Integer status = null, code = null;
+		Long contactId = null;
+		long[] ids = extra.getLongArray(EXTRA_IDS);
+		if(extra.containsKey(EXTRA_STATUS))
+			status = extra.getInt(EXTRA_STATUS);
+		if(extra.containsKey(EXTRA_CODE))
+			code = extra.getInt(EXTRA_CODE);
+		if(extra.containsKey(EXTRA_CONTACT_ID))
+			contactId = extra.getLong(EXTRA_CONTACT_ID);
+		if(ids == null && status == null && code == null && contactId == null)
 			return null;
 		Bundle args = new Bundle();
 		switch(pagerId) {
 		case R.string.log:
 			if(ids != null)
 				args.putLongArray(LogFragment.ARGUMENT_KEY_IDS, ids);
-			if(status != R.string.undefined)
+			if(status != null)
 				args.putInt(LogFragment.ARGUMENT_KEY_STATUS, status);
-			if(code != R.string.undefined)
+			if(code != null)
 				args.putInt(LogFragment.ARGUMENT_KEY_CODE, code);
+			if(contactId != null)
+				args.putLong(LogFragment.ARGUMENT_KEY_CONTACT_ID, contactId);
 			break;
 		default:
 			throw new UnsupportedOperationException("unsupported pager");
