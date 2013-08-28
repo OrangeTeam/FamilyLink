@@ -147,10 +147,40 @@ public class LogFragment extends ListFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		// 尝试恢复选中状态
+		if(savedInstanceState != null) {
+			long[] ids = savedInstanceState.getLongArray(STATE_CHECKED_ITEM_IDS);
+			if(ids != null)
+				mCheckedItemids = ids;
+		}
+		int codePosition, statusPosition;
 		// 恢复上次的筛选选项
 		SharedPreferences pref = getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
-		mSpinnerForStatus.setSelection(pref.getInt(PREF_KEY_STATUS, 0));
-		mSpinnerForCode.setSelection(pref.getInt(PREF_KEY_CODE, 0));
+		statusPosition = pref.getInt(PREF_KEY_STATUS, 0);
+		codePosition = pref.getInt(PREF_KEY_CODE, 0);
+		// 处理Fragment的参数
+		Bundle arguments = getArguments();
+		if(arguments != null) {
+			long[] argumentIds = arguments.getLongArray(ARGUMENT_KEY_IDS);
+			if(argumentIds != null) {
+				mCheckedItemids = argumentIds;
+				codePosition = statusPosition = 0;	//禁止筛选，设为“全部”
+			}
+			if(arguments.containsKey(ARGUMENT_KEY_STATUS)) {
+				int status = arguments.getInt(ARGUMENT_KEY_STATUS);
+				Integer position = getStatusSpinnerPosition(status);
+				if(position != null)
+					statusPosition = position;
+			}
+			if(arguments.containsKey(ARGUMENT_KEY_CODE)) {
+				int code = arguments.getInt(ARGUMENT_KEY_CODE);
+				Integer position = getCodeSpinnerPosition(code);
+				if(position != null)
+					codePosition = position;
+			}
+		}
+		mSpinnerForStatus.setSelection(statusPosition);
+		mSpinnerForCode.setSelection(codePosition);
 
 		// Give some text to display if there is no data.
 		setEmptyText(getResources().getText(R.string.no_message_record));
@@ -161,34 +191,6 @@ public class LogFragment extends ListFragment {
 		listView.setItemsCanFocus(false);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		listView.setMultiChoiceModeListener(mMultiChoiceModeListener);
-		// 尝试恢复选中状态
-		if(savedInstanceState != null) {
-			long[] ids = savedInstanceState.getLongArray(STATE_CHECKED_ITEM_IDS);
-			if(ids != null)
-				mCheckedItemids = ids;
-		}
-		// 处理Fragment的参数
-		Bundle arguments = getArguments();
-		if(arguments != null) {
-			long[] argumentIds = arguments.getLongArray(ARGUMENT_KEY_IDS);
-			if(argumentIds != null) {
-				mCheckedItemids = argumentIds;
-				mSpinnerForCode.setSelection(0);
-				mSpinnerForStatus.setSelection(0);
-			}
-			int status = arguments.getInt(ARGUMENT_KEY_STATUS, R.string.undefined);
-			if(status != R.string.undefined) {
-				Integer position = getStatusSpinnerPosition(status);
-				if(position != null)
-					mSpinnerForStatus.setSelection(position);
-			}
-			int code = arguments.getInt(ARGUMENT_KEY_CODE, R.string.undefined);
-			if(code != R.string.undefined) {
-				Integer position = getCodeSpinnerPosition(code);
-				if(position != null)
-					mSpinnerForCode.setSelection(position);
-			}
-		}
 		// 设置ListView的FastScrollBar
 		listView.setFastScrollEnabled(true);
 		listView.setFastScrollAlwaysVisible(false);
