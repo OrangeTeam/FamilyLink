@@ -19,7 +19,8 @@
     <string name="delete">Delete</string>
 
     <!-- SmsStatusReceiver -->
-    <string name="failed_to_send_because_of_radio_off">Because of radio off, failed to send %s.</string>
+    <string name="failed_to_send_because_of_radio_off">Because of radio off, failed to send message.</string>
+    <string name="failed_to_send_because_of_generic_failure">Because of generic failure(error code:%s), failed to send message. Please contact your service provider.</string>
     <!-- Seek Help -->
     <string name="name_label">Name:</string>
     <string name="phone_label">Phone:</string>

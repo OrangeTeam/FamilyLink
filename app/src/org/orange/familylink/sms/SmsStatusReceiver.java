@@ -20,6 +20,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -104,7 +105,15 @@ public class SmsStatusReceiver extends BroadcastReceiver {
 				.setAutoCancel(true);
 		switch(getResultCode()) {
 		case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-			//TODO 待处理
+			Bundle extra = intent.getExtras();
+			if(BuildConfig.DEBUG) {
+				System.out.println("has errorCode:"+extra.containsKey("errorCode"));
+				System.out.println("errorCode:"+extra.get("errorCode"));
+				// 无话费时，上边是true和21（Integer）
+			}
+			builder.setContentText(context.getString(
+					R.string.failed_to_send_because_of_generic_failure,
+					extra.get("errorCode").toString()));
 			break;
 		case SmsManager.RESULT_ERROR_NO_SERVICE:
 			//TODO 待处理
@@ -113,10 +122,8 @@ public class SmsStatusReceiver extends BroadcastReceiver {
 			//TODO 待处理
 			break;
 		case SmsManager.RESULT_ERROR_RADIO_OFF:
-			//TODO 待处理
 			builder.setContentText(context.getString(
-					R.string.failed_to_send_because_of_radio_off,
-					intent.getDataString()));
+					R.string.failed_to_send_because_of_radio_off));
 			break;
 		}
 		ContentValues updateValues = new ContentValues();
