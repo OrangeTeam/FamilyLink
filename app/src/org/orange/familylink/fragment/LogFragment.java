@@ -32,10 +32,11 @@ import org.holoeverywhere.widget.Spinner;
 import org.holoeverywhere.widget.TextView;
 import org.holoeverywhere.widget.Toast;
 import org.orange.familylink.R;
+import org.orange.familylink.data.Message;
 import org.orange.familylink.data.Message.Code;
-import org.orange.familylink.data.MessageLogRecord;
 import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.MessageLogRecord.Status;
+import org.orange.familylink.data.Settings;
 import org.orange.familylink.database.Contract;
 import org.orange.familylink.fragment.LogFragment.MessagesSender.MessageWrapper;
 import org.orange.familylink.sms.SmsMessage;
@@ -810,23 +811,23 @@ public class LogFragment extends ListFragment {
 			int index = 0;
 			for(int position : items) {
 				MessageWrapper message = new MessageWrapper();
+				message.message = new SmsMessage();
 				Cursor cursor = (Cursor) mAdapterForLogList.getItem(position);
 				int indexId = cursor.getColumnIndex(Contract.Messages._ID);
 				int indexCode = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE);
 				int indexBody = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_BODY);
-				int indexContactId = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CONTACT_ID);
 				int indexDest = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_ADDRESS);
 				if(!cursor.isNull(indexCode))
-					message.setCode(cursor.getInt(indexCode));
-				message.setBody(cursor.getString(indexBody));
-				message.contactId = cursor.getLong(indexContactId);
+					message.message.setCode(cursor.getInt(indexCode));
+				message.message.setBody(cursor.getString(indexBody));
 				message.dest = cursor.getString(indexDest);
-				messages[index++] = message;
 				// 设置Uri
 				long _id = cursor.getLong(indexId);
 				Uri uri = Contract.Messages.MESSAGES_ID_URI;
 				uri = ContentUris.withAppendedId(uri, _id);
 				message.uri = uri;
+
+				messages[index++] = message;
 			}
 			mMessagesSender = new MessagesSender(getActivity()) {
 				@Override
@@ -1177,7 +1178,7 @@ public class LogFragment extends ListFragment {
 	 * @author Team Orange
 	 */
 	protected static class MessagesSender extends
-					AsyncTask<MessagesSender.MessageWrapper, Integer, Void> {
+					AsyncTask<MessageWrapper, Integer, Void> {
 		private final Context mContext;
 
 		public MessagesSender(Context context) {
@@ -1191,9 +1192,12 @@ public class LogFragment extends ListFragment {
 				return null;
 			final int total = messages.length;
 			int finished = 0;
+			String password = Settings.getPassword(mContext);
 			for(MessageWrapper message : messages) {
-				//TODO is this right?
-				message.sendAndSave(mContext, message.contactId, message.dest);
+				if(message.uri != null)
+					message.message.send(mContext, message.uri, message.dest, password);
+				else
+					message.message.sendAndSave(mContext, message.contactId, message.dest, password);
 				publishProgress(total, ++finished);
 				if(isCancelled())
 					break;
@@ -1201,20 +1205,19 @@ public class LogFragment extends ListFragment {
 			return null;
 		}
 
-		public static class MessageWrapper extends SmsMessage {
-			public long contactId;
+		/**
+		 * {@link Message}的包装器，作为{@link MessagesSender}的泛型参数，用于传递发送参数。
+		 * @author Team Orange
+		 */
+		public static class MessageWrapper {
+			/** 要发送的消息主体，也将使用此对象的方法发送消息 */
+			public Message message;
+			/** 如果用于重发，可以不设置此字段；如果发送新消息，请设置为对方联系人ID */
+			public Long contactId;
+			/** 目标地址。如对方手机号 */
 			public String dest;
 			/** 如果用于重发，此属性为原消息的{@link Uri}；如果发送新消息，此属性应设置为null */
 			public Uri uri;
-
-			@Override
-			protected Uri saveMessage(Context context, Long contactId,
-					String address, MessageLogRecord.Status status) {
-				if(uri != null)
-					return uri;
-				else
-					return super.saveMessage(context, contactId, address, status);
-			}
 		}
 	}
 }
