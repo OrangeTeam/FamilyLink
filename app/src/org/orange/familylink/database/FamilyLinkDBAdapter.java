@@ -9,7 +9,6 @@ import org.orange.familylink.data.Contact;
 import org.orange.familylink.data.Message;
 import org.orange.familylink.data.MessageLogRecord;
 import org.orange.familylink.data.MessageLogRecord.Status;
-import org.orange.familylink.sms.SmsMessage;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,6 +20,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 
 /**
@@ -416,7 +416,19 @@ public class FamilyLinkDBAdapter {
 	public ArrayList<MessageLogRecord> getListsMessages(String where, String order) throws SQLException{
 		ArrayList<MessageLogRecord> messageLogRecords = new ArrayList<MessageLogRecord>();
 		MessageLogRecord messageLogRecord = new MessageLogRecord();
-		Message aMessage = new SmsMessage();
+		Message aMessage = new Message(){
+			@Override
+			public void send(Context context, Uri messageUri, String dest,
+					String password) {
+				throw new UnsupportedOperationException("unsupport send message. " +
+						"This is a simple storage object.");
+			}
+			@Override
+			public void receive(String receivedMessage, String password) {
+				throw new UnsupportedOperationException("unsupport receive message. " +
+						"This is a simple storage object.");
+			}
+		};
 		Cursor cursor = db.query(Contract.DATABASE_MESSAGES_TABLE, null, where, null, null, null, order);
 		if(cursor.getCount() == 0 || !cursor.moveToFirst()){
 			throw new SQLException("No record found from database");
