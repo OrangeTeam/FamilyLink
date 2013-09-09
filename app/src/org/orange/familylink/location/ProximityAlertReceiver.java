@@ -1,11 +1,10 @@
 package org.orange.familylink.location;
 
-import org.holoeverywhere.widget.Toast;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
+import android.widget.Toast;
 
 public class ProximityAlertReceiver extends BroadcastReceiver {
 

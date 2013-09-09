@@ -5,12 +5,11 @@ package org.orange.familylink;
 
 import java.util.List;
 
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.widget.LinearLayout;
-import org.holoeverywhere.widget.TextView;
 import org.orange.familylink.alarm.AccelerometerListener;
 import org.orange.familylink.alarm.AccelerometerListener.OnFallListener;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -23,9 +22,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
-
-import com.actionbarsherlock.app.ActionBar;
+import android.widget.TextView;
 
 /**
  * 显示应用的当前状态
@@ -55,7 +54,7 @@ public class StatusActivity extends Activity {
 	 * 初始化配置{@link ActionBar}
 	 */
 	protected void setupActionBar() {
-		ActionBar actionBar = getSupportActionBar();
+		ActionBar actionBar = getActionBar();
 		// Show the Up button in the action bar.
 		actionBar.setDisplayHomeAsUpEnabled(true);
 	}

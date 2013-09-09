@@ -1,11 +1,8 @@
 package org.orange.familylink;
 
-import org.holoeverywhere.widget.EditText;
-import org.orange.familylink.R;
-
 import android.content.Intent;
 import android.os.Bundle;
-
+import android.widget.EditText;
 
 public class ContactDetailActivity extends BaseActivity {
 	private EditText editText2 = null;

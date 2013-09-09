@@ -3,12 +3,10 @@
  */
 package org.orange.familylink;
 
-import org.holoeverywhere.app.Activity;
-
+import android.app.Activity;
 import android.content.Intent;
-
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuItem;
 
 /**
  * @author Team Orange
@@ -18,7 +16,7 @@ public abstract class BaseActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getSupportMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
 	@Override

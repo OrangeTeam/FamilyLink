@@ -3,21 +3,21 @@
  */
 package org.orange.familylink.fragment.dialog;
 
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.app.Dialog;
-import org.holoeverywhere.app.DialogFragment;
-import org.holoeverywhere.preference.PreferenceManager;
-import org.holoeverywhere.widget.ArrayAdapter;
-import org.holoeverywhere.widget.EditText;
-import org.holoeverywhere.widget.Spinner;
 import org.orange.familylink.R;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 /**
  * 初始化设置对话框。
@@ -36,8 +36,8 @@ public class InitialSetupDialogFragment extends DialogFragment {
 		final EditText passwordInput = (EditText) dialogView.findViewById(R.id.password);
 		final Spinner roleInput = (Spinner) dialogView.findViewById(R.id.role);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				getActivity(), R.array.pref_role_titles, R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+				getActivity(), R.array.pref_role_titles, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		roleInput.setAdapter(adapter);
 		// 默认选择“受顾者”，照顾用户心理，避免用户自己选择“受顾者”
 		roleInput.setSelection(1);

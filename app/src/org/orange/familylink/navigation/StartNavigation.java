@@ -2,21 +2,21 @@ package org.orange.familylink.navigation;
 
 import java.util.List;
 
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.app.Dialog;
 import org.orange.familylink.R;
 import org.orange.familylink.util.Network;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 
 /**
  * 这个开启导航类有个静态方法，这个方法是用于紧急求助时受监护人把定位坐标发送给监护人时，在监护人端就调用这个方法，把受监护人的定位信息传入给静态方法
@@ -39,7 +39,7 @@ public class StartNavigation {
 	 * @param latitude 纬度double类型
 	 * @param longitude 经度double类型
 	 */
-	public static void toStartNavigationApp(Context context, FragmentActivity fragmentActivity, double latitude, double longitude){
+	public static void toStartNavigationApp(Context context, FragmentManager manager, double latitude, double longitude){
 		//导航用的定位信息，包括起点到终点位置信息
 		Uri location = Uri.parse("http://maps.google.com/maps?f=dsaddr=startLat startLng&daddr=" + latitude + " " + longitude + "&hl=en");
 		Intent mapIntent = new Intent(Intent.ACTION_VIEW, location);
@@ -58,11 +58,11 @@ public class StartNavigation {
 			else{
 				//没有谷歌地图时就提示是否现在安装谷歌地图，如果是就会跳到谷歌地图安装页面
 				NoMapsAppDialogFragment mDialog = new NoMapsAppDialogFragment();
-				mDialog.show(fragmentActivity.getSupportFragmentManager(), "noMapsAppDialog");
+				mDialog.show(manager, "noMapsAppDialog");
 			}
 		}else{
 			//没网络就会提示是否打开网络设置
-			Network.openNoConnectionDialog(fragmentActivity);
+			Network.openNoConnectionDialog(manager);
 		}
 	}
 

@@ -1,9 +1,5 @@
 package org.orange.familylink;
 
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.app.Fragment;
-import org.holoeverywhere.preference.PreferenceManager;
-import org.holoeverywhere.widget.ViewPager;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
 import org.orange.familylink.database.Contract;
@@ -12,17 +8,20 @@ import org.orange.familylink.fragment.NavigateFragment;
 import org.orange.familylink.fragment.SeekHelpFragment;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
+import android.preference.PreferenceManager;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.view.Window;
+import android.view.Window;
 
 /**
  * 主{@link Activity}。应用的默认{@link Activity}
@@ -75,7 +74,7 @@ public class MainActivity extends BaseActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		setSupportProgressBarIndeterminateVisibility(false);
+		setProgressBarIndeterminateVisibility(false);
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 
 		setup();
@@ -109,7 +108,7 @@ public class MainActivity extends BaseActivity {
 					changePagersOrderIfNecessary();
 				}
 			});
-			dialog.show(getSupportFragmentManager());
+			dialog.show(getFragmentManager(), null);
 		}
 		else
 			throw new IllegalArgumentException("ilegal role: " + role);
@@ -140,7 +139,7 @@ public class MainActivity extends BaseActivity {
 	 * 配置{@link ActionBar}，典型情况下在{@link #onCreate(Bundle)}调用
 	 */
 	protected void setupActionBar() {
-		ActionBar actionBar = getSupportActionBar();
+		ActionBar actionBar = getActionBar();
 		// Specify that the Home/Up button should not be enabled, since there is no hierarchical parent.
 		actionBar.setHomeButtonEnabled(false);
 		// Specify that tabs should be displayed in the action bar.
@@ -164,13 +163,13 @@ public class MainActivity extends BaseActivity {
 	 * 配置{@link ViewPager}，典型情况下在{@link #onCreate(Bundle)}调用
 	 */
 	protected void setupViewPager() {
-		mViewPager.setAdapter(new AppSectionsPagerAdapter(getSupportFragmentManager()));
+		mViewPager.setAdapter(new AppSectionsPagerAdapter(getFragmentManager()));
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener(){
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 			@Override
 			public void onPageSelected(int position) {
-				getSupportActionBar().setSelectedNavigationItem(position);
+				getActionBar().setSelectedNavigationItem(position);
 			}
 			@Override
 			public void onPageScrollStateChanged(int state) {}
@@ -189,7 +188,7 @@ public class MainActivity extends BaseActivity {
 		setPagersOrder(role);
 		// 更新ActionBar的Tabs的顺序
 		for(int i = 0 ; i < mPagersOrder.length ; i++)
-			getSupportActionBar().getTabAt(i).setText(mPagersOrder[i]);
+			getActionBar().getTabAt(i).setText(mPagersOrder[i]);
 		// 通知ViewPager数据集有变化
 		mViewPager.getAdapter().notifyDataSetChanged();
 		return true;

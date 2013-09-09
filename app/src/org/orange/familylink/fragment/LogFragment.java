@@ -15,21 +15,6 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.holoeverywhere.LayoutInflater;
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.app.ListFragment;
-import org.holoeverywhere.preference.SharedPreferences;
-import org.holoeverywhere.preference.SharedPreferences.Editor;
-import org.holoeverywhere.widget.AdapterView;
-import org.holoeverywhere.widget.AdapterView.OnItemSelectedListener;
-import org.holoeverywhere.widget.ArrayAdapter;
-import org.holoeverywhere.widget.CheckedTextView;
-import org.holoeverywhere.widget.LinearLayout;
-import org.holoeverywhere.widget.ListView;
-import org.holoeverywhere.widget.ListView.MultiChoiceModeListener;
-import org.holoeverywhere.widget.Spinner;
-import org.holoeverywhere.widget.TextView;
-import org.holoeverywhere.widget.Toast;
 import org.orange.familylink.R;
 import org.orange.familylink.data.Message;
 import org.orange.familylink.data.Message.Code;
@@ -41,32 +26,46 @@ import org.orange.familylink.fragment.LogFragment.MessagesSender.MessageWrapper;
 import org.orange.familylink.sms.SmsMessage;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ListFragment;
+import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncQueryHandler;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.format.DateFormat;
 import android.util.SparseBooleanArray;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.CheckedTextView;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
-
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * 日志{@link ListFragment}
@@ -154,7 +153,7 @@ public class LogFragment extends ListFragment {
 		}
 		int codePosition, statusPosition;
 		// 恢复上次的筛选选项
-		SharedPreferences pref = getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
+		SharedPreferences pref = getActivity().getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
 		statusPosition = pref.getInt(PREF_KEY_STATUS, 0);
 		codePosition = pref.getInt(PREF_KEY_CODE, 0);
 		// 处理Fragment的参数
@@ -217,7 +216,7 @@ public class LogFragment extends ListFragment {
 	public void onStop() {
 		super.onStop();
 		// 保存筛选条件的当前选择
-		Editor editor = getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE).edit();
+		Editor editor = getActivity().getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE).edit();
 		editor.putInt(PREF_KEY_STATUS, mSpinnerForStatus.getSelectedItemPosition());
 		editor.putInt(PREF_KEY_CODE, mSpinnerForCode.getSelectedItemPosition());
 		editor.putLong(PREF_KEY_CONTACT_ID, mSpinnerForContact.getSelectedItemId());
@@ -270,7 +269,7 @@ public class LogFragment extends ListFragment {
 		mSelectionForStatus[4] = mSelectionForStatus[5] + " OR " + mSelectionForStatus[6]
 				+ " OR " + mSelectionForStatus[7] + " OR " + mSelectionForStatus[8];
 		ArrayAdapter<String> adapter = new MyHierarchicalArrayAdapter<String>(
-				getActivity(), R.layout.simple_spinner_item, status) {
+				getActivity(), android.R.layout.simple_spinner_item, status) {
 			@Override
 			protected int getLevel(int position) {
 				if(position != 0 && position != 1 && position != 4)
@@ -279,7 +278,7 @@ public class LogFragment extends ListFragment {
 					return 1;
 			}
 		};
-		adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mSpinnerForStatus.setAdapter(adapter);
 		mSpinnerForStatus.setOnItemSelectedListener(mOnSpinnerItemSelectedListener);
 		spinnersContainer.addView(mSpinnerForStatus, new LinearLayout.LayoutParams(
@@ -310,7 +309,7 @@ public class LogFragment extends ListFragment {
 				mSelectionForCode[1] + " AND " +
 				columnCode + " & " + Code.Extra.Inform.RESPOND + " = " + Code.Extra.Inform.RESPOND + " )";
 		adapter = new MyHierarchicalArrayAdapter<String>(
-				getActivity(), R.layout.simple_spinner_item, code) {
+				getActivity(), android.R.layout.simple_spinner_item, code) {
 			@Override
 			protected int getLevel(int position) {
 				if(position == 2 || position == 3)
@@ -319,7 +318,7 @@ public class LogFragment extends ListFragment {
 					return 1;
 			}
 		};
-		adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mSpinnerForCode.setAdapter(adapter);
 		mSpinnerForCode.setOnItemSelectedListener(mOnSpinnerItemSelectedListener);
 		spinnersContainer.addView(mSpinnerForCode, new LinearLayout.LayoutParams(
@@ -632,7 +631,7 @@ public class LogFragment extends ListFragment {
 					contactId = args.getLong(ARGUMENT_KEY_CONTACT_ID);
 			}
 			if(contactId == null) {
-				SharedPreferences pref = getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
+				SharedPreferences pref = getActivity().getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
 				if(pref.contains(PREF_KEY_CONTACT_ID))
 					contactId = pref.getLong(PREF_KEY_CONTACT_ID, 0);
 			}
@@ -875,7 +874,7 @@ public class LogFragment extends ListFragment {
 						Object cookie, int result) {
 					mDeletehandlers.remove(this);
 					if(mDeletehandlers.isEmpty())
-						getSupportActivity().setSupportProgressBarIndeterminateVisibility(false);
+						getActivity().setProgressBarIndeterminateVisibility(false);
 					Toast.makeText(
 							getActivity(),
 							getString(R.string.prompt_delete_messages_successfully, result),
@@ -884,7 +883,7 @@ public class LogFragment extends ListFragment {
 				}
 			};
 			mDeletehandlers.add(handler);
-			getSupportActivity().setSupportProgressBarIndeterminateVisibility(true);
+			getActivity().setProgressBarIndeterminateVisibility(true);
 			handler.startDelete(-1, null, Contract.Messages.MESSAGES_URI, selection, null);
 		}
 	}
@@ -1091,8 +1090,8 @@ public class LogFragment extends ListFragment {
 	 * 带有标题的{@link SimpleCursorAdapter}
 	 * <p>
 	 * <strong>Note</strong>：这是一个特化的{@link SimpleCursorAdapter}，此类是用于{@link Spinner}的{@link SpinnerAdapter}，
-	 * 其layout已经设置为了{@link R.layout#simple_spinner_item}，
-	 * 其DropDownViewResource已设置为{@link R.layout#simple_spinner_dropdown_item}。
+	 * 其layout已经设置为了{@link android.R.layout#simple_spinner_item}，
+	 * 其DropDownViewResource已设置为{@link android.R.layout#simple_spinner_dropdown_item}。
 	 * @author Team Orange
 	 * @see SimpleCursorAdapter#SimpleCursorAdapter(Context, int, Cursor, String[], int[], int)
 	 * @see SimpleCursorAdapter#setDropDownViewResource(int)
@@ -1103,9 +1102,9 @@ public class LogFragment extends ListFragment {
 
 		public MySimpleCursorAdapterWithHeader(Context context,
 				Cursor c, String[] from, int flags, String[] header) {
-			super(context, R.layout.simple_spinner_item, c, from,
+			super(context, android.R.layout.simple_spinner_item, c, from,
 					new int[]{android.R.id.text1}, flags);
-			setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+			setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			mHeader = header;
 			mInflater = LayoutInflater.from(context);
 		}
@@ -1137,7 +1136,7 @@ public class LogFragment extends ListFragment {
 				return super.getView(getPositionWithoutHeader(position), convertView, parent);
 			else {
 				if(convertView == null)
-					convertView = mInflater.inflate(R.layout.simple_spinner_item, parent, false);
+					convertView = mInflater.inflate(android.R.layout.simple_spinner_item, parent, false);
 				((TextView)convertView.findViewById(android.R.id.text1)).setText(mHeader[position]);
 				return convertView;
 			}
@@ -1150,7 +1149,7 @@ public class LogFragment extends ListFragment {
 				return super.getDropDownView(getPositionWithoutHeader(position), convertView, parent);
 			else {
 				if(convertView == null)
-					convertView = mInflater.inflate(R.layout.simple_spinner_dropdown_item, parent, false);
+					convertView = mInflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
 				((CheckedTextView)convertView.findViewById(android.R.id.text1)).setText(mHeader[position]);
 				return convertView;
 			}

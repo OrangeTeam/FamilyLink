@@ -1,9 +1,10 @@
-<PreferenceScreen xmlns:holo="http://schemas.android.com/apk/res-auto" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <EditTextPreference
-        holo:key="password"
-        holo:title="@string/pref_title_password"
-        holo:summary="@string/pref_summary_password" />
+        android:key="password"
+        android:title="@string/pref_title_password"
+        android:summary="@string/pref_summary_password"
+        android:inputType="textPassword" />
 
     <!--
          NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
@@ -11,12 +12,12 @@
     -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference
-        holo:key="role"
-        holo:title="@string/pref_title_role"
-        holo:entries="@array/pref_role_titles"
-        holo:entryValues="@array/pref_role_values"
-        holo:negativeButtonText="@null"
-        holo:positiveButtonText="@null" />
+        android:key="role"
+        android:title="@string/pref_title_role"
+        android:entries="@array/pref_role_titles"
+        android:entryValues="@array/pref_role_values"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
 
     <!--
          NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
@@ -24,77 +25,77 @@
     -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference
-        holo:key="sync_frequency"
-        holo:defaultValue="60"
-        holo:title="@string/pref_title_sync_frequency"
-        holo:layout="?attr/preferenceLayoutChild"
-        holo:entries="@array/pref_sync_frequency_titles"
-        holo:entryValues="@array/pref_sync_frequency_values"
-        holo:negativeButtonText="@null"
-        holo:positiveButtonText="@null" />
+        android:key="sync_frequency"
+        android:defaultValue="60"
+        android:title="@string/pref_title_sync_frequency"
+        android:layout="?android:attr/preferenceLayoutChild"
+        android:entries="@array/pref_sync_frequency_titles"
+        android:entryValues="@array/pref_sync_frequency_values"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
 
     <PreferenceCategory
-        holo:title="@string/pref_title_location_service" >
+        android:title="@string/pref_title_location_service" >
 
         <CheckBoxPreference
-            holo:key="start_location_service"
-            holo:defaultValue="false"
-            holo:title="@string/pref_title_start_location_service" />
+            android:key="start_location_service"
+            android:defaultValue="false"
+            android:title="@string/pref_title_start_location_service" />
 
         <ListPreference
-            holo:key="location_frequency"
-            holo:defaultValue="60"
-            holo:title="@string/pref_title_location_frequency"
-            holo:dependency="start_location_service"
-            holo:layout="?attr/preferenceLayoutChild"
-            holo:entries="@array/pref_location_frequency_titles"
-            holo:entryValues="@array/pref_location_frequency_values"
-            holo:negativeButtonText="@null"
-            holo:positiveButtonText="@null" />
+            android:key="location_frequency"
+            android:defaultValue="60"
+            android:title="@string/pref_title_location_frequency"
+            android:dependency="start_location_service"
+            android:layout="?android:attr/preferenceLayoutChild"
+            android:entries="@array/pref_location_frequency_titles"
+            android:entryValues="@array/pref_location_frequency_values"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        holo:title="@string/pref_notifications" >
+        android:title="@string/pref_notifications" >
 
         <!--
              A 'parent' preference, which enables/disables child preferences (below)
              when checked/unchecked.
         -->
         <CheckBoxPreference
-            holo:key="notifications_new_message"
-            holo:defaultValue="true"
-            holo:title="@string/pref_title_new_message_notifications" />
+            android:key="notifications_new_message"
+            android:defaultValue="true"
+            android:title="@string/pref_title_new_message_notifications" />
 
         <!-- Allows the user to choose a ringtone in the 'notification' category. -->
         <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
         <!-- NOTE: RingtonePreference's summary should be set to its value by the activity code. -->
         <RingtonePreference
-            holo:key="notifications_new_message_ringtone"
-            holo:defaultValue="content://settings/system/notification_sound"
-            holo:title="@string/pref_title_ringtone"
-            holo:dependency="notifications_new_message"
-            holo:layout="?attr/preferenceLayoutChild"
-            holo:ringtoneType="notification" />
+            android:key="notifications_new_message_ringtone"
+            android:defaultValue="content://settings/system/notification_sound"
+            android:title="@string/pref_title_ringtone"
+            android:dependency="notifications_new_message"
+            android:layout="?android:attr/preferenceLayoutChild"
+            android:ringtoneType="notification" />
 
         <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
         <CheckBoxPreference
-            holo:key="notifications_new_message_vibrate"
-            holo:defaultValue="true"
-            holo:title="@string/pref_title_vibrate"
-            holo:dependency="notifications_new_message"
-            holo:layout="?attr/preferenceLayoutChild" />
+            android:key="notifications_new_message_vibrate"
+            android:defaultValue="true"
+            android:title="@string/pref_title_vibrate"
+            android:dependency="notifications_new_message"
+            android:layout="?android:attr/preferenceLayoutChild" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        holo:title="@string/pref_title_others">
+        android:title="@string/pref_title_others">
 
         <Preference
-            holo:title="@string/status_activity_label">
+            android:title="@string/status_activity_label">
             <intent
-                holo:targetPackage="org.orange.familylink"
-                holo:targetClass="org.orange.familylink.StatusActivity"/>
+                android:targetPackage="org.orange.familylink"
+                android:targetClass="org.orange.familylink.StatusActivity"/>
         </Preference>
 
     </PreferenceCategory>

@@ -32,6 +32,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 	 * <p>引用自<a href="http://developer.android.com/tools/samples/index.html">官方示例：SpinnerTest</a></p>
 	 */
 	public void testPreconditions() {
-		assertTrue(mActivity.getSupportActionBar() != null);
+		assertTrue(mActivity.getActionBar() != null);
 	}
 }

@@ -1,9 +1,11 @@
 package org.orange.familylink.util;
 
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.app.Dialog;
 import org.orange.familylink.R;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -11,8 +13,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 
 /**
  * 网络操作类，用来判断是否有网络，有哪些类型网络可用，无网络时询问是否打开网络设置
@@ -88,12 +88,10 @@ public class Network {
 
 	/**
 	 * 打开“无网络连接”对话框，提问是否打开网络设置Activity。
-	 * @param fragmentActivity
 	 */
-	public static void openNoConnectionDialog(FragmentActivity fragmentActivity){
+	public static void openNoConnectionDialog(FragmentManager manager){
 		NoConnectionDialogFragment newDialog = new NoConnectionDialogFragment();
-		newDialog.show(fragmentActivity.getSupportFragmentManager(),
-				FRAGMENT_TAG_NO_CONNECTION_DIALOG);
+		newDialog.show(manager, FRAGMENT_TAG_NO_CONNECTION_DIALOG);
 	}
 
 	/**

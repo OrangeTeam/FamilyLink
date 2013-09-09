@@ -3,14 +3,13 @@
  */
 package org.orange.familylink.sms;
 
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.widget.Toast;
 import org.orange.familylink.BuildConfig;
 import org.orange.familylink.MainActivity;
 import org.orange.familylink.R;
 import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.database.Contract.Messages;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -24,6 +23,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * 短信发送状态接收器
