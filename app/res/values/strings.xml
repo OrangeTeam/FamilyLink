@@ -71,8 +71,13 @@
         <item>@string/failed_to_send</item>
     </string-array>
 
+    <!-- StatusActivity -->
+    <string name="status_activity_label">Status</string>
+
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">Initial Setup</string>
+    <!-- AlarmCountdownActivity -->
+    <string name="alarm_countdown_timer">Alarm Countdown Timer</string>
 
     <!-- network -->
     <string name="no_connection_title">No Connection</string>

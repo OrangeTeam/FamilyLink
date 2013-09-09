@@ -87,4 +87,16 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        holo:title="@string/pref_title_others">
+
+        <Preference
+            holo:title="@string/status_activity_label">
+            <intent
+                holo:targetPackage="org.orange.familylink"
+                holo:targetClass="org.orange.familylink.StatusActivity"/>
+        </Preference>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
