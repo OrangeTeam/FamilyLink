@@ -3,7 +3,6 @@
 
     <string name="app_name">心连每刻</string>
 
-    <string name="seek_help">求助</string>
     <string name="log">日志</string>
     <string name="navigate">导航</string>
     <string name="location">定位</string>
@@ -22,6 +21,16 @@
     <!-- SmsStatusReceiver -->
     <string name="failed_to_send_because_of_radio_off">由于无线被关闭，发送消息失败。</string>
     <string name="failed_to_send_because_of_generic_failure">遇到了一般错误（错误代码：%s），发送消息失败。请联系您的电话服务商。</string>
+
+    <!-- Main Menu -->
+    <string name="locate_service">定时定位</string>
+    <string name="fall_down_alarm_service">摔倒检测</string>
+    <string name="seek_help">求助</string>
+    <string name="call">电话</string>
+    <string name="outbox">已发消息</string>
+    <string name="response_message">反馈消息</string>
+    <string name="role_setting">角色设置</string>
+    <string name="contacts_setting">联系人</string>
     <!-- Seek Help -->
     <string name="name_label">姓名：</string>
     <string name="phone_label">电话：</string>

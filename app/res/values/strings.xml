@@ -3,7 +3,6 @@
 
     <string name="app_name">Heart²</string>
 
-    <string name="seek_help">Seek Help</string>
     <string name="log">Log</string>
     <string name="navigate">Navigate</string>
 	<string name="location">Location</string>
@@ -21,6 +20,16 @@
     <!-- SmsStatusReceiver -->
     <string name="failed_to_send_because_of_radio_off">Because of radio off, failed to send message.</string>
     <string name="failed_to_send_because_of_generic_failure">Because of generic failure(error code:%s), failed to send message. Please contact your service provider.</string>
+
+    <!-- Main Menu -->
+    <string name="locate_service">Locate Service</string>
+    <string name="fall_down_alarm_service">Fall Dow Alarm</string>
+    <string name="seek_help">Seek Help</string>
+    <string name="call">Call</string>
+    <string name="outbox">Outbox</string>
+    <string name="response_message">Response</string>
+    <string name="role_setting">Role</string>
+    <string name="contacts_setting">Contacts</string>
     <!-- Seek Help -->
     <string name="no_contact">You haven\'t added any Contact.</string>
     <string name="name_label">Name:</string>
