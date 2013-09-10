@@ -5,13 +5,10 @@ import org.orange.familylink.R.drawable;
 import org.orange.familylink.R.string;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
-import org.orange.familylink.database.Contract;
-import org.orange.familylink.fragment.LogFragment;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,7 +16,6 @@ import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -65,15 +61,11 @@ public class MainActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-		// LogFragment在删除消息时使用
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		setProgressBarIndeterminateVisibility(false);
 		mMainMenuGridView = (GridView) findViewById(R.id.main_menu);
 
 		setup();
-		handleIntent();
 	}
 
 	@Override
@@ -147,69 +139,6 @@ public class MainActivity extends BaseActivity {
 		// 通知ViewPager数据集有变化
 		((MainMenuAdapter) mMainMenuGridView.getAdapter()).notifyDataSetChanged();
 		return true;
-	}
-
-	/**
-	 * 取得启动本{@link Activity}的意图（{@link Intent}）Pager
-	 * @return 意图（{@link Intent}）打开的Pager，用R.string.*表示；如果没有指定，返回null
-	 * @see #EXTRA_IDS
-	 * @see #getIntent()
-	 */
-	protected Integer getIntentPager() {
-		Intent intent = getIntent();
-		Integer fragmentId = null;
-		if(Contract.Messages.MESSAGES_TYPE.equals(intent.getType())) {
-			fragmentId = R.string.log;
-		}
-		return fragmentId;
-	}
-	/**
-	 * 根据{@link Intent}，创建{@link Fragment}的参数
-	 * @return 创建的参数；如果{@link Intent}没有指定Pager或参数，返回null
-	 * @see #getIntent()
-	 * @see #getIntentPager()
-	 */
-	protected Bundle buildFragmentArgumentsByIntent() {
-		Integer pagerId = getIntentPager();
-		if(pagerId == null)
-			return null;
-		Bundle extra = getIntent().getExtras();
-		if(extra == null)
-			return null;
-		Integer status = null, code = null;
-		Long contactId = null;
-		long[] ids = extra.getLongArray(EXTRA_IDS);
-		if(extra.containsKey(EXTRA_STATUS))
-			status = extra.getInt(EXTRA_STATUS);
-		if(extra.containsKey(EXTRA_CODE))
-			code = extra.getInt(EXTRA_CODE);
-		if(extra.containsKey(EXTRA_CONTACT_ID))
-			contactId = extra.getLong(EXTRA_CONTACT_ID);
-		if(ids == null && status == null && code == null && contactId == null)
-			return null;
-		Bundle args = new Bundle();
-		switch(pagerId) {
-		case R.string.log:
-			if(ids != null)
-				args.putLongArray(LogFragment.ARGUMENT_KEY_IDS, ids);
-			if(status != null)
-				args.putInt(LogFragment.ARGUMENT_KEY_STATUS, status);
-			if(code != null)
-				args.putInt(LogFragment.ARGUMENT_KEY_CODE, code);
-			if(contactId != null)
-				args.putLong(LogFragment.ARGUMENT_KEY_CONTACT_ID, contactId);
-			break;
-		default:
-			throw new UnsupportedOperationException("unsupported pager");
-		}
-		return args;
-	}
-
-	/**
-	 * 处理{@link Intent}，跳转到意图的页面。
-	 * @see #getIntent()
-	 */
-	protected void handleIntent() {
 	}
 
 	private class MainMenuAdapter extends BaseAdapter {

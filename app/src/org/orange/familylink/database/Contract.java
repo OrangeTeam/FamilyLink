@@ -1,5 +1,8 @@
 package org.orange.familylink.database;
 
+import org.orange.familylink.data.MessageLogRecord.Direction;
+import org.orange.familylink.data.MessageLogRecord.Status;
+
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -127,6 +130,34 @@ public class Contract {
 		//为messages表中的time字段创建索引
 		public static final String INDEX_CREATE = "create index messages_time_index on " + 
 		DATABASE_MESSAGES_TABLE + "(" + COLUMN_NAME_TIME + ");";
+
+		/**
+		 * 取得与指定条件对应的SQL where子句（不包括“WHERE”自身）
+		 * @param status 筛选条件：消息状态
+		 * @return SQL where子句，满足此子句的消息的状态都为status
+		 */
+		public static String getWhereClause(Status status) {
+			return COLUMN_NAME_STATUS + " = '" + status.name() + "'";
+		}
+		/**
+		 * 取得与指定条件对应的SQL where子句（不包括“WHERE”自身）
+		 * @param direction 筛选条件：消息方向
+		 * @return SQL where子句，满足此子句的消息的{@link Direction}都为direction
+		 */
+		public static String getWhereClause(Direction direction) {
+			switch (direction) {
+			case RECEIVE:
+				return "(" + getWhereClause(Status.HAVE_READ) + ") OR ("
+						+ getWhereClause(Status.UNREAD) + ")";
+			case SEND:
+				return "(" + getWhereClause(Status.DELIVERED) + ") OR ("
+						+ getWhereClause(Status.SENT) + ") OR ("
+						+ getWhereClause(Status.SENDING) + ") OR ("
+						+ getWhereClause(Status.FAILED_TO_SEND) + ")";
+			default:
+				throw new UnsupportedOperationException("unsupported direction: " + direction);
+			}
+		}
 	}
 
 }

@@ -25,8 +25,6 @@ import org.orange.familylink.database.Contract;
 import org.orange.familylink.fragment.LogFragment.MessagesSender.MessageWrapper;
 import org.orange.familylink.sms.SmsMessage;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -35,8 +33,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -52,18 +48,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
-import android.widget.CheckedTextView;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,20 +63,13 @@ public class LogFragment extends ListFragment {
 	/** 参数Key：需要选中的消息IDs */
 	public static final String ARGUMENT_KEY_IDS =
 			LogFragment.class.getName() + ".argument.IDS";
-	/** 参数Key：需要设置的 <em>消息状态</em> 筛选条件，用R.string.*设置 */
+	/** 参数Key：需要设置的 <em>消息状态</em> 筛选条件，用{@link Status}设置 */
 	public static final String ARGUMENT_KEY_STATUS =
 			LogFragment.class.getName() + ".argument.STATUS";
-	/** 参数Key：需要设置的 <em>消息代码</em> 筛选条件 ，用R.string.*设置*/
-	public static final String ARGUMENT_KEY_CODE =
-			LogFragment.class.getName() + ".argument.CODE";
-	/** 参数Key：需要设置的 <em>对方联系人ID</em> 筛选条件 ，用R.string.*设置*/
-	public static final String ARGUMENT_KEY_CONTACT_ID =
-			LogFragment.class.getName() + ".argument.CONTACT_ID";
+	/** 参数Key：需要设置的 <em>消息方向</em> 筛选条件，用{@link Direction}设置 */
+	public static final String ARGUMENT_KEY_DIRECTION =
+			LogFragment.class.getName() + ".argument.DIRECTION";
 
-	private static final String PREF_NAME = "log_fragment";
-	private static final String PREF_KEY_STATUS = "status";
-	private static final String PREF_KEY_CODE = "code";
-	private static final String PREF_KEY_CONTACT_ID = "contact_id";
 	private static final String STATE_CHECKED_ITEM_IDS =
 			LogFragment.class.getName() + ".state.CHECKED_ITEM_IDS";
 	private static final int LOADER_ID_CONTACTS = 1;
@@ -100,48 +81,9 @@ public class LogFragment extends ListFragment {
 	private long[] mCheckedItemids;
 	/** 用于把联系人ID映射为联系人名称的{@link Map} */
 	private Map<Long, String> mContactIdToNameMap;
-	/** 用于显示联系人筛选条件的{@link Spinner}的{@link SpinnerAdapter} */
-	private MySimpleCursorAdapterWithHeader mAdapterForContactsSpinner;
 	/** 用于显示消息日志的{@link ListView}的{@link ListAdapter} */
 	private CursorAdapter mAdapterForLogList;
-	private Spinner mSpinnerForStatus;
-	private Spinner mSpinnerForCode;
-	private Spinner mSpinnerForContact;
-	private String[] mSelectionForStatus;
-	private String[] mSelectionForCode;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		// 因为super.onCreateView没有使用android.R.layout.list_content布局文件，
-		// 我们也无法按此方法的文档说明来include list_content，
-		// 只能在这用代码继承布局，以保留其内建indeterminant progress state
-
-		// 创建自定义布局，把原来的root作为新布局的子元素
-		View originalRoot = super.onCreateView(inflater, container, savedInstanceState);
-
-		LinearLayout root = new LinearLayout(getActivity());
-		root.setOrientation(LinearLayout.VERTICAL);
-		// ------------------------------------------------------------------
-		// 添加 原来的root
-		root.addView(originalRoot, new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				LinearLayout.LayoutParams.WRAP_CONTENT,
-				1));
-		// ------------------------------------------------------------------
-		// 添加 筛选条件输入部件
-		root.addView(createFilterWidget(), new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				LinearLayout.LayoutParams.WRAP_CONTENT,
-				0));
-		// ------------------------------------------------------------------
-		return root;
-	}
-
-	/* (non-Javadoc)
-	 * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
-	 */
-	@SuppressLint("NewApi")
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -151,34 +93,14 @@ public class LogFragment extends ListFragment {
 			if(ids != null)
 				mCheckedItemids = ids;
 		}
-		int codePosition, statusPosition;
-		// 恢复上次的筛选选项
-		SharedPreferences pref = getActivity().getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
-		statusPosition = pref.getInt(PREF_KEY_STATUS, 0);
-		codePosition = pref.getInt(PREF_KEY_CODE, 0);
 		// 处理Fragment的参数
 		Bundle arguments = getArguments();
 		if(arguments != null) {
 			long[] argumentIds = arguments.getLongArray(ARGUMENT_KEY_IDS);
 			if(argumentIds != null) {
 				mCheckedItemids = argumentIds;
-				codePosition = statusPosition = 0;	//禁止筛选，设为“全部”
-			}
-			if(arguments.containsKey(ARGUMENT_KEY_STATUS)) {
-				int status = arguments.getInt(ARGUMENT_KEY_STATUS);
-				Integer position = getStatusSpinnerPosition(status);
-				if(position != null)
-					statusPosition = position;
-			}
-			if(arguments.containsKey(ARGUMENT_KEY_CODE)) {
-				int code = arguments.getInt(ARGUMENT_KEY_CODE);
-				Integer position = getCodeSpinnerPosition(code);
-				if(position != null)
-					codePosition = position;
 			}
 		}
-		mSpinnerForStatus.setSelection(statusPosition);
-		mSpinnerForCode.setSelection(codePosition);
 
 		// Give some text to display if there is no data.
 		setEmptyText(getResources().getText(R.string.no_message_record));
@@ -211,21 +133,6 @@ public class LogFragment extends ListFragment {
 		loaderManager.initLoader(LOADER_ID_LOG, null, mLoaderCallbacksForLogList);
 	}
 
-	@SuppressLint("NewApi")
-	@Override
-	public void onStop() {
-		super.onStop();
-		// 保存筛选条件的当前选择
-		Editor editor = getActivity().getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE).edit();
-		editor.putInt(PREF_KEY_STATUS, mSpinnerForStatus.getSelectedItemPosition());
-		editor.putInt(PREF_KEY_CODE, mSpinnerForCode.getSelectedItemPosition());
-		editor.putLong(PREF_KEY_CONTACT_ID, mSpinnerForContact.getSelectedItemId());
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD)
-			editor.apply();
-		else
-			editor.commit();
-	}
-
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -240,146 +147,6 @@ public class LogFragment extends ListFragment {
 		super.onListItemClick(l, v, position, id);
 		if(mActionMode == null)
 			l.setItemChecked(position, true); //触发ActionModes
-	}
-
-	/**
-	 * 创建筛选条件输入部件
-	 * @return 新创建的筛选条件输入部件
-	 */
-	protected View createFilterWidget() {
-		LinearLayout spinnersContainer = new LinearLayout(getActivity());
-		spinnersContainer.setOrientation(LinearLayout.HORIZONTAL);
-
-		mSpinnerForStatus = new Spinner(getActivity());
-		// Create an ArrayAdapter using the string array and a default spinner layout
-		String[] status = getResources().getStringArray(R.array.message_status);
-		if(status.length != 9)
-			throw new IllegalStateException("Unexpected number of status. " +
-					"Maybe because you only update on one place");
-		String columnStatus = Contract.Messages.COLUMN_NAME_STATUS;
-		mSelectionForStatus = new String[status.length];
-		mSelectionForStatus[0] = "1";
-		mSelectionForStatus[2] = columnStatus + " = '" + Status.UNREAD.name() + "'";
-		mSelectionForStatus[3] = columnStatus + " = '" + Status.HAVE_READ.name() + "'";
-		mSelectionForStatus[1] = mSelectionForStatus[2] + " OR " + mSelectionForStatus[3];
-		mSelectionForStatus[5] = columnStatus + " = '" + Status.SENDING.name() + "'";
-		mSelectionForStatus[6] = columnStatus + " = '" + Status.SENT.name() + "'";
-		mSelectionForStatus[7] = columnStatus + " = '" + Status.DELIVERED.name() + "'";
-		mSelectionForStatus[8] = columnStatus + " = '" + Status.FAILED_TO_SEND.name() + "'";
-		mSelectionForStatus[4] = mSelectionForStatus[5] + " OR " + mSelectionForStatus[6]
-				+ " OR " + mSelectionForStatus[7] + " OR " + mSelectionForStatus[8];
-		ArrayAdapter<String> adapter = new MyHierarchicalArrayAdapter<String>(
-				getActivity(), android.R.layout.simple_spinner_item, status) {
-			@Override
-			protected int getLevel(int position) {
-				if(position != 0 && position != 1 && position != 4)
-					return 2;
-				else
-					return 1;
-			}
-		};
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		mSpinnerForStatus.setAdapter(adapter);
-		mSpinnerForStatus.setOnItemSelectedListener(mOnSpinnerItemSelectedListener);
-		spinnersContainer.addView(mSpinnerForStatus, new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.WRAP_CONTENT,
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				1));
-
-		mSpinnerForCode = new Spinner(getActivity());
-		String[] code = getResources().getStringArray(R.array.message_code);
-		if(code.length != 5)
-			throw new IllegalStateException("Unexpected number of code. " +
-					"Maybe because you only update on one place");
-		String columnCode = Contract.Messages.COLUMN_NAME_CODE;
-		mSelectionForCode = new String[code.length];
-		mSelectionForCode[0] = "1";
-		// 通告
-		mSelectionForCode[1] = columnCode + " BETWEEN " + Code.INFORM + " AND " +
-								(Code.INFORM | Code.EXTRA_BITS);
-		// 通告 && 定时消息
-		mSelectionForCode[2] = mSelectionForCode[1] + " AND " +
-			columnCode + " & " + Code.Extra.Inform.PULSE + " = " + Code.Extra.Inform.PULSE;
-		// 通告 &&　紧急消息
-		mSelectionForCode[3] = mSelectionForCode[1] + " AND " +
-			columnCode + " & " + Code.Extra.Inform.URGENT + " = " + Code.Extra.Inform.URGENT;
-		// 命令 || ( 通告 && 命令响应 )
-		mSelectionForCode[4] = columnCode + " BETWEEN " + Code.COMMAND + " AND " +
-				(Code.COMMAND | Code.EXTRA_BITS) + " OR ( " +
-				mSelectionForCode[1] + " AND " +
-				columnCode + " & " + Code.Extra.Inform.RESPOND + " = " + Code.Extra.Inform.RESPOND + " )";
-		adapter = new MyHierarchicalArrayAdapter<String>(
-				getActivity(), android.R.layout.simple_spinner_item, code) {
-			@Override
-			protected int getLevel(int position) {
-				if(position == 2 || position == 3)
-					return 2;
-				else
-					return 1;
-			}
-		};
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		mSpinnerForCode.setAdapter(adapter);
-		mSpinnerForCode.setOnItemSelectedListener(mOnSpinnerItemSelectedListener);
-		spinnersContainer.addView(mSpinnerForCode, new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.WRAP_CONTENT,
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				1));
-
-		mSpinnerForContact = new Spinner(getActivity());
-		mAdapterForContactsSpinner = new MySimpleCursorAdapterWithHeader(
-				getActivity(),
-				null,
-				new String[]{Contract.Contacts.COLUMN_NAME_NAME},
-				0,
-				new String[]{getString(R.string.all)});
-		mSpinnerForContact.setAdapter(mAdapterForContactsSpinner);
-		mSpinnerForContact.setOnItemSelectedListener(mOnSpinnerItemSelectedListener);
-		spinnersContainer.addView(mSpinnerForContact, new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.WRAP_CONTENT,
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				1));
-		return spinnersContainer;
-	}
-	/**
-	 * 取得指定消息状态在其{@link Spinner}中的位置
-	 * @param status 需要查询的消息状态，用R.string.*表示
-	 * @return 指定状态在其{@link Spinner}中的位置；如果没有其位置，返回null
-	 */
-	protected Integer getStatusSpinnerPosition(int status) {
-		String[] statuses = getResources().getStringArray(R.array.message_status);
-		String target = getString(status);
-		int position = -1;
-		for(int i = 0 ; i < statuses.length ; i++) {
-			if(statuses[i].equals(target)) {
-				position = i;
-				break;
-			}
-		}
-		if(position == -1)
-			return null;
-		else
-			return position;
-	}
-	/**
-	 * 取得指定消息代码在其{@link Spinner}中的位置
-	 * @param code 需要查询的消息代码，用R.string.*表示
-	 * @return 指定代码在其{@link Spinner}中的位置；如果没有其位置，返回null
-	 */
-	protected Integer getCodeSpinnerPosition(int code) {
-		String[] codes = getResources().getStringArray(R.array.message_code);
-		String target = getString(code);
-		int position = -1;
-		for(int i = 0 ; i < codes.length ; i++) {
-			if(codes[i].equals(target)) {
-				position = i;
-				break;
-			}
-		}
-		if(position == -1)
-			return null;
-		else
-			return position;
 	}
 
 	/**
@@ -451,7 +218,6 @@ public class LogFragment extends ListFragment {
 	 * @return 实际选中的消息的个数
 	 * @see #checkItemsByIds(long[])
 	 */
-	@SuppressLint("NewApi")
 	public int setItemsCheckedByIds(long[] ids) {
 		ListView listView = getListView();
 		if(listView == null)
@@ -604,7 +370,6 @@ public class LogFragment extends ListFragment {
 
 		@Override
 		public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-			Cursor old = mAdapterForContactsSpinner.swapCursor(data);
 			// setup Map
 			Map<Long, String> id2nameNew = new HashMap<Long, String>(data.getCount());
 			int indexId = data.getColumnIndex(Contract.Contacts._ID);
@@ -615,39 +380,10 @@ public class LogFragment extends ListFragment {
 			}
 			mContactIdToNameMap = id2nameNew;
 			mAdapterForLogList.notifyDataSetChanged();
-
-			if(old == null)
-				onFirstLoadFinished();
-		}
-
-		private void onFirstLoadFinished() {
-			// 如果是第一次更新，使用Arguments指定的联系人或恢复上次的选择
-			Long contactId = null;
-			Bundle args = getArguments();
-			if(args != null) {
-				if(args.containsKey(ARGUMENT_KEY_IDS))
-					contactId = -1L;	// 暂设置为Header：ALL，其ID应该为0-1
-				if(args.containsKey(ARGUMENT_KEY_CONTACT_ID))
-					contactId = args.getLong(ARGUMENT_KEY_CONTACT_ID);
-			}
-			if(contactId == null) {
-				SharedPreferences pref = getActivity().getSharedPreferences(PREF_NAME, Activity.MODE_PRIVATE);
-				if(pref.contains(PREF_KEY_CONTACT_ID))
-					contactId = pref.getLong(PREF_KEY_CONTACT_ID, 0);
-			}
-			if(contactId != null) {
-				for(int i = 0 ; i < mSpinnerForContact.getCount() ; i++) {
-					if(mSpinnerForContact.getItemIdAtPosition(i) == contactId) {
-						mSpinnerForContact.setSelection(i);
-						break;
-					}
-				}
-			}
 		}
 
 		@Override
 		public void onLoaderReset(Loader<Cursor> loader) {
-			mAdapterForContactsSpinner.swapCursor(null);
 			mContactIdToNameMap = null;
 		}
 	};
@@ -668,15 +404,14 @@ public class LogFragment extends ListFragment {
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 			// This class only has one Loader, so we don't care about the ID.
 			// 根据当前筛选条件，构造where子句
-			String selection =
-					"( " + mSelectionForStatus[mSpinnerForStatus.getSelectedItemPosition()] +
-					" ) AND ( " + mSelectionForCode[mSpinnerForCode.getSelectedItemPosition()]
-					+ " )";
-			if(mAdapterForContactsSpinner.getPositionWithoutHeader(
-					mSpinnerForContact.getSelectedItemPosition()) >= 0) {
-				selection += " AND ( " + Contract.Messages.COLUMN_NAME_CONTACT_ID + " = " +
-					mSpinnerForContact.getSelectedItemId() + " )";
-			}
+			String selection = "1";
+			Bundle arguments = getArguments();
+			if(arguments.containsKey(ARGUMENT_KEY_STATUS))
+				selection = Contract.Messages.getWhereClause(
+						(Status) arguments.getSerializable(ARGUMENT_KEY_STATUS));
+			else if(arguments.containsKey(ARGUMENT_KEY_DIRECTION))
+				selection = Contract.Messages.getWhereClause(
+						(Direction) arguments.getSerializable(ARGUMENT_KEY_DIRECTION));
 			// Now create and return a CursorLoader that will take care of
 			// creating a Cursor for the data being displayed.
 			return new CursorLoader(getActivity(), baseUri, projection, selection, null, sortOrder);
@@ -710,21 +445,6 @@ public class LogFragment extends ListFragment {
 		}
 	};
 
-	/** 用于接收 已修改筛选条件 的事件监听器*/
-	protected final OnItemSelectedListener mOnSpinnerItemSelectedListener =
-			new OnItemSelectedListener() {
-		@Override
-		public void onItemSelected(AdapterView<?> parent, View view,
-				int position, long id) {
-			// 如果正处于多选状态，保存现在的选择状态
-			if(mActionMode != null)
-				mCheckedItemids = getListView().getCheckedItemIds();
-			// 重新加载日志
-			getLoaderManager().restartLoader(LOADER_ID_LOG, null, mLoaderCallbacksForLogList);
-		}
-		@Override
-		public void onNothingSelected(AdapterView<?> parent) {}
-	};
 	protected final LogMultiChoiceModeListener mMultiChoiceModeListener =
 			new LogMultiChoiceModeListener();
 	protected class LogMultiChoiceModeListener implements MultiChoiceModeListener {
@@ -805,7 +525,6 @@ public class LogFragment extends ListFragment {
 					mode.invalidate();
 			}
 		}
-		@SuppressLint("NewApi")
 		public void updateTitle(ActionMode mode) {
 			int count = getListView().getCheckedItemCount();
 			String title = getString(
@@ -1049,126 +768,6 @@ public class LogFragment extends ListFragment {
 			ImageView type_icon;
 			ImageView directon_icon;
 			ImageView unread_icon;
-		}
-	}
-
-	/**
-	 * 带有层次结构的{@link ArrayAdapter}。低层次的item会被缩进。
-	 * @author Team Orange
-	 * @see MyHierarchicalArrayAdapter#getLevel(int)
-	 */
-	protected abstract class MyHierarchicalArrayAdapter<T> extends ArrayAdapter<T> {
-		private Integer DefaultPaddingLeft, DefaultPaddingRight, DefaultPaddingTop, DefaultPaddingBottom;
-
-		public MyHierarchicalArrayAdapter(Context context, int resource, T[] objects) {
-			super(context, resource, objects);
-		}
-
-		@Override
-		public View getDropDownView(int position, View convertView,
-				ViewGroup parent) {
-			View view = super.getDropDownView(position, convertView, parent);
-			if(DefaultPaddingLeft == null) {
-				DefaultPaddingLeft = view.getPaddingLeft();
-				DefaultPaddingRight = view.getPaddingRight();
-				DefaultPaddingTop = view.getPaddingTop();
-				DefaultPaddingBottom = view.getPaddingBottom();
-			}
-			view.setPadding(DefaultPaddingLeft * getLevel(position),
-					DefaultPaddingTop, DefaultPaddingRight, DefaultPaddingBottom);
-			return view;
-		}
-
-		/**
-		 * 取得位置为position的item的层级
-		 * @param position 待判定层次的item的position
-		 * @return 如果此item是最高层（类似&lt;h1&gt;）返回1；第二层返回2。以此类推
-		 */
-		protected abstract int getLevel(int position);
-	}
-	/**
-	 * 带有标题的{@link SimpleCursorAdapter}
-	 * <p>
-	 * <strong>Note</strong>：这是一个特化的{@link SimpleCursorAdapter}，此类是用于{@link Spinner}的{@link SpinnerAdapter}，
-	 * 其layout已经设置为了{@link android.R.layout#simple_spinner_item}，
-	 * 其DropDownViewResource已设置为{@link android.R.layout#simple_spinner_dropdown_item}。
-	 * @author Team Orange
-	 * @see SimpleCursorAdapter#SimpleCursorAdapter(Context, int, Cursor, String[], int[], int)
-	 * @see SimpleCursorAdapter#setDropDownViewResource(int)
-	 */
-	protected class MySimpleCursorAdapterWithHeader extends SimpleCursorAdapter {
-		private final String[] mHeader;
-		private final LayoutInflater mInflater;
-
-		public MySimpleCursorAdapterWithHeader(Context context,
-				Cursor c, String[] from, int flags, String[] header) {
-			super(context, android.R.layout.simple_spinner_item, c, from,
-					new int[]{android.R.id.text1}, flags);
-			setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			mHeader = header;
-			mInflater = LayoutInflater.from(context);
-		}
-
-		@Override
-		public int getCount() {
-			return super.getCount() + mHeader.length;
-		}
-
-		@Override
-		public Object getItem(int position) {
-			if(!isHeader(position))
-				return super.getItem(getPositionWithoutHeader(position));
-			else
-				return mHeader[position];
-		}
-
-		@Override
-		public long getItemId(int position) {
-			if(!isHeader(position))
-				return super.getItemId(getPositionWithoutHeader(position));
-			else
-				return position - mHeader.length;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if(!isHeader(position))
-				return super.getView(getPositionWithoutHeader(position), convertView, parent);
-			else {
-				if(convertView == null)
-					convertView = mInflater.inflate(android.R.layout.simple_spinner_item, parent, false);
-				((TextView)convertView.findViewById(android.R.id.text1)).setText(mHeader[position]);
-				return convertView;
-			}
-		}
-
-		@Override
-		public View getDropDownView(int position, View convertView,
-				ViewGroup parent) {
-			if(!isHeader(position))
-				return super.getDropDownView(getPositionWithoutHeader(position), convertView, parent);
-			else {
-				if(convertView == null)
-					convertView = mInflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
-				((CheckedTextView)convertView.findViewById(android.R.id.text1)).setText(mHeader[position]);
-				return convertView;
-			}
-		}
-
-		@Override
-		public int getViewTypeCount() {
-			return 1;
-		}
-		@Override
-		public int getItemViewType(int position) {
-			return 0;
-		}
-
-		public boolean isHeader(int position) {
-			return position < mHeader.length;
-		}
-		public int getPositionWithoutHeader(int rawPosition) {
-			return rawPosition - mHeader.length;
 		}
 	}
 
