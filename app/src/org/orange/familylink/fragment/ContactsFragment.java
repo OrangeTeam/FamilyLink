@@ -33,10 +33,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * 求助{@link Fragment}
+ * 联系人{@link Fragment}
+ * <ol>
+ * <li>选择默认联系人</li>
+ * <li>添加，编辑，删除，显示联系人</li>
+ * </ol>
  * @author Team Orange
  */
-public class SeekHelpFragment extends ListFragment {
+public class ContactsFragment extends ListFragment {
 	private static final int LOADER_ID_CONTACTS = 1;
 	/** 用于显示联系人的{@link ListView}的{@link ListAdapter} */
 	private CursorAdapter mAdapterForContactList;
@@ -118,7 +122,7 @@ public class SeekHelpFragment extends ListFragment {
 
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			View rootView = mInflater.inflate(R.layout.fragment_seek_help,
+			View rootView = mInflater.inflate(R.layout.fragment_contacts,
 					parent, false);
 			ViewHolder holder = new ViewHolder();
 			holder.name = (TextView) rootView.findViewById(R.id.name);

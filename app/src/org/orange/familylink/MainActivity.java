@@ -248,7 +248,7 @@ public class MainActivity extends BaseActivity {
 		}
 	}
 
-	private static class OnMenuItemClickListener implements OnItemClickListener {
+	private class OnMenuItemClickListener implements OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
@@ -267,6 +267,7 @@ public class MainActivity extends BaseActivity {
 			case RESPONSE_MESSAGE:
 				break;
 			case CONTACTS_SETTING:
+				startActivity(new Intent(MainActivity.this, ContactsActivity.class));
 				break;
 			case ROLE_SETTING:
 				break;

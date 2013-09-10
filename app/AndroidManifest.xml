@@ -54,8 +54,16 @@
                 <data android:mimeType="vnd.android.cursor.dir/vnd.familylink.messages" />
             </intent-filter>
         </activity>
-        <activity android:name="org.orange.familylink.ContactDetailActivity" >
-        </activity>
+        <activity
+            android:name="org.orange.familylink.ContactsActivity"
+            android:label="@string/contact"
+            android:parentActivityName="org.orange.familylink.MainActivity"
+             />
+        <activity
+            android:name="org.orange.familylink.ContactDetailActivity"
+            android:label="@string/contact_details"
+            android:parentActivityName="org.orange.familylink.ContactsActivity"
+             />
         <activity
             android:name="org.orange.familylink.SettingsActivity"
             android:label="@string/settings" >
