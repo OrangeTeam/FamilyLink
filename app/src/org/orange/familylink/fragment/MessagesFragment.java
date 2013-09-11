@@ -22,7 +22,7 @@ import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.database.Contract;
-import org.orange.familylink.fragment.LogFragment.MessagesSender.MessageWrapper;
+import org.orange.familylink.fragment.MessagesFragment.MessagesSender.MessageWrapper;
 import org.orange.familylink.sms.SmsMessage;
 
 import android.app.ListFragment;
@@ -59,19 +59,19 @@ import android.widget.Toast;
  * 日志{@link ListFragment}
  * @author Team Orange
  */
-public class LogFragment extends ListFragment {
+public class MessagesFragment extends ListFragment {
 	/** 参数Key：需要选中的消息IDs */
 	public static final String ARGUMENT_KEY_IDS =
-			LogFragment.class.getName() + ".argument.IDS";
+			MessagesFragment.class.getName() + ".argument.IDS";
 	/** 参数Key：需要设置的 <em>消息状态</em> 筛选条件，用{@link Status}设置 */
 	public static final String ARGUMENT_KEY_STATUS =
-			LogFragment.class.getName() + ".argument.STATUS";
+			MessagesFragment.class.getName() + ".argument.STATUS";
 	/** 参数Key：需要设置的 <em>消息方向</em> 筛选条件，用{@link Direction}设置 */
 	public static final String ARGUMENT_KEY_DIRECTION =
-			LogFragment.class.getName() + ".argument.DIRECTION";
+			MessagesFragment.class.getName() + ".argument.DIRECTION";
 
 	private static final String STATE_CHECKED_ITEM_IDS =
-			LogFragment.class.getName() + ".state.CHECKED_ITEM_IDS";
+			MessagesFragment.class.getName() + ".state.CHECKED_ITEM_IDS";
 	private static final int LOADER_ID_CONTACTS = 1;
 	private static final int LOADER_ID_LOG = 2;
 
@@ -404,14 +404,16 @@ public class LogFragment extends ListFragment {
 		public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 			// This class only has one Loader, so we don't care about the ID.
 			// 根据当前筛选条件，构造where子句
-			String selection = "1";
+			String selection = null;
 			Bundle arguments = getArguments();
-			if(arguments.containsKey(ARGUMENT_KEY_STATUS))
-				selection = Contract.Messages.getWhereClause(
-						(Status) arguments.getSerializable(ARGUMENT_KEY_STATUS));
-			else if(arguments.containsKey(ARGUMENT_KEY_DIRECTION))
-				selection = Contract.Messages.getWhereClause(
-						(Direction) arguments.getSerializable(ARGUMENT_KEY_DIRECTION));
+			if(arguments != null) {
+				if(arguments.containsKey(ARGUMENT_KEY_STATUS))
+					selection = Contract.Messages.getWhereClause(
+							(Status) arguments.getSerializable(ARGUMENT_KEY_STATUS));
+				else if(arguments.containsKey(ARGUMENT_KEY_DIRECTION))
+					selection = Contract.Messages.getWhereClause(
+							(Direction) arguments.getSerializable(ARGUMENT_KEY_DIRECTION));
+			}
 			// Now create and return a CursorLoader that will take care of
 			// creating a Cursor for the data being displayed.
 			return new CursorLoader(getActivity(), baseUri, projection, selection, null, sortOrder);
@@ -619,7 +621,7 @@ public class LogFragment extends ListFragment {
 
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			View rootView = mInflater.inflate(R.layout.fragment_log_list_item, parent, false);
+			View rootView = mInflater.inflate(R.layout.fragment_messages_list_item, parent, false);
 			// Creates a ViewHolder and store references to the two children views
 			// we want to bind data to.
 			ViewHolder holder = new ViewHolder();

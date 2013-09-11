@@ -3,6 +3,7 @@ package org.orange.familylink;
 import org.apache.commons.lang3.ArrayUtils;
 import org.orange.familylink.R.drawable;
 import org.orange.familylink.R.string;
+import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
@@ -27,32 +28,6 @@ import android.widget.TextView;
  * @author Team Orange
  */
 public class MainActivity extends BaseActivity {
-	/**
-	 * 应当显示的消息的ID列表
-	 * <p>
-	 * Type: long[]
-	 */
-	public static final String EXTRA_IDS = MainActivity.class.getName() + ".extra.IDS";
-	/**
-	 * 意图设置的消息状态筛选条件，用R.string.*表示
-	 * <p>
-	 * Type: int
-	 */
-	public static final String EXTRA_STATUS = MainActivity.class.getName() + ".extra.STATUS";
-	/**
-	 * 意图设置的消息代码筛选条件，用R.string.*表示
-	 * <p>
-	 * Type: int
-	 */
-	public static final String EXTRA_CODE = MainActivity.class.getName() + ".extra.CODE";
-	/**
-	 * 意图设置的消息联系人筛选条件，用联系人ID表示
-	 * <p>
-	 * Type: long
-	 */
-	public static final String EXTRA_CONTACT_ID =
-			MainActivity.class.getName() + ".extra.CONTACT_ID";
-
 	private GridView mMainMenuGridView;
 	private Role mRole;
 	private Function[] mFunctions;
@@ -200,10 +175,18 @@ public class MainActivity extends BaseActivity {
 			//----------------------- 通用 -----------------------
 			case GIVE_A_CALL:
 				break;
-			case OUTBOX:
+			case OUTBOX: {
+				Intent intent = new Intent(MainActivity.this, MessagesActivity.class);
+				intent.putExtra(MessagesActivity.EXTRA_DIRECTION, Direction.SEND);
+				startActivity(intent);
 				break;
-			case RESPONSE_MESSAGE:
+			}
+			case RESPONSE_MESSAGE: {
+				Intent intent = new Intent(MainActivity.this, MessagesActivity.class);
+				intent.putExtra(MessagesActivity.EXTRA_DIRECTION, Direction.RECEIVE);
+				startActivity(intent);
 				break;
+			}
 			case CONTACTS_SETTING:
 				startActivity(new Intent(MainActivity.this, ContactsActivity.class));
 				break;

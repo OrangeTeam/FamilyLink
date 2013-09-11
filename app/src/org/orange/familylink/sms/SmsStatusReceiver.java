@@ -4,7 +4,7 @@
 package org.orange.familylink.sms;
 
 import org.orange.familylink.BuildConfig;
-import org.orange.familylink.MainActivity;
+import org.orange.familylink.MessagesActivity;
 import org.orange.familylink.R;
 import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.database.Contract.Messages;
@@ -88,13 +88,13 @@ public class SmsStatusReceiver extends BroadcastReceiver {
 	 */
 	//TODO 改进友好性
 	protected void onFailedToSend(Context context, Intent intent) {
-		Intent resultIntent = new Intent(context, MainActivity.class);
+		Intent resultIntent = new Intent(context, MessagesActivity.class);
 		resultIntent.setAction(Intent.ACTION_VIEW);
 		resultIntent.setType(Messages.MESSAGES_TYPE);
 		long id = ContentUris.parseId(intent.getData());
 		if(id >= 1) {
-			resultIntent.putExtra(MainActivity.EXTRA_IDS, new long[]{id});
-			resultIntent.putExtra(MainActivity.EXTRA_STATUS, R.string.failed_to_send);
+			resultIntent.putExtra(MessagesActivity.EXTRA_IDS, new long[]{id});
+			resultIntent.putExtra(MessagesActivity.EXTRA_STATUS, Status.FAILED_TO_SEND);
 		}
 		PendingIntent resultPendingIntent = PendingIntent.getActivity(
 				context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
