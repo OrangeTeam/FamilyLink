@@ -22,7 +22,9 @@
     <string name="failed_to_send_because_of_generic_failure">遇到了一般错误（错误代码：%s），发送消息失败。请联系您的电话服务商。</string>
 
     <!-- Main Menu -->
+    <string name="master_switch">总开关</string>
     <string name="locate_service">定时定位</string>
+    <string name="locate_frequency">定位频率</string>
     <string name="fall_down_alarm_service">摔倒检测</string>
     <string name="seek_help">求助</string>
     <string name="call">电话</string>

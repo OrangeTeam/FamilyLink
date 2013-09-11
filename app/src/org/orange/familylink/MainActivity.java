@@ -183,13 +183,22 @@ public class MainActivity extends BaseActivity {
 				long id) {
 			Function function = Function.values()[(int)id];
 			switch (function) {
+			//----------------------- 受顾方 -----------------------
+			case MASTER_SWITCH:
+				break;
 			case LOCATE_SERVICE:
+				break;
+			case LOCATE_FREQUENCY:
 				break;
 			case FALL_DOWN_ALARM_SERVICE:
 				break;
 			case SEEK_HELP:
 				break;
-			case GIVE_CARER_A_CALL:
+			//----------------------- 监护方 -----------------------
+			case LOCATE_NOW:
+				break;
+			//----------------------- 通用 -----------------------
+			case GIVE_A_CALL:
 				break;
 			case OUTBOX:
 				break;
@@ -212,14 +221,23 @@ public class MainActivity extends BaseActivity {
 	 * @author Team Orange
 	 */
 	private static enum Function {
+		//----------------------- 受顾方 -----------------------
+		/** 总开关 */
+		MASTER_SWITCH(R.string.master_switch, R.drawable.ic_main_menu_sample),
 		/** 定位服务（开关） */
 		LOCATE_SERVICE(R.string.locate_service, R.drawable.ic_main_menu_sample),
+		/** 定位频率 */
+		LOCATE_FREQUENCY(R.string.locate_frequency, R.drawable.ic_main_menu_sample),
 		/** 摔倒检测服务（开关） */
 		FALL_DOWN_ALARM_SERVICE(R.string.fall_down_alarm_service, R.drawable.ic_main_menu_sample),
 		/** 求助 */
 		SEEK_HELP(R.string.seek_help, R.drawable.ic_main_menu_sample),
-		/** 给照料着打电话 */
-		GIVE_CARER_A_CALL(R.string.call, R.drawable.ic_main_menu_sample),
+		//----------------------- 监护方 -----------------------
+		/** 现在获取对方地点 */
+		LOCATE_NOW(R.string.locate_now, R.drawable.ic_main_menu_sample),
+		//----------------------- 通用 -----------------------
+		/** 给对方打电话 */
+		GIVE_A_CALL(R.string.call, R.drawable.ic_main_menu_sample),
 		/** 发件箱（已发消息） */
 		OUTBOX(R.string.outbox, R.drawable.ic_main_menu_sample),
 		/** 回馈信息（相应消息） */
@@ -249,15 +267,16 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private static final Function[] FUNCTIONS_GENERAL =
-	{Function.OUTBOX, Function.RESPONSE_MESSAGE, Function.CONTACTS_SETTING,
-	Function.ROLE_SETTING};
+	{Function.GIVE_A_CALL, Function.OUTBOX, Function.RESPONSE_MESSAGE,
+	Function.CONTACTS_SETTING, Function.ROLE_SETTING};
 	/** 受顾者的功能及其顺序 */
 	private static final Function[] FUNCTIONS_CAREE = ArrayUtils.addAll(
-			new Function[]{Function.LOCATE_SERVICE, Function.FALL_DOWN_ALARM_SERVICE,
-			Function.SEEK_HELP, Function.GIVE_CARER_A_CALL},
+			new Function[]{Function.MASTER_SWITCH, Function.LOCATE_SERVICE,
+					Function.LOCATE_FREQUENCY, Function.FALL_DOWN_ALARM_SERVICE,
+					Function.SEEK_HELP},
 			FUNCTIONS_GENERAL);
 	/** 照料者的功能及其顺序 */
 	private static final Function[] FUNCTIONS_CARER = ArrayUtils.addAll(
-			new Function[]{},
+			new Function[]{Function.LOCATE_NOW},
 			FUNCTIONS_GENERAL);
 }
