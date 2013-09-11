@@ -131,6 +131,12 @@ public class MainActivity extends BaseActivity {
 		public Object getItem(int position) {
 			return mFunctions[position];
 		}
+		public int getItemPosition(Function function) {
+			for(int i = 0 ; i < mFunctions.length ; i++)
+				if(mFunctions[i] == function)
+					return i;
+			return -1;
+		}
 		@Override
 		public long getItemId(int position) {
 			return mFunctions[position].ordinal();
@@ -160,12 +166,24 @@ public class MainActivity extends BaseActivity {
 			switch (function) {
 			//----------------------- 受顾方 -----------------------
 			case MASTER_SWITCH:
+				boolean isOn = view.isActivated();
+				isOn = !isOn;	//改变状态
+				view.setActivated(isOn);
+				MainMenuAdapter adapter = (MainMenuAdapter) mMainMenuGridView.getAdapter();
+				setLocateService(mMainMenuGridView.getChildAt(
+						adapter.getItemPosition(Function.LOCATE_SERVICE)), isOn);
+				setFallDownAlarmService(mMainMenuGridView.getChildAt(
+						adapter.getItemPosition(Function.FALL_DOWN_ALARM_SERVICE)), isOn);
+				if(!isOn)
+					finish();
 				break;
 			case LOCATE_SERVICE:
+				setLocateService(view, !view.isActivated());
 				break;
 			case LOCATE_FREQUENCY:
 				break;
 			case FALL_DOWN_ALARM_SERVICE:
+				setFallDownAlarmService(view, !view.isActivated());
 				break;
 			case SEEK_HELP:
 				break;
@@ -197,6 +215,12 @@ public class MainActivity extends BaseActivity {
 				throw new IllegalStateException("unsupport function: " + function.name());
 			}
 		}
+		private void setLocateService(View locateSwitch, boolean isOn) {
+			locateSwitch.setActivated(isOn);
+		}
+		private void setFallDownAlarmService(View alarmSwitch, boolean isOn) {
+			alarmSwitch.setActivated(isOn);
+		}
 	}
 
 	/**
@@ -206,13 +230,13 @@ public class MainActivity extends BaseActivity {
 	private static enum Function {
 		//----------------------- 受顾方 -----------------------
 		/** 总开关 */
-		MASTER_SWITCH(R.string.master_switch, R.drawable.ic_main_menu_sample),
+		MASTER_SWITCH(R.string.master_switch, R.drawable.ic_main_menu_sample_switch),
 		/** 定位服务（开关） */
-		LOCATE_SERVICE(R.string.locate_service, R.drawable.ic_main_menu_sample),
+		LOCATE_SERVICE(R.string.locate_service, R.drawable.ic_main_menu_sample_switch),
 		/** 定位频率 */
 		LOCATE_FREQUENCY(R.string.locate_frequency, R.drawable.ic_main_menu_sample),
 		/** 摔倒检测服务（开关） */
-		FALL_DOWN_ALARM_SERVICE(R.string.fall_down_alarm_service, R.drawable.ic_main_menu_sample),
+		FALL_DOWN_ALARM_SERVICE(R.string.fall_down_alarm_service, R.drawable.ic_main_menu_sample_switch),
 		/** 求助 */
 		SEEK_HELP(R.string.seek_help, R.drawable.ic_main_menu_sample),
 		//----------------------- 监护方 -----------------------
