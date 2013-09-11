@@ -346,7 +346,6 @@ public abstract class Message implements Cloneable{
 	 * 接收消息。接收到的消息存到本{@link Message}对象
 	 * @param receivedMessage 接收到的消息原始内容
 	 * @param password 解密密钥
-	 * @throws JsonSyntaxException 当给定的receivedMessage与本类不对应时
 	 */
 	public abstract void receive(String receivedMessage, String password);
 

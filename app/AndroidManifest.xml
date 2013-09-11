@@ -11,6 +11,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <application
@@ -33,7 +35,14 @@
         <!-- 短信发送状态Receiver -->
         <receiver android:name=".sms.SmsStatusReceiver" />
         <!-- 开机启动的Receiver，用于开启Service -->
-        <receiver android:name=".location.BootBroadcastReceiver">
+        <receiver android:name="org.orange.familylink.location.StartServiceReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
+            </intent-filter>
+        </receiver>
+        <!--  -->
+        <receiver android:name="org.orange.familylink.sms.SmsReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.REBOOT" />

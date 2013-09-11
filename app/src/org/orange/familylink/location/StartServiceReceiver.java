@@ -1,5 +1,6 @@
 package org.orange.familylink.location;
 
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +10,7 @@ import android.content.Intent;
  * @author Orange Team
  *
  */
-public class BootBroadcastReceiver extends BroadcastReceiver {
+public class StartServiceReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context arg0, Intent arg1) {

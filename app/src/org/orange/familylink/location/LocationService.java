@@ -41,7 +41,7 @@ public class LocationService extends Service {
 	private SmsSenderController senderController;
 
 	//本应用中编写的一个Message类
-	private org.orange.familylink.data.Message localMessage;
+	private SmsMessage localMessage;
 
 	/**
 	 * 服务中的一个内部类，继承了Handler类，用于一些功能上的操作
