@@ -9,60 +9,72 @@
     tools:context=".ContactDetailActivity" >
 
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/photo"
         android:layout_width="fill_parent"
         android:layout_height="130dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/ic_launcher"
+        android:contentDescription="@null" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/name_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/edit1"
-        android:layout_alignBottom="@+id/edit1"
+        android:layout_alignBaseline="@+id/name_input"
+        android:layout_alignBottom="@id/name_input"
         android:text="@string/name_label"
         android:textSize="16sp" />
 
     <EditText
-        android:id="@+id/edit1"
+        android:id="@id/name_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/imageView1"
-        android:layout_below="@+id/imageView1"
-        android:layout_toRightOf="@+id/textView1"
+        android:layout_alignRight="@id/photo"
+        android:layout_below="@id/photo"
+        android:layout_toRightOf="@id/name_label"
         android:ems="10"
-        android:textSize="16sp" >
-
+        android:textSize="16sp"
+        android:inputType="text" >
         <requestFocus />
     </EditText>
 
     <EditText
-        android:id="@+id/edit2"
+        android:id="@+id/phone_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/edit1"
-        android:layout_alignRight="@+id/edit1"
+        android:layout_alignRight="@+id/name_input"
         android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/phone_label"
         android:ems="10"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:inputType="phone|textEmailAddress" />
 
     <TextView
-        android:id="@+id/TextView01"
+        android:id="@+id/phone_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/edit1"
+        android:layout_alignBottom="@+id/phone_input"
         android:text="@string/phone_label"
         android:textSize="16sp" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/button_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/phone_input"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
         android:text="@string/edit" />
+
+    <Button
+        android:id="@+id/button_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/button_edit"
+        android:layout_alignBottom="@id/button_edit"
+        android:layout_marginLeft="48dp"
+        android:layout_toRightOf="@id/button_edit"
+        android:text="@string/save" />
 
 </RelativeLayout>

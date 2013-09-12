@@ -17,6 +17,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
@@ -200,8 +201,12 @@ public class MainActivity extends BaseActivity {
 			case LOCATE_NOW:
 				break;
 			//----------------------- 通用 -----------------------
-			case GIVE_A_CALL:
+			case GIVE_A_CALL: {
+				Intent intent = new Intent(Intent.ACTION_CALL, Uri
+						.parse("tel:" + "13"));
+				startActivity(intent);
 				break;
+			}
 			case OUTBOX: {
 				Intent intent = new Intent(MainActivity.this, MessagesActivity.class);
 				intent.putExtra(MessagesActivity.EXTRA_DIRECTION, Direction.SEND);
@@ -215,7 +220,7 @@ public class MainActivity extends BaseActivity {
 				break;
 			}
 			case CONTACTS_SETTING:
-				startActivity(new Intent(MainActivity.this, ContactsActivity.class));
+				startActivity(new Intent(MainActivity.this, ContactDetailActivity.class));
 				break;
 			case ROLE_SETTING:
 				mRoleDialogFragment.show(getFragmentManager(), null);
