@@ -232,29 +232,29 @@ public class MainActivity extends BaseActivity {
 	private static enum Function {
 		//----------------------- 受顾方 -----------------------
 		/** 总开关 */
-		MASTER_SWITCH(R.string.master_switch, R.drawable.ic_main_menu_sample_switch),
+		MASTER_SWITCH(R.string.master_switch, R.drawable.ic_main_menu_master_switch),
 		/** 定位服务（开关） */
-		LOCATE_SERVICE(R.string.locate_service, R.drawable.ic_main_menu_sample_switch),
+		LOCATE_SERVICE(R.string.locate_service, R.drawable.ic_main_menu_locate_service),
 		/** 定位频率 */
-		LOCATE_FREQUENCY(R.string.locate_frequency, R.drawable.ic_main_menu_sample),
+		LOCATE_FREQUENCY(R.string.locate_frequency, R.drawable.ic_main_menu_locate_frequency),
 		/** 摔倒检测服务（开关） */
-		FALL_DOWN_ALARM_SERVICE(R.string.fall_down_alarm_service, R.drawable.ic_main_menu_sample_switch),
+		FALL_DOWN_ALARM_SERVICE(R.string.fall_down_alarm_service, R.drawable.ic_main_menu_fall_down_alarm_service),
 		/** 求助 */
-		SEEK_HELP(R.string.seek_help, R.drawable.ic_main_menu_sample),
+		SEEK_HELP(R.string.seek_help, R.drawable.ic_main_menu_seek_help),
 		//----------------------- 监护方 -----------------------
 		/** 现在获取对方地点 */
-		LOCATE_NOW(R.string.locate_now, R.drawable.ic_main_menu_sample),
+		LOCATE_NOW(R.string.locate_now, R.drawable.ic_main_menu_locate_now),
 		//----------------------- 通用 -----------------------
 		/** 给对方打电话 */
-		GIVE_A_CALL(R.string.call, R.drawable.ic_main_menu_sample),
+		GIVE_A_CALL(R.string.call, R.drawable.ic_main_menu_call),
 		/** 发件箱（已发消息） */
-		OUTBOX(R.string.outbox, R.drawable.ic_main_menu_sample),
+		OUTBOX(R.string.outbox, R.drawable.ic_main_menu_outbox),
 		/** 回馈信息（相应消息） */
-		RESPONSE_MESSAGE(R.string.response_message, R.drawable.ic_main_menu_sample),
+		RESPONSE_MESSAGE(R.string.response_message, R.drawable.ic_main_menu_response_message),
 		/** 联系人设置 */
-		CONTACTS_SETTING(R.string.contacts_setting, R.drawable.ic_main_menu_sample),
+		CONTACTS_SETTING(R.string.contacts_setting, R.drawable.ic_main_menu_contacts_setting),
 		/** 角色设置 */
-		ROLE_SETTING(R.string.role_setting, R.drawable.ic_main_menu_sample);
+		ROLE_SETTING(R.string.role_setting, R.drawable.ic_main_menu_role_setting);
 
 		private final int mIconResourceId;
 		private final int mTitleResourceId;
