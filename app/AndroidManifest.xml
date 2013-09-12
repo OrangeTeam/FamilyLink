@@ -98,6 +98,8 @@
         </activity>
 
         <service android:name=".location.LocationService" />
+        <!-- fall down service-->
+        <service android:name="org.orange.familylink.alarm.AlarmService" />
 
     </application>
 

@@ -47,9 +47,10 @@ public class AccelerometerListener implements SensorEventListener {
 	 */
 	public AccelerometerListener setAutoAlarm(Context context) {
 		mContext = context;
-		if(context != null)
+		if(context != null) {
 			mAlarmIntent = new Intent(context, AlarmCountdownActivity.class);
-		else
+			mAlarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		} else
 			mAlarmIntent = null;
 		return this;
 	}
@@ -185,7 +186,7 @@ public class AccelerometerListener implements SensorEventListener {
 			linear_acceleration[1] = event.values[1] - gravity[1];
 			linear_acceleration[2] = event.values[2] - gravity[2];
 
-			if(gravity[0]*gravity[0]+gravity[1]*gravity[1]+gravity[2]*gravity[2] <= 5) {
+			if(gravity[0]*gravity[0]+gravity[1]*gravity[1]+gravity[2]*gravity[2] <= 10) {
 				if(mContext != null)
 					mContext.startActivity(mAlarmIntent);
 				if(mOnFallListener != null)
