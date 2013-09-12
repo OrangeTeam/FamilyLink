@@ -31,7 +31,7 @@
             android:exported="false"
             android:multiprocess="true">
         </provider>
-		
+
         <!-- 短信发送状态Receiver -->
         <receiver android:name=".sms.SmsStatusReceiver" />
         <!-- 开机启动的Receiver，用于开启Service -->
@@ -48,9 +48,7 @@
                 <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
-		
-		<!-- fall down service-->
-		<service android:name=".alarm.AlarmService"></service>  
+
         <!-- The main/home activity (has no parent activity) -->
         <activity
             android:name="org.orange.familylink.MainActivity"
