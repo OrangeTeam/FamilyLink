@@ -34,20 +34,12 @@ public class StatusActivity extends Activity {
 	private TextView mMainTextView;
 	private GraphView mStatusGraphView;
 
-	private SensorManager mSensorManager;
-	private Sensor mAccelerometer;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setupActionBar();
 		setupContentView();
 
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		//TODO 提高友好性，告知用户无相应传感器
-		if(mAccelerometer == null)
-			finish();
 		showSensorInformation();
 	}
 	/**
@@ -83,23 +75,27 @@ public class StatusActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mSensorManager.registerListener(mAccelerometerListener, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-//		mSensorManager.registerListener(mSensorEventListener, mAccelerometer, 1000000);
+		if(mAccelerometerListener.register(this, SensorManager.SENSOR_DELAY_NORMAL))
+			mMainTextView.append("register ok\n");
+		else
+			mMainTextView.append("register failure\n");
+//		mAccelerometerListener.register(this, 1000000);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mSensorManager.unregisterListener(mAccelerometerListener);
+		mAccelerometerListener.unregister(this);
 	}
 
 	/**
 	 * 显示使用的传感器的信息
 	 */
 	protected void showSensorInformation() {
+		SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		StringBuilder sb = new StringBuilder();
 		sb.append("Accelerometers on Device:\n");
-		List<Sensor> deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
+		List<Sensor> deviceSensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
 		for(Sensor sensor : deviceSensors)
 			sb.append(sensor.getName()).append(" ")
 				.append(sensor.getType()).append(" ")
@@ -107,13 +103,17 @@ public class StatusActivity extends Activity {
 				.append(sensor.getVersion()).append(" ")
 				.append(sensor.getPower()).append(" ")
 				.append("\n\n");
-		sb.append("Default Accelerometer:\n")
-			.append(mAccelerometer.getName()).append(" ")
-			.append(mAccelerometer.getType()).append(" ")
-			.append(mAccelerometer.getVendor()).append(" ")
-			.append(mAccelerometer.getVersion()).append(" ")
-			.append(mAccelerometer.getPower()).append(" ")
-			.append("\n\n");
+		sb.append("Default Accelerometer:\n");
+		Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		if(accelerometer != null)
+			sb.append(accelerometer.getName()).append(" ")
+				.append(accelerometer.getType()).append(" ")
+				.append(accelerometer.getVendor()).append(" ")
+				.append(accelerometer.getVersion()).append(" ")
+				.append(accelerometer.getPower()).append(" ")
+				.append("\n\n");
+		else
+			sb.append("None(null)").append("\n\n");;
 		mMainTextView.setText(sb.toString());
 	}
 

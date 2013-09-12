@@ -92,6 +92,73 @@ public class AccelerometerListener implements SensorEventListener {
 		return linear_acceleration;
 	}
 
+	/**
+	 * 注册本{@link SensorEventListener}
+	 * @param context
+	 * @param rate
+	 *        The rate {@link android.hardware.SensorEvent sensor events} are
+	 *        delivered at. This is only a hint to the system. Events may be
+	 *        received faster or slower than the specified rate. Usually events
+	 *        are received faster. The value must be one of
+	 *        {@link #SENSOR_DELAY_NORMAL}, {@link #SENSOR_DELAY_UI},
+	 *        {@link #SENSOR_DELAY_GAME}, or {@link #SENSOR_DELAY_FASTEST}
+	 *        or, the desired delay between events in microseconds.
+	 *        Specifying the delay in microseconds only works from Android
+	 *        2.3 (API level 9) onwards. For earlier releases, you must use
+	 *        one of the {@code SENSOR_DELAY_*} constants.
+	 * @return 若成功注册，返回true；若因为无{@link Sensor#TYPE_ACCELEROMETER}类型的传感器，注册失败，返回false
+	 * @see SensorManager#registerListener(SensorEventListener, Sensor, int)
+	 */
+	public boolean register(Context context, int rate) {
+		SensorManager manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		Sensor accelerometer = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		if(accelerometer == null)
+			return false;
+		manager.registerListener(this, accelerometer, rate);
+		return true;
+	}
+	/**
+	 * 注册本{@link SensorEventListener}。使用{@link #AccelerometerListener(Context)}
+	 * 和 {@link #setAutoAlarm(Context)}中设置的{@link Context}
+	 * @param rate
+	 *        The rate {@link android.hardware.SensorEvent sensor events} are
+	 *        delivered at. This is only a hint to the system. Events may be
+	 *        received faster or slower than the specified rate. Usually events
+	 *        are received faster. The value must be one of
+	 *        {@link #SENSOR_DELAY_NORMAL}, {@link #SENSOR_DELAY_UI},
+	 *        {@link #SENSOR_DELAY_GAME}, or {@link #SENSOR_DELAY_FASTEST}
+	 *        or, the desired delay between events in microseconds.
+	 *        Specifying the delay in microseconds only works from Android
+	 *        2.3 (API level 9) onwards. For earlier releases, you must use
+	 *        one of the {@code SENSOR_DELAY_*} constants.
+	 * @return 若成功注册，返回true；若因为无{@link Sensor#TYPE_ACCELEROMETER}类型的传感器，注册失败，返回false
+	 * @throws IllegalStateException 如果之前没有设置过{@link Context}
+	 * @see #register(Context, int)
+	 */
+	public boolean register(int rate) {
+		if(mContext == null)
+			throw new IllegalStateException("You haven't set Context");
+		return register(mContext, rate);
+	}
+	/**
+	 * 反（取消）注册本{@link SensorEventListener}
+	 * @param context
+	 */
+	public void unregister(Context context) {
+		SensorManager manager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		manager.unregisterListener(this);
+	}
+	/**
+	 * 反（取消）注册本{@link SensorEventListener}。使用{@link #AccelerometerListener(Context)}
+	 * 和 {@link #setAutoAlarm(Context)}中设置的{@link Context}
+	 * @throws IllegalStateException 如果之前没有设置过{@link Context}
+	 */
+	public void unregister() {
+		if(mContext == null)
+			throw new IllegalStateException("You haven't set Context");
+		unregister(mContext);
+	}
+
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		long start;
