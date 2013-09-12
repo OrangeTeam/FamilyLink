@@ -11,6 +11,7 @@ import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 import org.orange.familylink.fragment.dialog.LocateFrequencyDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment.OnRoleChangeListener;
+import org.orange.familylink.location.LocationService;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -226,6 +227,21 @@ public class MainActivity extends BaseActivity {
 		}
 		private void setLocateService(View locateSwitch, boolean isOn) {
 			locateSwitch.setActivated(isOn);
+			PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit()
+			.putBoolean(Settings.PREF_KEY_START_LOCATION_SERVICE, isOn).commit();
+			if(isOn){
+				toStartLocationService(MainActivity.this);
+			}else{
+				toEndLocationService(MainActivity.this);
+			}
+		}
+		private void toStartLocationService(Context context){
+			Intent intent = new Intent(context, LocationService.class);
+			context.startService(intent);
+		}
+		private void toEndLocationService(Context context){
+			Intent intent = new Intent(context, LocationService.class);
+			context.stopService(intent);
 		}
 		private void setFallDownAlarmService(View alarmSwitch, boolean isOn) {
 			alarmSwitch.setActivated(isOn);
