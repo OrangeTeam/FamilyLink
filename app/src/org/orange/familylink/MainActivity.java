@@ -8,6 +8,8 @@ import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 import org.orange.familylink.fragment.dialog.LocateFrequencyDialogFragment;
+import org.orange.familylink.fragment.dialog.RoleDialogFragment;
+import org.orange.familylink.fragment.dialog.RoleDialogFragment.OnRoleChangeListener;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -182,7 +184,7 @@ public class MainActivity extends BaseActivity {
 				setLocateService(view, !view.isActivated());
 				break;
 			case LOCATE_FREQUENCY:
-				new LocateFrequencyDialogFragment().show(getFragmentManager(), null);
+				mLocateFrequencyDialogFragment.show(getFragmentManager(), null);
 				break;
 			case FALL_DOWN_ALARM_SERVICE:
 				setFallDownAlarmService(view, !view.isActivated());
@@ -211,6 +213,7 @@ public class MainActivity extends BaseActivity {
 				startActivity(new Intent(MainActivity.this, ContactsActivity.class));
 				break;
 			case ROLE_SETTING:
+				mRoleDialogFragment.show(getFragmentManager(), null);
 				break;
 
 			default:
@@ -288,4 +291,16 @@ public class MainActivity extends BaseActivity {
 	private static final Function[] FUNCTIONS_CARER = ArrayUtils.addAll(
 			new Function[]{Function.LOCATE_NOW},
 			FUNCTIONS_GENERAL);
+
+	private final LocateFrequencyDialogFragment mLocateFrequencyDialogFragment =
+			new LocateFrequencyDialogFragment();
+	private final RoleDialogFragment mRoleDialogFragment = new RoleDialogFragment();
+	{
+		mRoleDialogFragment.setOnRoleChangeListener(new OnRoleChangeListener() {
+			@Override
+			public void onRoleChange(RoleDialogFragment dialog) {
+				changeMainMenuIfNecessary();
+			}
+		});
+	}
 }

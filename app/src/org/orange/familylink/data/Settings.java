@@ -120,7 +120,7 @@ public class Settings {
 	 * 设置用户角色
 	 * @param context 应用全局信息
 	 * @param role 用户角色
-	 * @return 如果成功保存了新设置，返回true
+	 * @return 如果成功保存了新值，返回true
 	 * @see Editor#commit()
 	 */
 	public static boolean setRole(Context context, Role role) {
@@ -133,8 +133,21 @@ public class Settings {
 			value = "0";
 			break;
 		}
-		return PreferenceManager.getDefaultSharedPreferences(context).edit()
-			.putString(PREF_KEY_ROLE, value).commit();
+		return setRole(context, value);
+	}
+	/**
+	 * 设置用户角色
+	 * @param context
+	 * @param value 用户角色。见{@link #PREF_KEY_ROLE}
+	 * @return 如果成功保存了新值，返回true
+	 */
+	public static boolean setRole(Context context, String value){
+		if(!"0".equals(value) && !"1".equals(value))
+			throw new IllegalArgumentException("Illegal Argument: "+value);
+		return PreferenceManager.getDefaultSharedPreferences(context)
+				.edit()
+				.putString(PREF_KEY_ROLE, value)
+				.commit();
 	}
 	/**
 	 * 取得同步频率。用更新间隔表示，单位微秒。如3 600 000表示每1小时更新一次。
