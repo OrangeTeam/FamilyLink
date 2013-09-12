@@ -3,6 +3,7 @@ package org.orange.familylink;
 import org.apache.commons.lang3.ArrayUtils;
 import org.orange.familylink.R.drawable;
 import org.orange.familylink.R.string;
+import org.orange.familylink.alarm.AlarmService;
 import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
@@ -162,6 +163,7 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private class OnMenuItemClickListener implements OnItemClickListener {
+		Intent intent2 = new Intent(MainActivity.this,AlarmService.class) ;
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
@@ -177,8 +179,11 @@ public class MainActivity extends BaseActivity {
 						adapter.getItemPosition(Function.LOCATE_SERVICE)), isOn);
 				setFallDownAlarmService(mMainMenuGridView.getChildAt(
 						adapter.getItemPosition(Function.FALL_DOWN_ALARM_SERVICE)), isOn);
-				if(!isOn)
+				startService(intent2) ;
+				if(!isOn){
 					finish();
+					stopService(intent2);
+				}
 				break;
 			case LOCATE_SERVICE:
 				setLocateService(view, !view.isActivated());
@@ -188,6 +193,11 @@ public class MainActivity extends BaseActivity {
 				break;
 			case FALL_DOWN_ALARM_SERVICE:
 				setFallDownAlarmService(view, !view.isActivated());
+				if(!view.isActivated()){
+					stopService(intent2);
+				}else{
+					startService(intent2) ;
+				}
 				break;
 			case SEEK_HELP:
 				break;
