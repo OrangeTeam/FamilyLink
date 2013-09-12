@@ -154,7 +154,7 @@ public class LocationService extends Service {
 		if(Settings.getStartLocationService(LocationService.this)){
 			//启动时间计划进行发送定位信息短信
 			senderController.timer.schedule(senderController, 20*1000,
-					Settings.getLocationFrequency(LocationService.this));
+					Settings.getLocateFrequency(LocationService.this));
 		}
 
 		return START_STICKY;

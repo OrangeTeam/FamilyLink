@@ -50,7 +50,7 @@ public class SettingsActivity extends PreferenceActivity {
 		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_ROLE));
 		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_SYNC_FREQUENCY));
 		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_START_LOCATION_SERVICE));
-		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_LOCATIN_FREQUENCY));
+		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_LOCATE_FREQUENCY));
 		bindPreferenceSummaryToValue(findPreference(Settings.PREF_KEY_NOTIFICATIONS_NEW_MESSAGE_RINGTONE));
 	}
 
@@ -106,7 +106,7 @@ public class SettingsActivity extends PreferenceActivity {
 					onRoleChanged(listPreference, stringValue);
 
 				//如果用户更改了定位的频率，就会重新启动定位服务
-				if(Settings.PREF_KEY_LOCATIN_FREQUENCY.equals(listPreference.getKey())){
+				if(Settings.PREF_KEY_LOCATE_FREQUENCY.equals(listPreference.getKey())){
 					//这里是一旦用户更改了定位的时间间隔，就要从新更改服务中的定位的时间计划任务，也就是也先停用服务在开启
 					//这样避免了计划任务再次被调用而出现异常，这里不要判断服务是否被开启就可以停用这个服务，是因为
 					//stopService方法，这个方法如果服务没被启动，那么停止它将不会有任何影响

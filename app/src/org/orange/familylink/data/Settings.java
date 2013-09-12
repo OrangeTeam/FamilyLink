@@ -44,11 +44,12 @@ public class Settings {
 	public static final String PREF_KEY_START_LOCATION_SERVICE = "start_location_service";
 	/**
 	 * 设置项key：定位频率
-	 * Type:String
 	 * <p>
-	 * 定位的时间间隔值，单位：分钟
+	 * Type: String
+	 * <p>
+	 * 定位的时间间隔值，单位：分钟。如“180”表示每3小时定位一次
 	 */
-	public static final String PREF_KEY_LOCATIN_FREQUENCY = "location_frequency";
+	public static final String PREF_KEY_LOCATE_FREQUENCY = "location_frequency";
 	/**
 	 * 设置项key：新消息通知
 	 * <p>
@@ -166,12 +167,25 @@ public class Settings {
 	 * @param context
 	 * @return 返回定位频率，定位频率为两次定位之间的时间间隔
 	 */
-	public static Long getLocationFrequency(Context context){
+	public static Long getLocateFrequency(Context context){
 		String locationFrequency = PreferenceManager.getDefaultSharedPreferences(context)
-				.getString(PREF_KEY_LOCATIN_FREQUENCY, null);
+				.getString(PREF_KEY_LOCATE_FREQUENCY, null);
 		if(locationFrequency == null)
 			return null;
 		else
 			return Long.parseLong(locationFrequency) * 60 * 1000;
+	}
+	/**
+	 * 设置定位频率
+	 * @param context
+	 * @param value 新定位频率
+	 * @return 当成功保存新值时，返回true
+	 * @see #PREF_KEY_LOCATE_FREQUENCY
+	 */
+	public static boolean setLocateFrequency(Context context, String value) {
+		return PreferenceManager.getDefaultSharedPreferences(context)
+				.edit()
+				.putString(PREF_KEY_LOCATE_FREQUENCY, value)
+				.commit();
 	}
 }

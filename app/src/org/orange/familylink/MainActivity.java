@@ -7,6 +7,7 @@ import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
+import org.orange.familylink.fragment.dialog.LocateFrequencyDialogFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -181,6 +182,7 @@ public class MainActivity extends BaseActivity {
 				setLocateService(view, !view.isActivated());
 				break;
 			case LOCATE_FREQUENCY:
+				new LocateFrequencyDialogFragment().show(getFragmentManager(), null);
 				break;
 			case FALL_DOWN_ALARM_SERVICE:
 				setFallDownAlarmService(view, !view.isActivated());
