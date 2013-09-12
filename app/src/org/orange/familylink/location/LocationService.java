@@ -150,9 +150,10 @@ public class LocationService extends Service {
 	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
+		Log.w("start", "start");
 		if(Settings.getStartLocationService(LocationService.this)){
 			//启动时间计划进行发送定位信息短信
-			senderController.timer.schedule(senderController, 10*1000,
+			senderController.timer.schedule(senderController, 20*1000,
 					Settings.getLocateFrequency(LocationService.this));
 		}
 

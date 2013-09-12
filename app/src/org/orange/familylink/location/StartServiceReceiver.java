@@ -13,8 +13,7 @@ public class StartServiceReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context arg0, Intent arg1) {
-		if(arg1.getAction().equals(Intent.ACTION_BOOT_COMPLETED)
-				|| arg1.getAction().equals(Intent.ACTION_REBOOT)){
+		if(arg1.getAction().equals(Intent.ACTION_BOOT_COMPLETED)){
 			Intent intent = new Intent(arg0, LocationService.class);
 			arg0.startService(intent);
 		}

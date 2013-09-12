@@ -5,13 +5,11 @@ package org.orange.familylink.fragment.dialog;
 
 import org.orange.familylink.R;
 import org.orange.familylink.data.Settings;
-import org.orange.familylink.location.LocationService;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
@@ -42,9 +40,6 @@ public class LocateFrequencyDialogFragment extends DialogFragment {
 			public void onClick(DialogInterface dialog, int which) {
 				String value = values[which];
 				Settings.setLocateFrequency(getActivity(), value);
-				Intent intent = new Intent(getActivity(), LocationService.class);
-				getActivity().stopService(intent);
-				getActivity().startService(intent);
 				dismiss();
 			}
 		});
