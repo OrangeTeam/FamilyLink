@@ -16,6 +16,9 @@ import org.orange.familylink.location.LocationService;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -116,11 +119,81 @@ public class MainActivity extends BaseActivity {
 		Role role = Settings.getRole(this);
 		if(mRole == role)
 			return false;
+		else {
+			onRoleChanged(role);
+			return true;
+		}
+	}
+	/**
+	 * 当 用户角色 改变时，调用此方法
+	 * @param newRole 新的用户角色
+	 */
+	private void onRoleChanged(Role newRole) {
+		MainMenuAdapter adapter = (MainMenuAdapter) mMainMenuGridView.getAdapter();
+		// 如果角色不再是 受顾者，关闭受顾者才使用的服务
+		if(mRole == Role.CAREE) {
+			View view = null;
+			view = mMainMenuGridView.getChildAt(
+					adapter.getItemPosition(Function.MASTER_SWITCH));
+			view.setActivated(false);
+			view = mMainMenuGridView.getChildAt(
+					adapter.getItemPosition(Function.LOCATE_SERVICE));
+			if(view.isActivated())
+				setLocateService(view, false);
+			view = mMainMenuGridView.getChildAt(
+					adapter.getItemPosition(Function.FALL_DOWN_ALARM_SERVICE));
+			if(view.isActivated())
+				setFallDownAlarmService(view, false);
+		}
 		// 更新Pagers的顺序设置
-		setMainMenuContent(role);
+		setMainMenuContent(newRole);
 		// 通知ViewPager数据集有变化
-		((MainMenuAdapter) mMainMenuGridView.getAdapter()).notifyDataSetChanged();
-		return true;
+		adapter.notifyDataSetChanged();
+	}
+
+	/**
+	 * 检查指定服务是否已打开
+	 * @param serviceClass 待检测的服务的{@link Class}
+	 * @return 如果已打开，返回true
+	 */
+	private boolean isServiceRunning(Class<? extends Service> serviceClass) {
+		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (serviceClass.getName().equals(service.service.getClassName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	/**
+	 * 开启或关闭 {@link LocationService} 服务
+	 * @param locateSwitch 本服务的开关按钮
+	 * @param isOn 如果要打开服务，设为true；如果要关闭服务，设为false
+	 */
+	private void setLocateService(View locateSwitch, boolean isOn) {
+		locateSwitch.setActivated(isOn);
+		PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit()
+		.putBoolean(Settings.PREF_KEY_START_LOCATION_SERVICE, isOn).commit();
+		final Intent intent = new Intent(this, LocationService.class);
+		if(isOn){
+			startService(intent);
+		}else{
+			stopService(intent);
+		}
+	}
+	/**
+	 * 开启或关闭 {@link AlarmService} 服务
+	 * @param locateSwitch 本服务的开关按钮
+	 * @param isOn 如果要打开服务，设为true；如果要关闭服务，设为false
+	 */
+	private void setFallDownAlarmService(View alarmSwitch, boolean isOn) {
+		alarmSwitch.setActivated(isOn);
+		final Intent intent = new Intent(this, AlarmService.class);
+		if(isOn) {
+			startService(intent);
+		} else {
+			stopService(intent);
+		}
 	}
 
 	private class MainMenuAdapter extends BaseAdapter {
@@ -161,14 +234,15 @@ public class MainActivity extends BaseActivity {
 			Function function = mFunctions[position];
 			item.setText(function.getTitleResourceId());
 			item.setCompoundDrawablesWithIntrinsicBounds(0, function.getIconResourceId(), 0, 0);
+			if(function == Function.LOCATE_SERVICE)
+				item.setActivated(isServiceRunning(LocationService.class));
+			else if(function == Function.FALL_DOWN_ALARM_SERVICE)
+				item.setActivated(isServiceRunning(AlarmService.class));
 			return item;
 		}
 	}
 
 	private class OnMenuItemClickListener implements OnItemClickListener {
-		private final Intent mFallDownAlarmIntent =
-				new Intent(MainActivity.this,AlarmService.class);
-
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
@@ -230,32 +304,6 @@ public class MainActivity extends BaseActivity {
 
 			default:
 				throw new IllegalStateException("unsupport function: " + function.name());
-			}
-		}
-		private void setLocateService(View locateSwitch, boolean isOn) {
-			locateSwitch.setActivated(isOn);
-			PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit()
-			.putBoolean(Settings.PREF_KEY_START_LOCATION_SERVICE, isOn).commit();
-			if(isOn){
-				toStartLocationService(MainActivity.this);
-			}else{
-				toEndLocationService(MainActivity.this);
-			}
-		}
-		private void toStartLocationService(Context context){
-			Intent intent = new Intent(context, LocationService.class);
-			context.startService(intent);
-		}
-		private void toEndLocationService(Context context){
-			Intent intent = new Intent(context, LocationService.class);
-			context.stopService(intent);
-		}
-		private void setFallDownAlarmService(View alarmSwitch, boolean isOn) {
-			alarmSwitch.setActivated(isOn);
-			if(isOn) {
-				startService(mFallDownAlarmIntent);
-			} else {
-				stopService(mFallDownAlarmIntent);
 			}
 		}
 	}
