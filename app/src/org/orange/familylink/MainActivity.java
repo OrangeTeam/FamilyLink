@@ -1,6 +1,7 @@
 package org.orange.familylink;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.orange.familylink.ContactDetailActivity.Contact;
 import org.orange.familylink.R.drawable;
 import org.orange.familylink.R.string;
 import org.orange.familylink.alarm.AlarmService;
@@ -202,8 +203,9 @@ public class MainActivity extends BaseActivity {
 				break;
 			//----------------------- 通用 -----------------------
 			case GIVE_A_CALL: {
+				Contact contact = ContactDetailActivity.getContact(MainActivity.this);
 				Intent intent = new Intent(Intent.ACTION_CALL, Uri
-						.parse("tel:" + "13"));
+						.parse("tel:" + contact.phone));
 				startActivity(intent);
 				break;
 			}

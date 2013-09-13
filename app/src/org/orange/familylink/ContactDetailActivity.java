@@ -4,6 +4,7 @@ import org.orange.familylink.database.Contract;
 import org.orange.familylink.database.Contract.Contacts;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -11,18 +12,16 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 /**设置联默认系人
- * 
- * @author Dell
- *
+ * @author Team Orange
  */
 public class ContactDetailActivity extends BaseActivity {
+	private static String[] projection = { Contract.Contacts.COLUMN_NAME_NAME,
+			Contract.Contacts.COLUMN_NAME_PHONE_NUMBER};
+
 	private EditText mEditTextPhone = null;
 	private EditText mEditTextName = null;
 	private Button mButtonEdit = null;
 	private Button mButtonSave = null;
-	private String nameString = "";
-	private String phoneString = "";
-	private Cursor cursor;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,24 +32,14 @@ public class ContactDetailActivity extends BaseActivity {
 		mButtonSave = (Button) findViewById(R.id.button_save);
 		mEditTextName.setFocusable(false);
 		mEditTextPhone.setFocusable(false);
-		String[] projection = { Contract.Contacts.COLUMN_NAME_NAME,
-				Contract.Contacts.COLUMN_NAME_PHONE_NUMBER };
-		cursor = getContentResolver().query(Contract.Contacts.CONTACTS_URI,
-				projection, null, null, null);
-		if (cursor.moveToLast()) {
-			phoneString = cursor
-					.getString(cursor
-							.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER));
-			nameString = cursor.getString(cursor
-					.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME));
-		}
-		mEditTextName.setText(nameString);
-		mEditTextPhone.setText(phoneString);
+
+		Contact contact = getContact(this);
+		mEditTextName.setText(contact.name);
+		mEditTextPhone.setText(contact.phone);
 		/**
 		 * 解锁获取焦点
 		 */
 		mButtonEdit.setOnClickListener(new OnClickListener() {
-
 			public void onClick(View v) {
 				mEditTextPhone.setFocusable(true);
 				mEditTextPhone.setFocusableInTouchMode(true);
@@ -66,14 +55,11 @@ public class ContactDetailActivity extends BaseActivity {
 		 */
 		mButtonSave.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-
-				if (cursor.getCount() != 0) {
-					getContentResolver().delete(Contract.Contacts.CONTACTS_URI,
+				getContentResolver().delete(Contract.Contacts.CONTACTS_URI,
 							null, null);
-				}
 				ContentValues contact = new ContentValues(2);
-				contact.put(Contacts.COLUMN_NAME_NAME, getName());
-				contact.put(Contacts.COLUMN_NAME_PHONE_NUMBER, getNumber());
+				contact.put(Contacts.COLUMN_NAME_NAME, getInputName());
+				contact.put(Contacts.COLUMN_NAME_PHONE_NUMBER, getInputPhone());
 				getContentResolver().insert(Contract.Contacts.CONTACTS_URI,
 						contact);
 				mEditTextName.setFocusable(false);
@@ -82,11 +68,33 @@ public class ContactDetailActivity extends BaseActivity {
 		});
 	}
 
-	public String getNumber() {
+	private String getInputPhone() {
 		return mEditTextPhone.getText().toString();
 	}
-
-	public String getName() {
+	private String getInputName() {
 		return mEditTextName.getText().toString();
+	}
+
+	public static Contact getContact(Context context) {
+		Cursor cursor = context.getContentResolver().query(Contract.Contacts.CONTACTS_URI,
+				projection, null, null, null);
+		String phone = null;
+		String name = null;
+		if (cursor.moveToLast()) {
+			phone = cursor.getString(
+					cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER));
+			name = cursor.getString(
+					cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME));
+		}
+		return new Contact(name, phone);
+	}
+
+	public static class Contact {
+		public final String name;
+		public final String phone;
+		public Contact(String name, String phone) {
+			this.name = name;
+			this.phone = phone;
+		}
 	}
 }
