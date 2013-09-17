@@ -253,11 +253,17 @@ public class MainActivity extends BaseActivity {
 				boolean isOn = view.isActivated();
 				isOn = !isOn;	//改变状态
 				view.setActivated(isOn);
+				// 启动或关闭子开关
 				MainMenuAdapter adapter = (MainMenuAdapter) mMainMenuGridView.getAdapter();
-				setLocateService(mMainMenuGridView.getChildAt(
-						adapter.getItemPosition(Function.LOCATE_SERVICE)), isOn);
-				setFallDownAlarmService(mMainMenuGridView.getChildAt(
-						adapter.getItemPosition(Function.FALL_DOWN_ALARM_SERVICE)), isOn);
+				View subSwitch = mMainMenuGridView.getChildAt(
+						adapter.getItemPosition(Function.LOCATE_SERVICE));
+				if(subSwitch.isActivated() != isOn)
+					setLocateService(subSwitch, isOn);
+				subSwitch = mMainMenuGridView.getChildAt(
+						adapter.getItemPosition(Function.FALL_DOWN_ALARM_SERVICE));
+				if(subSwitch.isActivated() != isOn)
+					setFallDownAlarmService(subSwitch, isOn);
+				// 自动关闭自己
 				if(!isOn)
 					finish();
 				break;
