@@ -70,7 +70,10 @@
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">初始设置</string>
     <!-- AlarmCountdownActivity -->
-    <string name="alarm_countdown_timer">警报倒计时器</string>
+    <string name="fall_down_alarm">摔倒警报</string>
+    <string name="counting_down">倒计时中</string>
+    <string name="touch_again_to_cancel">请再按一次来取消警报</string>
+    <string name="tips_touch_twice_to_cancel">小贴士：触摸屏幕两次来取消警报</string>
 
     <!-- network -->
     <string name="no_connection_title">打开网络设置？</string>

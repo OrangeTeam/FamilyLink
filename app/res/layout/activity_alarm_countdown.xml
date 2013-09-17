@@ -14,13 +14,21 @@
         android:layout_height="300dp"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
-   
-    <TextView 
+
+    <TextView
         android:id="@+id/holoTimeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" 
         android:layout_centerVertical="true"
        	android:layout_centerHorizontal="true"
-        android:textSize="24sp" />
+        android:textSize="48sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/holoCircularProgressBar1"
+        android:layout_centerHorizontal="true"
+        android:text="@string/tips_touch_twice_to_cancel"
+         />
 
 </RelativeLayout>

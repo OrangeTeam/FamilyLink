@@ -93,7 +93,7 @@
         </activity>
         <activity
             android:name="org.orange.familylink.AlarmCountdownActivity"
-            android:label="@string/alarm_countdown_timer"
+            android:label="@string/fall_down_alarm"
             android:theme="@style/AppTheme.CircularProgress" >
         </activity>
 
