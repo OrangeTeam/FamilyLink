@@ -134,9 +134,6 @@ public class MainActivity extends BaseActivity {
 		if(mRole == Role.CAREE) {
 			View view = null;
 			view = mMainMenuGridView.getChildAt(
-					adapter.getItemPosition(Function.MASTER_SWITCH));
-			view.setActivated(false);
-			view = mMainMenuGridView.getChildAt(
 					adapter.getItemPosition(Function.LOCATE_SERVICE));
 			if(view.isActivated())
 				setLocateService(view, false);
@@ -249,24 +246,6 @@ public class MainActivity extends BaseActivity {
 			Function function = Function.values()[(int)id];
 			switch (function) {
 			//----------------------- 受顾方 -----------------------
-			case MASTER_SWITCH:
-				boolean isOn = view.isActivated();
-				isOn = !isOn;	//改变状态
-				view.setActivated(isOn);
-				// 启动或关闭子开关
-				MainMenuAdapter adapter = (MainMenuAdapter) mMainMenuGridView.getAdapter();
-				View subSwitch = mMainMenuGridView.getChildAt(
-						adapter.getItemPosition(Function.LOCATE_SERVICE));
-				if(subSwitch.isActivated() != isOn)
-					setLocateService(subSwitch, isOn);
-				subSwitch = mMainMenuGridView.getChildAt(
-						adapter.getItemPosition(Function.FALL_DOWN_ALARM_SERVICE));
-				if(subSwitch.isActivated() != isOn)
-					setFallDownAlarmService(subSwitch, isOn);
-				// 自动关闭自己
-				if(!isOn)
-					finish();
-				break;
 			case LOCATE_SERVICE:
 				setLocateService(view, !view.isActivated());
 				break;
@@ -320,8 +299,6 @@ public class MainActivity extends BaseActivity {
 	 */
 	private static enum Function {
 		//----------------------- 受顾方 -----------------------
-		/** 总开关 */
-		MASTER_SWITCH(R.string.master_switch, R.drawable.ic_main_menu_master_switch),
 		/** 定位服务（开关） */
 		LOCATE_SERVICE(R.string.locate_service, R.drawable.ic_main_menu_locate_service),
 		/** 定位频率 */
@@ -369,9 +346,8 @@ public class MainActivity extends BaseActivity {
 	Function.CONTACTS_SETTING, Function.ROLE_SETTING};
 	/** 受顾者的功能及其顺序 */
 	private static final Function[] FUNCTIONS_CAREE = ArrayUtils.addAll(
-			new Function[]{Function.MASTER_SWITCH, Function.LOCATE_SERVICE,
-					Function.LOCATE_FREQUENCY, Function.FALL_DOWN_ALARM_SERVICE,
-					Function.SEEK_HELP},
+			new Function[]{Function.FALL_DOWN_ALARM_SERVICE, Function.LOCATE_SERVICE,
+					Function.LOCATE_FREQUENCY, Function.SEEK_HELP},
 			FUNCTIONS_GENERAL);
 	/** 照料者的功能及其顺序 */
 	private static final Function[] FUNCTIONS_CARER = ArrayUtils.addAll(
