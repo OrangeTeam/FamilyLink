@@ -80,12 +80,15 @@ public class ContactDetailActivity extends BaseActivity {
 				projection, null, null, null);
 		String phone = null;
 		String name = null;
-		if (cursor.moveToLast()) {
-			phone = cursor.getString(
-					cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER));
-			name = cursor.getString(
-					cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME));
+		if(cursor.getCount() > 0){
+			if (cursor.moveToLast()) {
+				phone = cursor.getString(
+						cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER));
+				name = cursor.getString(
+						cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME));
+			}
 		}
+		cursor.close();
 		return new Contact(name, phone);
 	}
 

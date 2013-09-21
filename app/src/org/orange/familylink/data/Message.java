@@ -3,6 +3,7 @@
  */
 package org.orange.familylink.data;
 
+import org.orange.familylink.data.Message.Code.Extra;
 import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.database.Contract;
 import org.orange.familylink.database.Contract.Messages;
@@ -13,6 +14,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.telephony.PhoneNumberUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -331,7 +333,7 @@ public abstract class Message implements Cloneable{
 		Long contactId = null;
 		Uri baseUri = Contract.Contacts.CONTACTS_URI;
 		String[] projection = {Contract.Contacts._ID};
-		String selection = Contract.Contacts.COLUMN_NAME_PHONE_NUMBER + " = '?'";
+		String selection = Contract.Contacts.COLUMN_NAME_PHONE_NUMBER + " = ?";
 		String[] args = {contactAddress};
 		Cursor c = context.getContentResolver()
 				.query(baseUri, projection, selection, args, null);
@@ -359,6 +361,7 @@ public abstract class Message implements Cloneable{
 	 * @return 保存的消息的{@link Uri}
 	 */
 	protected Uri saveMessage(Context context, Long contactId , String address, Status status) {
+		Log.w("smsfamily", "sms5");
 		// 在Content Provider中记录发送日志
 		ContentValues newMessage = new ContentValues();
 		newMessage.put(Messages.COLUMN_NAME_CONTACT_ID, contactId);

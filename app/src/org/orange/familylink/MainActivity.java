@@ -13,6 +13,7 @@ import org.orange.familylink.fragment.dialog.LocateFrequencyDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment.OnRoleChangeListener;
 import org.orange.familylink.location.LocationService;
+import org.orange.familylink.sms.SmsReceiverService;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -71,6 +72,9 @@ public class MainActivity extends BaseActivity {
 		else if(role == null) {
 			// 还没有配置用户角色， 现在配置
 			mFunctions = FUNCTIONS_GENERAL;
+			//第一次使用这个软件，开启接收短信服务
+			Intent smsIntent = new Intent(this, SmsReceiverService.class);
+			startService(smsIntent);
 			// 弹出对话框
 			InitialSetupDialogFragment dialog = new InitialSetupDialogFragment();
 			dialog.setOnClickListener(new InitialSetupDialogFragment.OnClickListener() {

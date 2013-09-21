@@ -35,14 +35,7 @@
         <!-- 短信发送状态Receiver -->
         <receiver android:name=".sms.SmsStatusReceiver" />
         <!-- 开机启动的Receiver，用于开启Service -->
-        <receiver android:name="org.orange.familylink.location.StartServiceReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.REBOOT" />
-            </intent-filter>
-        </receiver>
-        <!--  -->
-        <receiver android:name="org.orange.familylink.sms.SmsReceiver" >
+        <receiver android:name="org.orange.familylink.util.StartServiceReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.REBOOT" />
@@ -98,6 +91,7 @@
         </activity>
 
         <service android:name=".location.LocationService" />
+        <service android:name="org.orange.familylink.sms.SmsReceiverService" />
         <!-- fall down service-->
         <service android:name="org.orange.familylink.alarm.AlarmService" />
 

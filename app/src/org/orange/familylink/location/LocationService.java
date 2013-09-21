@@ -82,7 +82,8 @@ public class LocationService extends Service {
 				localMessage.setBody(resultAddress);
 				localMessage.setCode(Code.INFORM);
 				//从设置中得到短信加密用的密码，发送短信
-				localMessage.sendAndSave(LocationService.this, 0L, "",
+				Log.w("stttt", "3");
+				localMessage.sendAndSave(LocationService.this, 1L, "15122055072",
 						Settings.getPassword(LocationService.this));
 			}
 		}
@@ -150,10 +151,14 @@ public class LocationService extends Service {
 	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
+		Log.w("stttt", "1");
 		if(Settings.getStartLocationService(LocationService.this)){
+			Log.w("stttt", "2");
 			//启动时间计划进行发送定位信息短信
-			senderController.timer.schedule(senderController, 10*1000,
+			senderController.timer.schedule(senderController, 2*1000,
 					Settings.getLocateFrequency(LocationService.this));
+		}else{
+			stopSelf();
 		}
 
 		return START_STICKY;
