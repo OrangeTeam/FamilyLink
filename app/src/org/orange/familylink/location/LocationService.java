@@ -1,24 +1,23 @@
 package org.orange.familylink.location;
 
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.orange.familylink.ContactDetailActivity;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.sms.SmsMessage;
+import org.orange.familylink.util.ConvertUtil;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
-import android.util.Log;
 
 /**
  * 定位服务
@@ -26,11 +25,10 @@ import android.util.Log;
  *
  */
 public class LocationService extends Service {
-	//调用一个定位类
-	LocationTracker mLocationTracker;
+	static Context mContext;
 
-	//地理信息编码类
-	Geocoder mGeocoder;
+	//调用一个定位类
+	static LocationTracker mLocationTracker;
 
 	private Looper mServiceLooper;
 
@@ -41,14 +39,14 @@ public class LocationService extends Service {
 	private SmsSenderController senderController;
 
 	//本应用中编写的一个Message类
-	private org.orange.familylink.data.Message localMessage;
+	static private org.orange.familylink.data.Message localMessage;
 
 	/**
 	 * 服务中的一个内部类，继承了Handler类，用于一些功能上的操作
 	 * @author Orange Team
 	 *
 	 */
-	private final class ServiceHandler extends Handler {
+	private static final class ServiceHandler extends Handler {
 
 		public ServiceHandler(Looper looper){
 			super(looper);
@@ -60,31 +58,17 @@ public class LocationService extends Service {
 		@Override
 		public void handleMessage(Message msg){
 
-			//用于存放geocoder获得的地址信息
-			Address mAddress = null;
-			try {
-				mAddress = mGeocoder.getFromLocation(mLocationTracker.getLatitude(),
-						mLocationTracker.getLongitude(), 1).get(0);
-			}catch(IndexOutOfBoundsException e1){
-				e1.printStackTrace();
-				return;
-			}catch (IOException e2) {
-				e2.printStackTrace();
-				return;
-			}
-
-			String resultAddress = String.format("%s, %s, %s",
-					mAddress.getMaxAddressLineIndex() > 0 ? mAddress.getAddressLine(0) : "",
-					mAddress.getLocality(), mAddress.getSubLocality());
+			//根据经纬度获取地址位置信息
+			String resultAddress = ConvertUtil.getAddress(mLocationTracker.getLongitude(),
+					mLocationTracker.getLatitude());
 
 			if(mLocationTracker.canGetLocation()){
 				localMessage = new SmsMessage();
 				localMessage.setBody(resultAddress);
 				localMessage.setCode(Code.INFORM);
 				//从设置中得到短信加密用的密码，发送短信
-				Log.w("stttt", "3");
-				localMessage.sendAndSave(LocationService.this, 1L, "15122055072",
-						Settings.getPassword(LocationService.this));
+				localMessage.sendAndSave(mContext, 1L, ContactDetailActivity.getContact(mContext).phone,
+						Settings.getPassword(mContext));
 			}
 		}
 	}
@@ -136,11 +120,10 @@ public class LocationService extends Service {
 
 		thread.start();
 
+		mContext = LocationService.this;
+
 		//实例化定位操作
 		mLocationTracker = new LocationTracker(LocationService.this);
-
-		//实例化位置信息编码操作
-		mGeocoder = new Geocoder(LocationService.this);
 
 		//实例化短信发送的时间计划控制操作
 		senderController = new SmsSenderController(thread.getLooper());
@@ -151,9 +134,8 @@ public class LocationService extends Service {
 	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
-		Log.w("stttt", "1");
+
 		if(Settings.getStartLocationService(LocationService.this)){
-			Log.w("stttt", "2");
 			//启动时间计划进行发送定位信息短信
 			senderController.timer.schedule(senderController, 2*1000,
 					Settings.getLocateFrequency(LocationService.this));
