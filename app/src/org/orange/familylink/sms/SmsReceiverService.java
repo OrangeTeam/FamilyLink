@@ -77,7 +77,7 @@ public class SmsReceiverService extends Service {
 			Cursor cursor = contentResolver.query(
 					uri,
 					new String[] {"_id", "address", "body"},
-					"address = ? and read = 0",
+					"address like ? and read = 0",
 					getAddressOfSetting(),
 					"date DESC");
 			if(cursor.getCount() > 0){
@@ -128,7 +128,7 @@ public class SmsReceiverService extends Service {
 			Cursor cursor = mContext.getContentResolver().query(
 					Uri.parse("content://sms/inbox"),
 					new String[] {"_id", "thread_id", "address", "date"},
-					"address = ?", getAddressOfSetting(), SORT_ORDER);
+					"address like ?", getAddressOfSetting(), SORT_ORDER);
 			if(cursor.getCount() > 0 && cursor.moveToFirst()){
 				threadId = cursor.getLong(cursor.getColumnIndex("thread_id"));
 			}
@@ -155,9 +155,9 @@ public class SmsReceiverService extends Service {
 		 * @return
 		 */
 		protected String[] getAddressOfSetting(){
-			final int AMOUNT_OF_CONTACTS = 1;
-			String[] phones = new String[AMOUNT_OF_CONTACTS];
-			phones[0] = "+86" + ContactDetailActivity.getDefaultContact(mContext).phone;
+			final int TYPES_OF_PHONE = 1;
+			String[] phones = new String[TYPES_OF_PHONE];
+			phones[0] = "%" + ContactDetailActivity.getDefaultContact(mContext).phone;
 			return phones;
 		}
 	}
