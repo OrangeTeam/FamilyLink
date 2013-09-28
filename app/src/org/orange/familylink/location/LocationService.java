@@ -9,6 +9,7 @@ import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.sms.SmsMessage;
 import org.orange.familylink.util.ConvertUtil;
+import org.orange.familylink.util.Network;
 
 import android.app.Service;
 import android.content.Context;
@@ -19,6 +20,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.widget.Toast;
 
 /**
  * 定位服务
@@ -58,10 +60,16 @@ public class LocationService extends Service {
 		 */
 		@Override
 		public void handleMessage(Message msg){
+			String resultAddress = null;
 
-			//根据经纬度获取地址位置信息
-			String resultAddress = ConvertUtil.getAddress(mLocationTracker.getLongitude(),
-					mLocationTracker.getLatitude());
+			if(Network.isConnected(mContext)){
+				//根据经纬度获取地址位置信息
+				resultAddress = ConvertUtil.getAddress(mLocationTracker.getLongitude(),
+						mLocationTracker.getLatitude());
+			}else{
+				Toast.makeText(mContext, "网络未连接", Toast.LENGTH_LONG).show();
+				return;
+			}
 
 			if(mLocationTracker.canGetLocation()){
 				localMessage = new SmsMessage();
