@@ -35,8 +35,8 @@
     <string name="contact">联系人</string>
     <string name="contact_details">联系人详情</string>
     <string name="no_contact">您还没有添加联系人</string>
-    <string name="name_label">姓名：</string>
-    <string name="phone_label">电话：</string>
+    <string name="name_label">姓名</string>
+    <string name="phone_label">电话</string>
     <string name="save">保存</string>
     <string name="edit">编辑</string>
     <!-- Log -->
@@ -69,6 +69,8 @@
 
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">初始设置</string>
+    <string name="contact_name">联系人姓名</string>
+    <string name="contact_phone">联系人电话</string>
     <!-- AlarmCountdownActivity -->
     <string name="fall_down_alarm">摔倒警报</string>
     <string name="counting_down">倒计时中</string>

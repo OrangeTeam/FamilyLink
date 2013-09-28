@@ -79,8 +79,7 @@ public class MainActivity extends BaseActivity {
 			InitialSetupDialogFragment dialog = new InitialSetupDialogFragment();
 			dialog.setOnClickListener(new InitialSetupDialogFragment.OnClickListener() {
 				@Override
-				public void onClickPositiveButton(InitialSetupDialogFragment dialog,
-						Role newRole, String newPassword) {
+				public void onClickPositiveButton(InitialSetupDialogFragment dialog) {
 					changeMainMenuIfNecessary();
 				}
 			});

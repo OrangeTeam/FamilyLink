@@ -35,8 +35,8 @@
     <string name="contact">Contact</string>
     <string name="contact_details">Contact Details</string>
     <string name="no_contact">You haven\'t added any Contact.</string>
-    <string name="name_label">Name:</string>
-    <string name="phone_label">Phone:</string>
+    <string name="name_label">Name</string>
+    <string name="phone_label">Phone</string>
     <string name="save">save</string>
     <string name="edit">Edit</string>
     <!-- Log -->
@@ -89,6 +89,8 @@
 
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">Initial Setup</string>
+    <string name="contact_name">Contact Name</string>
+    <string name="contact_phone">Contact Phone</string>
     <!-- AlarmCountdownActivity -->
     <string name="fall_down_alarm">Fall Down Alarm</string>
     <string name="counting_down">Counting down</string>

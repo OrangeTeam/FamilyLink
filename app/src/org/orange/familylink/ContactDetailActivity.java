@@ -45,11 +45,12 @@ public class ContactDetailActivity extends BaseActivity {
 			public void onClick(View v) {
 				mEditTextPhone.setFocusable(true);
 				mEditTextPhone.setFocusableInTouchMode(true);
-				mEditTextPhone.requestFocus();
 				mEditTextName.setFocusable(true);
 				mEditTextName.setFocusableInTouchMode(true);
 				mEditTextName.requestFocus();
 				mEditTextName.setSelection(mEditTextName.length());
+				mButtonEdit.setVisibility(View.GONE);
+				mButtonSave.setVisibility(View.VISIBLE);
 			}
 		});
 		/**先删除上一个后保存下一个
@@ -66,6 +67,8 @@ public class ContactDetailActivity extends BaseActivity {
 						contact);
 				mEditTextName.setFocusable(false);
 				mEditTextPhone.setFocusable(false);
+				mButtonSave.setVisibility(View.GONE);
+				mButtonEdit.setVisibility(View.VISIBLE);
 			}
 		});
 	}

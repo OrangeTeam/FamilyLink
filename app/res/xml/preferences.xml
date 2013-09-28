@@ -2,6 +2,7 @@
 
     <EditTextPreference
         android:key="password"
+        android:defaultValue="x?@}{H%(!,>2d#|7hR=$97&amp;EFC7!{uexg*~.|b+kJ2=G@j\F%p"
         android:title="@string/pref_title_password"
         android:summary="@string/pref_summary_password"
         android:inputType="textPassword" />

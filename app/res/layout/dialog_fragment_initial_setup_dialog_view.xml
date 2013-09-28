@@ -5,6 +5,32 @@
     android:orientation="vertical" >
 
     <TextView
+        android:id="@+id/contact_name_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/contact_name" />
+
+    <EditText
+        android:id="@+id/contact_name_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName" >
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/contact_address_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/contact_phone" />
+
+    <EditText
+        android:id="@+id/contact_address_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone|textEmailAddress" />
+
+    <TextView
         android:id="@+id/role_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,21 +40,5 @@
         android:id="@+id/role"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/password_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/pref_title_password" />
-
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/pref_summary_password"
-        android:inputType="textPassword" >
-        <requestFocus />
-    </EditText>
 
 </LinearLayout>
