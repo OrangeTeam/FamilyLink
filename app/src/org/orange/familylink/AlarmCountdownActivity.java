@@ -1,5 +1,10 @@
 package org.orange.familylink;
 
+import org.orange.familylink.ContactDetailActivity.Contact;
+import org.orange.familylink.data.Message.Code;
+import org.orange.familylink.data.UrgentMessageBody;
+import org.orange.familylink.sms.SmsMessage;
+
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
@@ -38,7 +43,13 @@ public class AlarmCountdownActivity extends Activity {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
 				getActionBar().setTitle(R.string.fall_down_alarm);
-				//在此启动摔倒警报
+				//TODO 在此启动摔倒警报
+				new Thread() {
+					@Override
+					public void run() {
+						sendAlarmMessage();
+					}
+				}.start();
 			}
 			@Override
 			public void onAnimationRepeat(final Animator animation) {
@@ -119,4 +130,17 @@ public class AlarmCountdownActivity extends Activity {
 		return super.onTouchEvent(event);
 	}
 
+	private void sendAlarmMessage() {
+		// 构造消息
+		SmsMessage message = new SmsMessage();
+		message.setCode(Code.INFORM | Code.Extra.Inform.URGENT);
+		UrgentMessageBody messageBody = new UrgentMessageBody();
+		messageBody.setType(UrgentMessageBody.Type.FALL_DOWN_ALARM);
+		//TODO 在下一行取得当前位置坐标，允许监护人导航过来
+//		messageBody.setContent(当前位置经纬度);
+		message.setBody(messageBody.toJson());
+		// 发送消息
+		Contact contact = ContactDetailActivity.getDefaultContact(this);
+		message.sendAndSave(this, contact.id, contact.phone);
+	}
 }

@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.orange.familylink.ContactDetailActivity;
+import org.orange.familylink.ContactDetailActivity.Contact;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.sms.SmsMessage;
@@ -65,10 +66,9 @@ public class LocationService extends Service {
 			if(mLocationTracker.canGetLocation()){
 				localMessage = new SmsMessage();
 				localMessage.setBody(resultAddress);
-				localMessage.setCode(Code.INFORM);
-				//从设置中得到短信加密用的密码，发送短信
-				localMessage.sendAndSave(mContext, 1L, ContactDetailActivity.getContact(mContext).phone,
-						Settings.getPassword(mContext));
+				localMessage.setCode(Code.INFORM | Code.Extra.Inform.PULSE);
+				Contact contact = ContactDetailActivity.getDefaultContact(mContext);
+				localMessage.sendAndSave(mContext, contact.id, contact.phone);
 			}
 		}
 	}

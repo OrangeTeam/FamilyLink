@@ -157,7 +157,7 @@ public class SmsReceiverService extends Service {
 		protected String[] getAddressOfSetting(){
 			final int AMOUNT_OF_CONTACTS = 1;
 			String[] phones = new String[AMOUNT_OF_CONTACTS];
-			phones[0] = "+86" + ContactDetailActivity.getContact(mContext).phone;
+			phones[0] = "+86" + ContactDetailActivity.getDefaultContact(mContext).phone;
 			return phones;
 		}
 	}

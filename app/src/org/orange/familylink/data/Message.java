@@ -3,7 +3,6 @@
  */
 package org.orange.familylink.data;
 
-import org.orange.familylink.data.Message.Code.Extra;
 import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.database.Contract;
 import org.orange.familylink.database.Contract.Messages;

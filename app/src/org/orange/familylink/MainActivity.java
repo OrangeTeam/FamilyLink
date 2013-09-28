@@ -266,7 +266,7 @@ public class MainActivity extends BaseActivity {
 				break;
 			//----------------------- 通用 -----------------------
 			case GIVE_A_CALL: {
-				Contact contact = ContactDetailActivity.getContact(MainActivity.this);
+				Contact contact = ContactDetailActivity.getDefaultContact(MainActivity.this);
 				Intent intent = new Intent(Intent.ACTION_CALL, Uri
 						.parse("tel:" + contact.phone));
 				startActivity(intent);

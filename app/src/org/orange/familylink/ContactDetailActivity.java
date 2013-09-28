@@ -15,7 +15,9 @@ import android.widget.EditText;
  * @author Team Orange
  */
 public class ContactDetailActivity extends BaseActivity {
-	private static String[] projection = { Contract.Contacts.COLUMN_NAME_NAME,
+	private static String[] projection = {
+			Contract.Contacts._ID,
+			Contract.Contacts.COLUMN_NAME_NAME,
 			Contract.Contacts.COLUMN_NAME_PHONE_NUMBER};
 
 	private EditText mEditTextPhone = null;
@@ -33,7 +35,7 @@ public class ContactDetailActivity extends BaseActivity {
 		mEditTextName.setFocusable(false);
 		mEditTextPhone.setFocusable(false);
 
-		Contact contact = getContact(this);
+		Contact contact = getDefaultContact(this);
 		mEditTextName.setText(contact.name);
 		mEditTextPhone.setText(contact.phone);
 		/**
@@ -75,13 +77,20 @@ public class ContactDetailActivity extends BaseActivity {
 		return mEditTextName.getText().toString();
 	}
 
-	public static Contact getContact(Context context) {
+	/**
+	 * 取得默认联系人
+	 */
+	public static Contact getDefaultContact(Context context) {
 		Cursor cursor = context.getContentResolver().query(Contract.Contacts.CONTACTS_URI,
 				projection, null, null, null);
+		Long id = null;
 		String phone = null;
 		String name = null;
 		if(cursor.getCount() > 0){
 			if (cursor.moveToLast()) {
+				int idIndex = cursor.getColumnIndex(Contract.Contacts._ID);
+				if(!cursor.isNull(idIndex))
+					id = cursor.getLong(idIndex);
 				phone = cursor.getString(
 						cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER));
 				name = cursor.getString(
@@ -89,13 +98,19 @@ public class ContactDetailActivity extends BaseActivity {
 			}
 		}
 		cursor.close();
-		return new Contact(name, phone);
+		return new Contact(id, name, phone);
 	}
 
+	/**
+	 * 联系人存储类，请直接读取其字段。
+	 * @author Team Orange
+	 */
 	public static class Contact {
+		public final Long id;
 		public final String name;
 		public final String phone;
-		public Contact(String name, String phone) {
+		public Contact(Long id, String name, String phone) {
+			this.id = id;
 			this.name = name;
 			this.phone = phone;
 		}
