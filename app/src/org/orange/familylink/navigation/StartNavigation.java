@@ -35,7 +35,6 @@ public class StartNavigation {
 	 * 主要是用于紧急求助时受监护人把定位坐标发送给监护人时，在监护人端就调用这个方法，把受监护人的定位信息传入给这个方法，然后这个方法就会开启谷歌地图进行导航
 	 * 当然也就是说明除了用受监护人传入的定位信息，这里还用了监护人的定位信息，这样就能从监护人导航到受监护人的位置
 	 * @param context 上下文环境
-	 * @param fragmentActivity FragmentActivity
 	 * @param latitude 纬度double类型
 	 * @param longitude 经度double类型
 	 */

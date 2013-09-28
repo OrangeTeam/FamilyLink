@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/alarm_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/alarm_notification"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/navigate_to_this_position"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/navigate_to_this_position"
+            android:onClick="onClickNavigateToThisPosition" />
+
+        <Button
+            android:id="@+id/call_to_somebody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/call_to_somebody"
+            android:onClick="onClickCallToSomebody" />
+
+    </LinearLayout>
+
+</RelativeLayout>

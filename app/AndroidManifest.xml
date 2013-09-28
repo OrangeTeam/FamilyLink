@@ -89,6 +89,10 @@
             android:label="@string/fall_down_alarm"
             android:theme="@style/AppTheme.CircularProgress" >
         </activity>
+        <activity
+            android:name="org.orange.familylink.FallDownAlarmActivity"
+            android:label="@string/fall_down_alarm" >
+        </activity>
 
         <service android:name=".location.LocationService" />
         <service android:name="org.orange.familylink.sms.SmsReceiverService" />

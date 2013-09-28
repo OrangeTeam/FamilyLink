@@ -94,6 +94,10 @@
     <string name="counting_down">Counting down</string>
     <string name="touch_again_to_cancel">Please touch again to cancel alarm.</string>
     <string name="tips_touch_twice_to_cancel">Tips: You can touch twice to cancel alarm.</string>
+    <!-- FallDownAlarmActivity.java -->
+    <string name="fall_down_alarm_notification"><b>%s</b> fell down at:</string>
+    <string name="call_to_somebody">Call to %s</string>
+    <string name="navigate_to_this_position">Navigate to this position</string>
 
     <!-- network -->
     <string name="no_connection_title">No Connection</string>
