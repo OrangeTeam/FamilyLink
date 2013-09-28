@@ -5,7 +5,6 @@ import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.UrgentMessageBody;
 import org.orange.familylink.sms.SmsMessage;
 
-import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -36,28 +35,7 @@ public class AlarmCountdownActivity extends Activity {
 		mTextView = (TextView) super.findViewById(R.id.holoTimeText);
 		//Animation实例化
 		progress = (HoloCircularProgressBar) findViewById(R.id.holoCircularProgressBar1);
-		animate(progress, new AnimatorListener() {
-			@Override
-			public void onAnimationCancel(final Animator animation) {
-			}
-			@Override
-			public void onAnimationEnd(final Animator animation) {
-				getActionBar().setTitle(R.string.fall_down_alarm);
-				//TODO 在此启动摔倒警报
-				new Thread() {
-					@Override
-					public void run() {
-						sendAlarmMessage();
-					}
-				}.start();
-			}
-			@Override
-			public void onAnimationRepeat(final Animator animation) {
-			}
-			@Override
-			public void onAnimationStart(final Animator animation) {
-			}
-		});
+		animate(progress, null);
 	}
 
 	/**
@@ -89,8 +67,17 @@ public class AlarmCountdownActivity extends Activity {
 				int currentPlayTimeSecond = (int) (animation.getCurrentPlayTime() / 1000);
 				if(currentPlayTimeSecond != mLastPlayTimeSecond) {
 					mLastPlayTimeSecond = currentPlayTimeSecond;
-					mTextView.setText(
-							String.valueOf(NUM_SHOW_TIME / 1000 - currentPlayTimeSecond));
+					int countDownTime = NUM_SHOW_TIME / 1000 - currentPlayTimeSecond;
+					mTextView.setText(String.valueOf(countDownTime));
+					if(countDownTime == 0) {
+						getActionBar().setTitle(R.string.fall_down_alarm);
+						new Thread() {
+							@Override
+							public void run() {
+								sendAlarmMessage();
+							}
+						}.start();
+					}
 				}
 			}
 		});
