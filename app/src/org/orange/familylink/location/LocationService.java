@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.orange.familylink.ContactDetailActivity;
+import org.orange.familylink.R;
 import org.orange.familylink.ContactDetailActivity.Contact;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.Settings;
@@ -67,7 +68,7 @@ public class LocationService extends Service {
 				resultAddress = ConvertUtil.getAddress(mLocationTracker.getLongitude(),
 						mLocationTracker.getLatitude());
 			}else{
-				Toast.makeText(mContext, "网络未连接", Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, R.string.unconnection, Toast.LENGTH_LONG).show();
 				return;
 			}
 

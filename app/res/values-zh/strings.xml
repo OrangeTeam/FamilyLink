@@ -85,6 +85,9 @@
     <string name="no_connection_title">打开网络设置？</string>
     <string name="no_connection_message">网络连接不可用，是否现在打开网络设置？</string>
 
+    <!-- LocationService -->
+    <string name="unconnection">网络未连接</string>
+
     <!-- navigation -->
     <string name="no_maps_app_title">安装地图应用</string>
     <string name="no_maps_app_message">是否现在到安卓应用商定安装谷歌地图？</string>

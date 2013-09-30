@@ -333,6 +333,7 @@ public abstract class Message implements Cloneable{
 		Uri baseUri = Contract.Contacts.CONTACTS_URI;
 		String[] projection = {Contract.Contacts._ID};
 		String selection = Contract.Contacts.COLUMN_NAME_PHONE_NUMBER + " = ?";
+		contactAddress = removePrefix(contactAddress);
 		String[] args = {contactAddress};
 		Cursor c = context.getContentResolver()
 				.query(baseUri, projection, selection, args, null);
@@ -343,6 +344,24 @@ public abstract class Message implements Cloneable{
 		}
 		return contactId;
 	}
+	/**
+	 * 移除电话号码的前缀，如“+86”
+	 * @param contactAddress 电话号码
+	 * @return 去除前缀之后的电话号码
+	 */
+	private String removePrefix(String contactAddress){
+		String newContactAddress = null;
+		//手机号的长度为11位
+		int phoneDigits = 11;
+		//手机号的前缀“+”的位置为0
+		final int PLUS_SIGN_POSITION = 0;
+		if(contactAddress.charAt(PLUS_SIGN_POSITION) == '+'){
+			int prefixDigits = contactAddress.length() - phoneDigits;
+			newContactAddress = contactAddress.substring(prefixDigits);
+		}
+		return newContactAddress;
+	}
+
 	/**
 	 * 接收消息。接收到的消息存到本{@link Message}对象
 	 * @param receivedMessage 接收到的消息原始内容
