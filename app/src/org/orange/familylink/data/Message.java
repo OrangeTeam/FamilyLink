@@ -56,7 +56,7 @@ public abstract class Message implements Cloneable{
 				/**
 				 * 应答命令
 				 */
-				public static final int RESPOND	 = 0x01;
+				public static final int RESPONSE = 0x01;
 				/**
 				 * 脉冲通告，定时报告
 				 */
@@ -67,14 +67,14 @@ public abstract class Message implements Cloneable{
 				public static final int URGENT	 = 0x04;
 
 				/**
-				 * 检测指定code是不是设置了{@link #RESPOND}位
+				 * 检测指定code是不是设置了{@link #RESPONSE}位
 				 * @param code 待检测code
-				 * @return 如果code是{@link Code#INFORM}并且设置了{@link #RESPOND}位，返回true；否则返回false
+				 * @return 如果code是{@link Code#INFORM}并且设置了{@link #RESPONSE}位，返回true；否则返回false
 				 */
 				public static boolean hasSetRespond(int code) {
 					if(!isInform(code))
 						return false;
-					return (code & RESPOND) == RESPOND;
+					return (code & RESPONSE) == RESPONSE;
 				}
 				/**
 				 * 检测指定code是不是设置了{@link #PULSE}位

@@ -208,7 +208,7 @@ public class MessageLogRecordTest extends TestCase {
 
 		m = new MockMessage();
 		m.setCode(Message.Code.INFORM | Message.Code.Extra.Inform.PULSE
-				| Message.Code.Extra.Inform.RESPOND);
+				| Message.Code.Extra.Inform.RESPONSE);
 		assertFalse(m.equals(mMessageLogRecord.getMessage()));
 		mMessageLogRecord.setMessage(m);
 		assertEquals(m, mMessageLogRecord.getMessage());

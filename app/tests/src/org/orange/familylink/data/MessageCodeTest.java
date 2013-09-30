@@ -40,7 +40,7 @@ public class MessageCodeTest extends TestCase {
 	// ---------- Inform ----------
 	public void testHasSetRespond()
 			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		testFlag(Code.INFORM, Code.Extra.Inform.RESPOND,
+		testFlag(Code.INFORM, Code.Extra.Inform.RESPONSE,
 				Code.Extra.Inform.class.getMethod("hasSetRespond", int.class));
 	}
 	public void testHasSetPulse()

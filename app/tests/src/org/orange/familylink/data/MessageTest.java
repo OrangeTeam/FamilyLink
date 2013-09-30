@@ -84,7 +84,7 @@ public class MessageTest extends TestCase {
 	public void testConstructor() {
 
 		Integer code = Message.Code.INFORM |Message.Code.Extra.Inform.PULSE
-				| Message.Code.Extra.Inform.RESPOND | Message.Code.Extra.Inform.URGENT;
+				| Message.Code.Extra.Inform.RESPONSE | Message.Code.Extra.Inform.URGENT;
 		mMessage = new MockMessage().setCode(code).setBody(TEST_CASE_BODY);
 		assertEquals(code, mMessage.getCode());
 		assertEquals(TEST_CASE_BODY, mMessage.getBody());

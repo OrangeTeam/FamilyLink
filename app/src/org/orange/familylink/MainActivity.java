@@ -5,14 +5,18 @@ import org.orange.familylink.ContactDetailActivity.Contact;
 import org.orange.familylink.R.drawable;
 import org.orange.familylink.R.string;
 import org.orange.familylink.alarm.AlarmService;
+import org.orange.familylink.data.Message;
+import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.data.Settings.Role;
+import org.orange.familylink.data.UrgentMessageBody;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 import org.orange.familylink.fragment.dialog.LocateFrequencyDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment.OnRoleChangeListener;
 import org.orange.familylink.location.LocationService;
+import org.orange.familylink.sms.SmsMessage;
 import org.orange.familylink.sms.SmsReceiverService;
 
 import android.app.ActionBar;
@@ -196,6 +200,27 @@ public class MainActivity extends BaseActivity {
 		}
 	}
 
+	private void sendMessage(Function function) {
+		// 构造消息
+		Message message = new SmsMessage();
+		switch(function) {
+		case SEEK_HELP:
+			message.setCode(Code.INFORM | Code.Extra.Inform.URGENT);
+			UrgentMessageBody body = new UrgentMessageBody();
+			body.setType(UrgentMessageBody.Type.SEEK_HELP);
+			message.setBody(body.toJson());
+			break;
+		case LOCATE_NOW:
+			message.setCode(Code.COMMAND | Code.Extra.Command.LOCATE_NOW);
+			break;
+		default:
+			throw new IllegalArgumentException("unsupported function: " + function);
+		}
+		// 发送消息
+		Contact contact = ContactDetailActivity.getDefaultContact(MainActivity.this);
+		message.sendAndSave(MainActivity.this, contact.id, contact.phone);
+	}
+
 	private class MainMenuAdapter extends BaseAdapter {
 		private Context mContext;
 
@@ -259,9 +284,11 @@ public class MainActivity extends BaseActivity {
 				setFallDownAlarmService(view, !view.isActivated());
 				break;
 			case SEEK_HELP:
+				sendMessage(Function.SEEK_HELP);
 				break;
 			//----------------------- 监护方 -----------------------
 			case LOCATE_NOW:
+				sendMessage(Function.LOCATE_NOW);
 				break;
 			//----------------------- 通用 -----------------------
 			case GIVE_A_CALL: {
