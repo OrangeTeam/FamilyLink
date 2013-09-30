@@ -21,7 +21,8 @@ public class SmsMessage extends Message {
 			String password) {
 		// 加密body
 		String body = getBody();
-		setBody(Crypto.encrypt(body, password));
+		if(body != null)
+			setBody(Crypto.encrypt(body, password));
 		String json = toJson();
 		// 通过SMS发送消息
 		json = encode(json);
@@ -33,7 +34,9 @@ public class SmsMessage extends Message {
 	public void receive(String receivedMessage, String password) {
 		receivedMessage = decode(receivedMessage);
 		fromJson(receivedMessage);
-		setBody(Crypto.decrypt(getBody(), password));
+		String body = getBody();
+		if(body != null)
+			setBody(Crypto.decrypt(body, password));
 	}
 	protected static String encode(String origin) {
 		origin = origin.replace('{', '(');
