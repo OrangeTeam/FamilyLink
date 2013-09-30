@@ -141,6 +141,10 @@ public class LocationTracker implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
+    	if(location != null){
+    		longitude = location.getLongitude();
+    		latitude = location.getLatitude();
+    	}
     }
 
     @Override
