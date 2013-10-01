@@ -21,67 +21,50 @@
         android:contentDescription="@null"
          />
 
+    <TextView
+        android:id="@+id/sender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:autoLink="phone|email"
+        android:focusable="false"
+         />
     <ImageView
         android:id="@+id/direction_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_toRightOf="@id/sender"
         android:layout_alignParentTop="true"
         android:focusable="false"
         android:paddingTop="4dp"
-        android:src="@drawable/left"
-        android:contentDescription="@string/send"
+        android:src="@drawable/right"
+        android:contentDescription="@string/to"
          />
     <TextView
-        android:id="@+id/code"
-        android:layout_width="80dp"
+        android:id="@+id/receiver"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/direction_icon"
         android:layout_alignParentTop="true"
-        android:focusable="false"
-         />
-    <TextView
-        android:id="@+id/code_extra"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/code"
-        android:layout_toLeftOf="@+id/unread_icon"
-        android:layout_alignParentTop="true"
-        android:layout_alignBaseline="@id/code"
+        android:autoLink="phone|email"
         android:focusable="false"
          />
     <TextView
         android:id="@+id/body"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/direction_icon"
-        android:layout_toLeftOf="@id/unread_icon"
-        android:layout_below="@id/code_extra"
+        android:layout_alignLeft="@id/sender"
+        android:layout_toLeftOf="@+id/unread_icon"
+        android:layout_below="@id/sender"
         android:focusable="false"
-         />
-    <TextView
-        android:id="@+id/contact_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/body"
-        android:layout_toLeftOf="@+id/address"
-        android:layout_alignBaseline="@id/address"
-        android:focusable="false"
-         />
-    <TextView
-        android:id="@id/address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/body"
-        android:layout_toLeftOf="@id/unread_icon"
-        android:focusable="false"
-        android:autoLink="phone|email"
          />
     <TextView
         android:id="@id/date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/contact_name"
+        android:layout_below="@id/body"
         android:layout_toLeftOf="@+id/send_status"
         android:layout_alignBaseline="@id/send_status"
         android:focusable="false"
@@ -91,7 +74,7 @@
         android:id="@id/send_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/contact_name"
+        android:layout_below="@id/body"
         android:layout_toLeftOf="@id/unread_icon"
         android:focusable="false"
         android:paddingBottom="4dp"

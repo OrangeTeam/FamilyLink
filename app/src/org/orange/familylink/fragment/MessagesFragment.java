@@ -283,54 +283,6 @@ public class MessagesFragment extends ListFragment {
 			throw new IllegalArgumentException("May be method Code.isLegalCode() not correct");
 		}
 	}
-	private String valueOfCode(Integer code) {
-		if(code == null)
-			return getString(R.string.undefined);
-		else if(Code.isInform(code))
-			return getString(R.string.inform);
-		else if(Code.isCommand(code))
-			return getString(R.string.command);
-		else if(!Code.isLegalCode(code))
-			return getString(R.string.illegal_code, code.intValue());
-		else
-			throw new IllegalArgumentException("May be method Code.isLegalCode() not correct");
-	}
-	private String valueOfCodeExtra(Integer code, String delimiter) {
-		if(delimiter.length() == 0)
-			throw new IllegalArgumentException("you should set a delimiter");
-		if(code == null || !Code.isLegalCode(code))
-			return "";
-		StringBuilder sb = new StringBuilder();
-		if(Code.isInform(code)){
-			if(Code.Extra.Inform.hasSetUrgent(code))
-				sb.append(getString(R.string.urgent) + delimiter);
-			if(Code.Extra.Inform.hasSetRespond(code))
-				sb.append(getString(R.string.respond) + delimiter);
-			if(Code.Extra.Inform.hasSetPulse(code))
-				sb.append(getString(R.string.pulse) + delimiter);
-		} else if(Code.isCommand(code)) {
-			if(Code.Extra.Command.hasSetLocateNow(code))
-				sb.append(getString(R.string.locate_now) + delimiter);
-		} else {
-			throw new IllegalArgumentException("May be method Code.isLegalCode() not correct");
-		}
-		int last = sb.lastIndexOf(delimiter);
-		if(last > 0)
-			return sb.substring(0, last);
-		else
-			return "";
-	}
-	private String valueOfDirection(Status status) {
-		if(status == null)
-			return "";
-		Direction direction = status.getDirection();
-		if(direction == Direction.SEND)
-			return getString(R.string.send);
-		else if(direction == Direction.RECEIVE)
-			return getString(R.string.receive);
-		else
-			throw new UnsupportedOperationException("unsupport "+direction+" now.");
-	}
 	private String valueOfHasRead(Status status) {
 		if(status == Status.HAVE_READ)
 			return getString(R.string.has_read);
@@ -625,11 +577,9 @@ public class MessagesFragment extends ListFragment {
 			// Creates a ViewHolder and store references to the two children views
 			// we want to bind data to.
 			ViewHolder holder = new ViewHolder();
-			holder.code = (TextView) rootView.findViewById(R.id.code);
-			holder.code_extra = (TextView) rootView.findViewById(R.id.code_extra);
+			holder.sender = (TextView) rootView.findViewById(R.id.sender);
+			holder.receiver = (TextView) rootView.findViewById(R.id.receiver);
 			holder.body = (TextView) rootView.findViewById(R.id.body);
-			holder.contact_name = (TextView) rootView.findViewById(R.id.contact_name);
-			holder.address = (TextView) rootView.findViewById(R.id.address);
 			holder.send_status = (TextView) rootView.findViewById(R.id.send_status);
 			holder.date = (TextView) rootView.findViewById(R.id.date);
 			holder.type_icon = (ImageView) rootView.findViewById(R.id.type_icon);
@@ -658,8 +608,6 @@ public class MessagesFragment extends ListFragment {
 
 			ViewHolder holder = (ViewHolder) view.getTag();
 			// message code
-			holder.code.setText(valueOfCode(code));
-			holder.code_extra.setText(valueOfCodeExtra(code, " | "));
 			setViewColor(code, holder.type_icon);
 			// message body
 			if(body != null)
@@ -667,17 +615,35 @@ public class MessagesFragment extends ListFragment {
 			else
 				holder.body.setText("");
 			// 联系人
-			if(mContactIdToNameMap != null) {
-				String contactName = mContactIdToNameMap.get(contactId);
-				if(contactName == null)
-					contactName = "null";
-				holder.contact_name.setText(contactName);
-			}
+			String contactName = null;
+			if(mContactIdToNameMap != null)
+				contactName = mContactIdToNameMap.get(contactId);
+			if(contactName == null)
+				contactName = getString(R.string.unknown);
 			// address
+			String contact;
 			if(address != null)
-				holder.address.setText(getString(R.string.address_formatter, address));
+				contact = getString(R.string.contact_formatter, contactName, address);
 			else
-				holder.address.setText(R.string.unknown);
+				contact = contactName;
+			// direction (in status)
+			if(status != null) {
+				holder.sender.setVisibility(View.VISIBLE);
+				holder.directon_icon.setVisibility(View.VISIBLE);
+				Direction dirct = status.getDirection();
+				if(dirct == Direction.SEND) {
+					holder.sender.setText(R.string.me);
+					holder.receiver.setText(contact);
+				} else if(dirct == Direction.RECEIVE) {
+					holder.sender.setText(contact);
+					holder.receiver.setText(R.string.me);
+				} else
+					throw new IllegalStateException("unknown Direction: " + dirct.name());
+			} else {
+				holder.sender.setVisibility(View.GONE);
+				holder.directon_icon.setVisibility(View.GONE);
+				holder.receiver.setText(contact);
+			}
 			// date
 			if(date != null) {
 				holder.date.setVisibility(View.VISIBLE);
@@ -686,28 +652,13 @@ public class MessagesFragment extends ListFragment {
 			} else {
 				holder.date.setVisibility(View.INVISIBLE);
 			}
-			// direction (in status)
-			if(status != null) {
-				//direction
-				holder.directon_icon.setVisibility(View.VISIBLE);
-				Direction dirct = status.getDirection();
-				if(dirct == Direction.SEND)
-					holder.directon_icon.setImageResource(R.drawable.left);
-				else if(dirct == Direction.RECEIVE)
-					holder.directon_icon.setImageResource(R.drawable.right);
-				else
-					throw new IllegalStateException("unknown Direction: " + dirct.name());
-			} else {
-				holder.directon_icon.setVisibility(View.INVISIBLE);
-			}
-			holder.directon_icon.setContentDescription(valueOfDirection(status));
 			// is it unread
 			if((status == Status.UNREAD)) {
 				holder.unread_icon.setVisibility(View.VISIBLE);
 				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem_Strong);
 			} else {	 // 包括 就收 或 status==null 的情况
 				holder.unread_icon.setVisibility(View.INVISIBLE);
-				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem_Weak);
+				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem);
 			}
 			holder.unread_icon.setContentDescription(valueOfHasRead(status));
 			// is it sent
@@ -746,11 +697,9 @@ public class MessagesFragment extends ListFragment {
 		 * @see TextView#setTextAppearance(Context, int)
 		 */
 		private void setTextAppearance(ViewHolder holder, int resid) {
-			holder.code.setTextAppearance(mContext, resid);
-			holder.code_extra.setTextAppearance(mContext, resid);
+			holder.sender.setTextAppearance(mContext, resid);
+			holder.receiver.setTextAppearance(mContext, resid);
 			holder.body.setTextAppearance(mContext, resid);
-			holder.contact_name.setTextAppearance(mContext, resid);
-			holder.address.setTextAppearance(mContext, resid);
 			holder.send_status.setTextAppearance(mContext, resid);
 			holder.date.setTextAppearance(mContext, resid);
 		}
@@ -760,11 +709,9 @@ public class MessagesFragment extends ListFragment {
 		 * @author Team Orange
 		 */
 		private class ViewHolder {
-			TextView code;
-			TextView code_extra;
+			TextView sender;
+			TextView receiver;
 			TextView body;
-			TextView contact_name;
-			TextView address;
 			TextView send_status;
 			TextView date;
 			ImageView type_icon;

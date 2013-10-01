@@ -3,10 +3,6 @@
 
     <string name="app_name">心连每刻</string>
 
-    <string name="log">日志</string>
-    <string name="navigate">导航</string>
-    <string name="location">定位</string>
-
     <string name="settings">设置</string>
 
     <string name="unknown">未知</string>
@@ -39,15 +35,16 @@
     <string name="phone_label">电话</string>
     <string name="save">保存</string>
     <string name="edit">编辑</string>
-    <!-- Log -->
+    <!-- Messages -->
     <string name="no_message_record">无过往消息记录</string>
     <string name="checked_one_message">1 条消息</string>
     <string name="checked_n_messages">%d 条消息</string>
     <string name="prompt_one_retransmission_at_a_time">请在上一次重发完成后再试</string>
     <string name="prompt_delete_messages_successfully">成功删除了 %d 条消息记录</string>
 
+    <string name="to">至</string>
+    <string name="me">我</string>
     <string name="illegal_code">非法代码：%d</string>
-    <string name="all">全部</string>
     <string name="inform">通知</string>
     <string name="command">指令</string>
     <string name="respond">应答</string>
@@ -55,8 +52,6 @@
     <string name="urgent">紧急消息</string>
     <string name="locate_now">现在定位</string>
 
-    <string name="send">送信</string>
-    <string name="receive">收信</string>
     <string name="has_read">已读</string>
     <string name="unread">未读</string>
     <string name="sending">正在发送</string>
