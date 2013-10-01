@@ -90,7 +90,7 @@
             android:theme="@style/AppTheme.CircularProgress" >
         </activity>
         <activity
-            android:name="org.orange.familylink.FallDownAlarmActivity"
+            android:name="org.orange.familylink.AlarmActivity"
             android:label="@string/fall_down_alarm" >
         </activity>
 

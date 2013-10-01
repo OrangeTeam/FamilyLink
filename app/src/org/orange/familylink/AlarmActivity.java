@@ -22,33 +22,42 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 
 /**
- * 摔倒警报{@link Activity}
+ * 警报{@link Activity}
  * @author Team Orange
  */
-public class FallDownAlarmActivity extends BaseActivity {
+public class AlarmActivity extends BaseActivity {
 	/**
-	 * 摔倒警告消息的ID
+	 * 警告消息的ID
 	 * <p>
 	 * Type: long
 	 */
-	public static final String EXTRA_ID = FallDownAlarmActivity.class.getName() + ".extra.ID";
+	public static final String EXTRA_ID = AlarmActivity.class.getName() + ".extra.ID";
 
 	private MessageWrapper mUrgentMessage;
 	private TextView mTextViewAlarmNotification;
 	private TextView mTextViewPosition;
-	private Button mButtonCallToSomeboy;
+	private Button mButtonCallBack;
 	private Button mButtonNavigate;
 
 	private void setUrgentMessage(MessageWrapper message) {
 		mUrgentMessage = message;
 		if(message == null)
 			return;
+		// 设置 通告内容和回电（call back）按钮的内容
+		Integer notificationResId = null;
+		if(message.body.getType() == UrgentMessageBody.Type.SEEK_HELP)
+			notificationResId = R.string.seek_help_alarm_notification;
+		else if(message.body.getType() == UrgentMessageBody.Type.FALL_DOWN_ALARM)
+			notificationResId = R.string.fall_down_alarm_notification;
 		if(message.contact_name != null) {
-			mTextViewAlarmNotification.setText(
-					getString(R.string.fall_down_alarm_notification, message.contact_name));
-			mButtonCallToSomeboy.setText(getString(R.string.call_to_somebody, message.contact_name));
+			mTextViewAlarmNotification.setText(getString(notificationResId, message.contact_name));
+			mButtonCallBack.setText(getString(R.string.call_to_somebody, message.contact_name));
+		} else {
+			mTextViewAlarmNotification.setText(getString(notificationResId, message.address));
+			mButtonCallBack.setText(R.string.call_back);
 		}
-		if(message.body != null && message.body.getContent() != null) {
+		// 显示 发送方当前位置
+		if(message.body.getContent() != null) {
 			mTextViewPosition.setText(message.body.getContent());
 			mButtonNavigate.setVisibility(View.VISIBLE);
 		} else {
@@ -60,17 +69,17 @@ public class FallDownAlarmActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_fall_down_alarm);
+		setContentView(R.layout.activity_alarm);
 		mTextViewAlarmNotification = (TextView) findViewById(R.id.alarm_notification);
 		mTextViewPosition = (TextView) findViewById(R.id.position);
-		mButtonCallToSomeboy = (Button) findViewById(R.id.call_to_somebody);
+		mButtonCallBack = (Button) findViewById(R.id.call_to_somebody);
 		mButtonNavigate = (Button) findViewById(R.id.navigate_to_this_position);
 
 		Bundle extras = getIntent().getExtras();
 		if(extras == null || !extras.containsKey(EXTRA_ID))
 			throw new IllegalStateException("You must put extra: EXTRA_ID(fell down alarm message's ID)");
 		long messageId = extras.getLong(EXTRA_ID);
-		new ShowFallDownAlarmMessage().execute(messageId);
+		new ShowUrgentMessage().execute(messageId);
 	}
 
 	/**
@@ -89,10 +98,10 @@ public class FallDownAlarmActivity extends BaseActivity {
 		}
 	}
 	/**
-	 * 当 给somebody打电话 按钮被点击时，调用此方法
+	 * 当回电按钮被点击时，调用此方法
 	 * @param button 被点击的按钮
 	 */
-	public void onClickCallToSomebody(View button) {
+	public void onClickCallBack(View button) {
 		if(mUrgentMessage == null || mUrgentMessage.address == null)
 			return;
 		Intent intent = new Intent(Intent.ACTION_CALL,
@@ -106,7 +115,7 @@ public class FallDownAlarmActivity extends BaseActivity {
 		public String address;
 		public UrgentMessageBody body;
 	}
-	private class ShowFallDownAlarmMessage extends AsyncTask<Long, Void, MessageWrapper> {
+	private class ShowUrgentMessage extends AsyncTask<Long, Void, MessageWrapper> {
 		private final String[] PROJECTION_MESSAGE = {
 			Contract.Messages.COLUMN_NAME_ADDRESS,
 			Contract.Messages.COLUMN_NAME_BODY,
