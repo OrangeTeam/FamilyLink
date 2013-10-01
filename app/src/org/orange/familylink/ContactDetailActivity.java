@@ -89,16 +89,14 @@ public class ContactDetailActivity extends BaseActivity {
 		Long id = null;
 		String phone = null;
 		String name = null;
-		if(cursor.getCount() > 0){
-			if (cursor.moveToLast()) {
-				int idIndex = cursor.getColumnIndex(Contract.Contacts._ID);
-				if(!cursor.isNull(idIndex))
-					id = cursor.getLong(idIndex);
-				phone = cursor.getString(
-						cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER));
-				name = cursor.getString(
-						cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME));
-			}
+		if (cursor.moveToLast()) { // if the cursor isn't empty
+			int idIndex = cursor.getColumnIndex(Contract.Contacts._ID);
+			if(!cursor.isNull(idIndex))
+				id = cursor.getLong(idIndex);
+			phone = cursor.getString(
+					cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_PHONE_NUMBER));
+			name = cursor.getString(
+					cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME));
 		}
 		cursor.close();
 		return new Contact(id, name, phone);

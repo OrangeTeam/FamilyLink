@@ -2,7 +2,7 @@ package org.orange.familylink.sms;
 
 import org.orange.familylink.ContactDetailActivity;
 import org.orange.familylink.data.Settings;
-import org.orange.familylink.data.Message.Code;
+
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -15,6 +15,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
+
+import com.google.gson.JsonSyntaxException;
 
 /**
  * 短信接收的service
@@ -80,25 +82,25 @@ public class SmsReceiverService extends Service {
 					"address like ? and read = 0",
 					getAddressOfSetting(),
 					"date DESC");
-			if(cursor.getCount() > 0){
-				if(cursor.moveToFirst()){
-					bodyResult = cursor.getString(cursor.getColumnIndex("body"));
-					Log.w("smsfamily", "sms2");
 
-					//此时这个短信已经符合是设置中设置的号码发过来的，如果短信中到 Code不正确说明不是本应用发出的，结束
-					if(!bodyContainsCode(bodyResult))
-						return;
+			if(cursor.moveToFirst()){ // if the cursor isn't empty
+				bodyResult = cursor.getString(cursor.getColumnIndex("body"));
+				Log.w("smsfamily", "sms2");
 
-					Log.w("smsfamily", "sms3");
-					idResult = cursor.getString(cursor.getColumnIndex("_id"));
-					addressResult = cursor.getString(cursor.getColumnIndex("address"));
+				//此时这个短信已经符合是设置中设置的号码发过来的，如果短信不是SmsMessage说明不是本应用发出的，结束
+				if(!isSmsMessage(bodyResult)) {
+					cursor.close();
+					return;
 				}
+
+				Log.w("smsfamily", "sms3");
+				idResult = cursor.getString(cursor.getColumnIndex("_id"));
+				addressResult = cursor.getString(cursor.getColumnIndex("address"));
+				cursor.close();
 			}else{
 				cursor.close();
 				return;
 			}
-
-			cursor.close();
 
 			//删除收件箱中的短信
 			int row = contentResolver.delete(
@@ -129,7 +131,7 @@ public class SmsReceiverService extends Service {
 					Uri.parse("content://sms/inbox"),
 					new String[] {"_id", "thread_id", "address", "date"},
 					"address like ?", getAddressOfSetting(), SORT_ORDER);
-			if(cursor.getCount() > 0 && cursor.moveToFirst()){
+			if(cursor.moveToFirst()){
 				threadId = cursor.getLong(cursor.getColumnIndex("thread_id"));
 			}
 			cursor.close();
@@ -137,17 +139,17 @@ public class SmsReceiverService extends Service {
 		}
 
 		/**
-		 * 此方法用于查看短信中的code是否正确
-		 * @param body
-		 * @return
+		 * 检查指定内容是否是本应用发送的{@link SmsMessage}
+		 * @param body 需检查的短信的内容
+		 * @return 如果是本应用发送的{@link SmsMessage}，返回true；否则返回false
 		 */
-		protected boolean bodyContainsCode(String body){
-			SmsMessage mMessage = new SmsMessage();
-			mMessage.receive(body, Settings.getPassword(mContext));
-			if(Code.isLegalCode(mMessage.getCode()))
+		protected boolean isSmsMessage(String body){
+			try{
+				new SmsMessage().receive(body, Settings.getPassword(mContext));
 				return true;
-			else
+			} catch(JsonSyntaxException e) {
 				return false;
+			}
 		}
 
 		/**
