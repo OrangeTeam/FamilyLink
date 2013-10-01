@@ -3,6 +3,7 @@ package org.orange.familylink;
 import org.orange.familylink.ContactDetailActivity.Contact;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.UrgentMessageBody;
+import org.orange.familylink.location.LocationTracker;
 import org.orange.familylink.sms.SmsMessage;
 
 import android.animation.Animator.AnimatorListener;
@@ -25,6 +26,8 @@ public class AlarmCountdownActivity extends Activity {
 	private HoloCircularProgressBar progress;
 	private TextView mTextView;
 
+	private LocationTracker mLocationTracker;
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,6 +39,19 @@ public class AlarmCountdownActivity extends Activity {
 		//Animation实例化
 		progress = (HoloCircularProgressBar) findViewById(R.id.holoCircularProgressBar1);
 		animate(progress, null);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		mLocationTracker = new LocationTracker(this);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		mLocationTracker.stopUsingGPS();
+		mLocationTracker = null;
 	}
 
 	/**
@@ -123,8 +139,9 @@ public class AlarmCountdownActivity extends Activity {
 		message.setCode(Code.INFORM | Code.Extra.Inform.URGENT);
 		UrgentMessageBody messageBody = new UrgentMessageBody();
 		messageBody.setType(UrgentMessageBody.Type.FALL_DOWN_ALARM);
-		//TODO 在下一行取得当前位置坐标，允许监护人导航过来
-//		messageBody.setContent(当前位置经纬度);
+		if(mLocationTracker != null && mLocationTracker.canGetLocation())
+			messageBody.setContent(mLocationTracker.getLatitude() + "," +
+									mLocationTracker.getLongitude());
 		message.setBody(messageBody.toJson());
 		// 发送消息
 		Contact contact = ContactDetailActivity.getDefaultContact(this);
