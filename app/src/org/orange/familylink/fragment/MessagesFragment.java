@@ -671,9 +671,9 @@ public class MessagesFragment extends ListFragment {
 			}
 		}
 		/**
-		 * 设置每项记录视图的颜色
+		 * 根据消息类型，设置消息视图的颜色
 		 */
-		private void setViewColor(Integer code, View rootView) {
+		private void setViewColor(Integer code, ImageView typeIcon) {
 			Integer colorResId = null;
 			switch(getImportantCode(code)) {
 				case R.string.urgent:
@@ -688,7 +688,7 @@ public class MessagesFragment extends ListFragment {
 				default:
 					colorResId = android.R.color.transparent;
 			}
-			rootView.setBackgroundColor(getResources().getColor(colorResId));
+			typeIcon.setImageResource(colorResId);
 		}
 		/**
 		 * 设置文字显示效果（颜色、大小等）

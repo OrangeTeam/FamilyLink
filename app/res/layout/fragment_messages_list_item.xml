@@ -1,25 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.orange.familylink.widget.CheckableRelativeLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/activatable_item_background"
     android:descendantFocusability="blocksDescendants"
      >
 
     <ImageView
         android:id="@+id/type_icon"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignBottom="@+id/date"
+        android:layout_height="match_parent"
         android:focusable="false"
         android:src="@android:color/transparent"
         android:background="@android:color/transparent"
         android:contentDescription="@null"
          />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="160dp"
+    android:orientation="horizontal"
+    android:background="@drawable/activatable_item_background"
+    android:descendantFocusability="blocksDescendants"
+     >
+
+<RelativeLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:layout_gravity="center_vertical"
+    android:descendantFocusability="blocksDescendants"
+     >
 
     <TextView
         android:id="@+id/sender"
@@ -47,6 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/direction_icon"
+        android:layout_alignWithParentIfMissing="true"
         android:layout_alignParentTop="true"
         android:autoLink="phone|email"
         android:focusable="false"
@@ -56,16 +69,17 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/sender"
-        android:layout_toLeftOf="@+id/unread_icon"
+        android:layout_alignParentRight="true"
         android:layout_below="@id/sender"
         android:focusable="false"
          />
     <TextView
-        android:id="@id/date"
+        android:id="@+id/date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/body"
         android:layout_toLeftOf="@+id/send_status"
+        android:layout_alignWithParentIfMissing="true"
         android:layout_alignBaseline="@id/send_status"
         android:focusable="false"
         android:paddingBottom="4dp"
@@ -75,21 +89,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/body"
-        android:layout_toLeftOf="@id/unread_icon"
+        android:layout_alignParentRight="true"
         android:focusable="false"
         android:paddingBottom="4dp"
          />
+
+</RelativeLayout>
+
     <ImageView
-        android:id="@id/unread_icon"
+        android:id="@+id/unread_icon"
         android:layout_width="6dp"
-        android:layout_height="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignBottom="@id/date"
+        android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
         android:focusable="false"
         android:src="@color/unread"
         android:contentDescription="@string/unread"
          />
 
-</org.orange.familylink.widget.CheckableRelativeLayout>
+</LinearLayout>
+
+</FrameLayout>
