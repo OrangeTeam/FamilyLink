@@ -49,8 +49,8 @@ public class ConvertUtil {
 						return jsonObject.getJSONArray("results").getJSONObject(0).getString("formatted_address");
 					}
 				});
-		new Thread(task).start();
 		try{
+			new Thread(task).start();
 			return task.get();
 		}catch(Exception e){
 			e.printStackTrace();

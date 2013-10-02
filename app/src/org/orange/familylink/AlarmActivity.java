@@ -6,6 +6,8 @@ package org.orange.familylink;
 import org.orange.familylink.data.UrgentMessageBody;
 import org.orange.familylink.database.Contract;
 import org.orange.familylink.navigation.StartNavigation;
+import org.orange.familylink.util.ConvertUtil;
+import org.orange.familylink.util.Network;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -58,7 +60,14 @@ public class AlarmActivity extends BaseActivity {
 		}
 		// 显示 发送方当前位置
 		if(message.body.getContent() != null) {
-			mTextViewPosition.setText(message.body.getContent());
+			String[] location;
+			String resultAddress = null;
+			location = message.body.getContent().split(",");
+			if(Network.isConnected(this)){
+				resultAddress = ConvertUtil.getAddress(Double.parseDouble(location[1].trim()),
+						Double.parseDouble(location[0].trim()));
+			}
+			mTextViewPosition.setText(resultAddress);
 			mButtonNavigate.setVisibility(View.VISIBLE);
 		} else {
 			mTextViewPosition.setText(R.string.unknown);

@@ -106,14 +106,19 @@ public class SmsStatusReceiver extends BroadcastReceiver {
 		switch(getResultCode()) {
 		case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
 			Bundle extra = intent.getExtras();
+			boolean containErrorCode = false;
+			String errorCode = null;
+			if(extra != null && extra.containsKey("errorCode"))
+				containErrorCode = true;
+			if(containErrorCode)
+				errorCode = extra.get("errorCode").toString();
 			if(BuildConfig.DEBUG) {
-				System.out.println("has errorCode:"+extra.containsKey("errorCode"));
-				System.out.println("errorCode:"+extra.get("errorCode"));
+				System.out.println("has errorCode:" + containErrorCode);
+				System.out.println("errorCode:" + errorCode);
 				// 无话费时，上边是true和21（Integer）
 			}
 			builder.setContentText(context.getString(
-					R.string.failed_to_send_because_of_generic_failure,
-					extra.get("errorCode").toString()));
+					R.string.failed_to_send_because_of_generic_failure, errorCode));
 			break;
 		case SmsManager.RESULT_ERROR_NO_SERVICE:
 			//TODO 待处理

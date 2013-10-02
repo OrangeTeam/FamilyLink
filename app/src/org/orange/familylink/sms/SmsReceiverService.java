@@ -1,10 +1,13 @@
 package org.orange.familylink.sms;
 
+import org.orange.familylink.AlarmActivity;
 import org.orange.familylink.ContactDetailActivity;
+import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.Settings;
 
 import android.app.Service;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
@@ -46,7 +49,24 @@ public class SmsReceiverService extends Service {
 			SmsMessage localMessage = new SmsMessage();
 			Log.w("smsfamily", "sms4");
 			//对接收的信息进行存储
-			localMessage.receiveAndSave(mContext, bodyResult, addressResult);
+			Uri uri = localMessage.receiveAndSave(mContext, bodyResult, addressResult);
+			startHelp(bodyResult, uri);
+		}
+		/**
+		 * 监护方接收到本应用发出的短信，之后通过这个方法分析短信的内容是否为紧急消息，如果是就会启动警告界面来提供帮助
+		 * @param body
+		 * @param uri
+		 */
+		private void startHelp(String body, Uri uri){
+			SmsMessage localMessage = new SmsMessage();
+			localMessage.receive(body, Settings.getPassword(mContext));
+			long messageId = ContentUris.parseId(uri);
+			if(Code.Extra.Inform.hasSetUrgent(localMessage.getCode())){
+				Intent mIntent = new Intent(mContext, AlarmActivity.class);
+				mIntent.putExtra(AlarmActivity.EXTRA_ID, messageId);
+				mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				mContext.startActivity(mIntent);
+			}
 		}
 	}
 
