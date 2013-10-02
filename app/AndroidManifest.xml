@@ -7,6 +7,7 @@
     <uses-sdk
         android:minSdkVersion="15"
         android:targetSdkVersion="18" />
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -15,21 +16,24 @@
     <uses-permission android:name="android.permission.WRITE_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <provider android:name="org.orange.familylink.database.ContactsProvider"
+        <provider
+            android:name="org.orange.familylink.database.ContactsProvider"
             android:authorities="org.orange.familylink.provider.contactsprovider"
             android:exported="false"
-            android:multiprocess="true">
+            android:multiprocess="true" >
         </provider>
-        <provider android:name="org.orange.familylink.database.MessagesProvider"
+        <provider
+            android:name="org.orange.familylink.database.MessagesProvider"
             android:authorities="org.orange.familylink.provider.messagesprovider"
             android:exported="false"
-            android:multiprocess="true">
+            android:multiprocess="true" >
         </provider>
 
         <!-- 短信发送状态Receiver -->
@@ -53,8 +57,7 @@
         </activity>
         <activity
             android:name="org.orange.familylink.MessagesActivity"
-            android:parentActivityName="org.orange.familylink.MainActivity"
-             >
+            android:parentActivityName="org.orange.familylink.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -64,13 +67,11 @@
         <activity
             android:name="org.orange.familylink.ContactsActivity"
             android:label="@string/contact"
-            android:parentActivityName="org.orange.familylink.MainActivity"
-             />
+            android:parentActivityName="org.orange.familylink.MainActivity" />
         <activity
             android:name="org.orange.familylink.ContactDetailActivity"
             android:label="@string/contact_details"
-            android:parentActivityName="org.orange.familylink.ContactsActivity"
-             />
+            android:parentActivityName="org.orange.familylink.ContactsActivity" />
         <activity
             android:name="org.orange.familylink.SettingsActivity"
             android:label="@string/settings" >
@@ -96,7 +97,7 @@
 
         <service android:name=".location.LocationService" />
         <service android:name="org.orange.familylink.sms.SmsReceiverService" />
-        <!-- fall down service-->
+        <!-- fall down service -->
         <service android:name="org.orange.familylink.alarm.AlarmService" />
 
     </application>

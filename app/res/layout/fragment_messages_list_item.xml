@@ -1,111 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants"
-     >
+    android:descendantFocusability="blocksDescendants" >
 
     <ImageView
         android:id="@+id/type_icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:focusable="false"
-        android:src="@android:color/transparent"
         android:background="@android:color/transparent"
         android:contentDescription="@null"
-         />
+        android:focusable="false"
+        android:src="@android:color/transparent" />
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="160dp"
-    android:orientation="horizontal"
-    android:background="@drawable/activatable_item_background"
-    android:descendantFocusability="blocksDescendants"
-     >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/activatable_item_background"
+        android:descendantFocusability="blocksDescendants"
+        android:minHeight="160dp"
+        android:orientation="horizontal" >
 
-<RelativeLayout
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:layout_gravity="center_vertical"
-    android:descendantFocusability="blocksDescendants"
-     >
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:descendantFocusability="blocksDescendants" >
 
-    <TextView
-        android:id="@+id/sender"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:autoLink="phone|email"
-        android:focusable="false"
-         />
-    <ImageView
-        android:id="@+id/direction_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/sender"
-        android:layout_alignParentTop="true"
-        android:focusable="false"
-        android:paddingTop="4dp"
-        android:src="@drawable/right"
-        android:contentDescription="@string/to"
-         />
-    <TextView
-        android:id="@+id/receiver"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/direction_icon"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_alignParentTop="true"
-        android:autoLink="phone|email"
-        android:focusable="false"
-         />
-    <TextView
-        android:id="@+id/body"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/sender"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/sender"
-        android:focusable="false"
-         />
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/body"
-        android:layout_toLeftOf="@+id/send_status"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_alignBaseline="@id/send_status"
-        android:focusable="false"
-        android:paddingBottom="4dp"
-         />
-    <TextView
-        android:id="@id/send_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/body"
-        android:layout_alignParentRight="true"
-        android:focusable="false"
-        android:paddingBottom="4dp"
-         />
+            <TextView
+                android:id="@+id/sender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="16dp"
+                android:autoLink="phone|email"
+                android:focusable="false" />
 
-</RelativeLayout>
+            <ImageView
+                android:id="@+id/direction_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@id/sender"
+                android:contentDescription="@string/to"
+                android:focusable="false"
+                android:paddingTop="4dp"
+                android:src="@drawable/right" />
 
-    <ImageView
-        android:id="@+id/unread_icon"
-        android:layout_width="6dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:focusable="false"
-        android:src="@color/unread"
-        android:contentDescription="@string/unread"
-         />
+            <TextView
+                android:id="@+id/receiver"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_toRightOf="@id/direction_icon"
+                android:autoLink="phone|email"
+                android:focusable="false" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/sender"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/sender"
+                android:focusable="false" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/send_status"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_below="@id/body"
+                android:layout_toLeftOf="@id/send_status"
+                android:focusable="false"
+                android:paddingBottom="4dp" />
+
+            <TextView
+                android:id="@id/send_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/body"
+                android:focusable="false"
+                android:paddingBottom="4dp" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/unread_icon"
+            android:layout_width="6dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:contentDescription="@string/unread"
+            android:focusable="false"
+            android:src="@color/unread" />
+    </LinearLayout>
 
 </FrameLayout>
