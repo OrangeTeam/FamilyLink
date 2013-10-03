@@ -59,15 +59,16 @@ public class AlarmActivity extends BaseActivity {
 			mButtonCallBack.setText(R.string.call_back);
 		}
 		// 显示 发送方当前位置
-		if(message.body.getContent() != null) {
-			String[] location;
+		if(message.body.containsPosition()) {
 			String resultAddress = null;
-			location = message.body.getContent().split(",");
 			if(Network.isConnected(this)){
-				resultAddress = ConvertUtil.getAddress(Double.parseDouble(location[1].trim()),
-						Double.parseDouble(location[0].trim()));
+				resultAddress = ConvertUtil.getAddress(message.body.getPositionLongitude(),
+						message.body.getPositionLatitude());
+				mTextViewPosition.setText(resultAddress);
+			} else {
+				mTextViewPosition.setText(message.body.getPositionLatitude() + "," +
+						message.body.getPositionLongitude());
 			}
-			mTextViewPosition.setText(resultAddress);
 			mButtonNavigate.setVisibility(View.VISIBLE);
 		} else {
 			mTextViewPosition.setText(R.string.unknown);
@@ -97,11 +98,10 @@ public class AlarmActivity extends BaseActivity {
 	 */
 	public void onClickNavigateToThisPosition(View button) {
 		try{
-			String[] location = mUrgentMessage.body.getContent().split(",");
 			StartNavigation.toStartNavigationApp(this,
 					getFragmentManager(),
-					Double.parseDouble(location[0]),
-					Double.parseDouble(location[1]));
+					mUrgentMessage.body.getPositionLatitude(),
+					mUrgentMessage.body.getPositionLongitude());
 		} catch(NullPointerException e) {
 			// do nothing
 		}

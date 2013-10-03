@@ -211,8 +211,7 @@ public class MainActivity extends BaseActivity {
 			body.setType(UrgentMessageBody.Type.SEEK_HELP);
 			LocationTracker locationTracker = new LocationTracker(this);
 			if(locationTracker.canGetLocation()) {
-				body.setContent(locationTracker.getLatitude() + "," +
-						locationTracker.getLongitude());
+				body.setPosition(locationTracker.getLatitude(), locationTracker.getLongitude());
 			}
 			locationTracker.stopUsingGPS();
 			message.setBody(body.toJson());
