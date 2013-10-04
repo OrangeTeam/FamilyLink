@@ -335,6 +335,7 @@ public abstract class Message implements Cloneable{
 		String selection = Contract.Contacts.COLUMN_NAME_PHONE_NUMBER + " = ?";
 		contactAddress = removePrefix(contactAddress);
 		String[] args = {contactAddress};
+		Log.w("cont", "" + contactAddress);
 		Cursor c = context.getContentResolver()
 				.query(baseUri, projection, selection, args, null);
 		if(c.moveToFirst()) {
@@ -358,6 +359,8 @@ public abstract class Message implements Cloneable{
 		if(contactAddress.charAt(PLUS_SIGN_POSITION) == '+'){
 			int prefixDigits = contactAddress.length() - phoneDigits;
 			newContactAddress = contactAddress.substring(prefixDigits);
+		}else{
+			newContactAddress = contactAddress;
 		}
 		return newContactAddress;
 	}
