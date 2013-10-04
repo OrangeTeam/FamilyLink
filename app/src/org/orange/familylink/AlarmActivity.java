@@ -17,6 +17,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.style.URLSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -60,15 +63,21 @@ public class AlarmActivity extends BaseActivity {
 		}
 		// 显示 发送方当前位置
 		if(message.body.containsPosition()) {
+			String location = message.body.getPositionLatitude() + "," +
+								message.body.getPositionLongitude();
 			String resultAddress = null;
 			if(Network.isConnected(this)){
 				resultAddress = ConvertUtil.getAddress(message.body.getPositionLongitude(),
 						message.body.getPositionLatitude());
-				mTextViewPosition.setText(resultAddress);
 			} else {
-				mTextViewPosition.setText(message.body.getPositionLatitude() + "," +
-						message.body.getPositionLongitude());
+				resultAddress = location;
 			}
+			// 设置在地图上显示的超链接
+			SpannableString ss = new SpannableString(resultAddress);
+			ss.setSpan(new URLSpan("geo:" + location), 0, ss.length(),
+						SpannableString.SPAN_INCLUSIVE_EXCLUSIVE);
+			mTextViewPosition.setText(ss);
+			mTextViewPosition.setMovementMethod(LinkMovementMethod.getInstance());
 			mButtonNavigate.setVisibility(View.VISIBLE);
 		} else {
 			mTextViewPosition.setText(R.string.unknown);
