@@ -53,6 +53,10 @@
     <string name="urgent">urgent</string>
     <string name="locate_now">locate now</string>
 
+    <string name="type">Type</string>
+    <string name="content">Content</string>
+    <string name="position_of_sender">Sender\'s Position</string>
+
     <string name="send_status_formatter" translatable="false">(%s)</string>
     <string name="has_read">read</string>
     <string name="unread">unread</string>

@@ -21,6 +21,7 @@ import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.MessageLogRecord.Status;
 import org.orange.familylink.data.Settings;
+import org.orange.familylink.data.UrgentMessageBody;
 import org.orange.familylink.database.Contract;
 import org.orange.familylink.fragment.MessagesFragment.MessagesSender.MessageWrapper;
 import org.orange.familylink.sms.SmsMessage;
@@ -54,6 +55,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 /**
  * 日志{@link ListFragment}
@@ -281,6 +284,18 @@ public class MessagesFragment extends ListFragment {
 				return R.string.illegal_code;
 		} else {
 			throw new IllegalArgumentException("May be method Code.isLegalCode() not correct");
+		}
+	}
+	private String valueOfUrgentMessageBodyType(UrgentMessageBody.Type type) {
+		if(type == null)
+			return getString(R.string.undefined);
+		switch (type) {
+		case SEEK_HELP:
+			return getString(R.string.seek_help);
+		case FALL_DOWN_ALARM:
+			return getString(R.string.fall_down_alarm);
+		default:
+			throw new UnsupportedOperationException("unsupported type: " + type);
 		}
 	}
 	private String valueOfHasRead(Status status) {
@@ -610,10 +625,7 @@ public class MessagesFragment extends ListFragment {
 			// message code
 			setViewColor(code, holder.type_icon);
 			// message body
-			if(body != null)
-				holder.body.setText(body);
-			else
-				holder.body.setText("");
+			holder.body.setText(formatBody(code, body));
 			// 联系人
 			String contactName = null;
 			if(mContactIdToNameMap != null)
@@ -669,6 +681,24 @@ public class MessagesFragment extends ListFragment {
 					getString(R.string.send_status_formatter, valueOfSendStatus(status)));
 				holder.send_status.setVisibility(View.VISIBLE);
 			}
+		}
+		private CharSequence formatBody(Integer code, String body) {
+			if(body == null)
+				return "";
+			if(code == null || !Code.Extra.Inform.hasSetUrgent(code))
+				return body;
+			final UrgentMessageBody urgentBody = new Gson().fromJson(body, UrgentMessageBody.class);
+			StringBuilder sb = new StringBuilder();
+			final UrgentMessageBody.Type type = urgentBody.getType();
+			if(type != null)
+				sb.append(getString(R.string.type) + ": " + valueOfUrgentMessageBodyType(type) + "\n");
+			if(urgentBody.getContent() != null)
+				sb.append(getString(R.string.content) + ": " + urgentBody.getContent() + "\n");
+			if(urgentBody.containsPosition()) {
+				String location = urgentBody.getPositionLatitude() + "," + urgentBody.getPositionLongitude();
+				sb.append(getString(R.string.position_of_sender) + ": " + location);
+			}
+			return sb;
 		}
 		/**
 		 * 根据消息类型，设置消息视图的颜色

@@ -52,6 +52,10 @@
     <string name="urgent">紧急消息</string>
     <string name="locate_now">现在定位</string>
 
+    <string name="type">类型</string>
+    <string name="content">内容</string>
+    <string name="position_of_sender">发送者的位置</string>
+
     <string name="has_read">已读</string>
     <string name="unread">未读</string>
     <string name="sending">正在发送</string>
