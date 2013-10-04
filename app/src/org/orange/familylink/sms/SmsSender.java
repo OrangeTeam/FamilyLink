@@ -29,10 +29,11 @@ public class SmsSender {
 	 * @param messageUri 消息{@link Uri}
 	 * @param message 要发动的消息内容
 	 * @param dest 目的地址，如手机号
+	 * @throws IllegalArgumentException 当message或dest为空时
 	 */
 	public static void sendMessage(Context context, Uri messageUri, String message, String dest) {
 		if(TextUtils.isEmpty(message) || TextUtils.isEmpty(dest))
-			return;
+			throw new IllegalArgumentException("message or dest address shouldn't be empty.");
 		// remove spaces and dashes from destination number
 		// (e.g. "801 555 1212" -> "8015551212")
 		// (e.g. "+8211-123-4567" -> "+82111234567")

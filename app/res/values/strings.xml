@@ -67,11 +67,6 @@
 
     <!-- StatusActivity -->
     <string name="status_activity_label">Status</string>
-
-    <!-- InitialSetupDialogFragment -->
-    <string name="initial_Setup">Initial Setup</string>
-    <string name="contact_name">Contact Name</string>
-    <string name="contact_phone">Contact Phone</string>
     <!-- AlarmCountdownActivity -->
     <string name="fall_down_alarm">Fall Down Alarm</string>
     <string name="counting_down">Counting down</string>
@@ -83,6 +78,14 @@
     <string name="call_to_somebody">Call to %s</string>
     <string name="call_back">Call back</string>
     <string name="navigate_to_this_position">Navigate to this position</string>
+
+    <!-- InitialSetupDialogFragment -->
+    <string name="initial_Setup">Initial Setup</string>
+    <string name="contact_name">Contact Name</string>
+    <string name="contact_phone">Contact Phone</string>
+    <!-- NoContactInformationDialogFragment -->
+    <string name="no_contact_information">No Contact Information</string>
+    <string name="no_contact_information_message">You haven\'t set contact\'s phone number. Would you like to set it now?</string>
 
     <!-- network -->
     <string name="no_connection_title">No Connection</string>

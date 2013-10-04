@@ -3,6 +3,7 @@ package org.orange.familylink;
 import org.orange.familylink.ContactDetailActivity.Contact;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.UrgentMessageBody;
+import org.orange.familylink.fragment.dialog.NoContactInformationDialogFragment;
 import org.orange.familylink.location.LocationTracker;
 import org.orange.familylink.sms.SmsMessage;
 
@@ -87,12 +88,7 @@ public class AlarmCountdownActivity extends Activity {
 					mTextView.setText(String.valueOf(countDownTime));
 					if(countDownTime == 0) {
 						getActionBar().setTitle(R.string.fall_down_alarm);
-						new Thread() {
-							@Override
-							public void run() {
-								sendAlarmMessage();
-							}
-						}.start();
+						sendAlarmMessage();
 					}
 				}
 			}
@@ -135,7 +131,7 @@ public class AlarmCountdownActivity extends Activity {
 
 	private void sendAlarmMessage() {
 		// 构造消息
-		SmsMessage message = new SmsMessage();
+		final SmsMessage message = new SmsMessage();
 		message.setCode(Code.INFORM | Code.Extra.Inform.URGENT);
 		UrgentMessageBody messageBody = new UrgentMessageBody();
 		messageBody.setType(UrgentMessageBody.Type.FALL_DOWN_ALARM);
@@ -143,7 +139,15 @@ public class AlarmCountdownActivity extends Activity {
 			messageBody.setPosition(mLocationTracker.getLatitude(), mLocationTracker.getLongitude());
 		message.setBody(messageBody.toJson());
 		// 发送消息
-		Contact contact = ContactDetailActivity.getDefaultContact(this);
-		message.sendAndSave(this, contact.id, contact.phone);
+		final Contact contact = ContactDetailActivity.getDefaultContact(this);
+		if(contact.phone != null && !contact.phone.isEmpty())
+			new Thread() {
+				@Override
+				public void run() {
+					message.sendAndSave(AlarmCountdownActivity.this, contact.id, contact.phone);
+				}
+			}.start();
+		else
+			new NoContactInformationDialogFragment().show(getFragmentManager(), "no_contact_info");
 	}
 }

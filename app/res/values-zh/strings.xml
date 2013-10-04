@@ -65,11 +65,6 @@
 
     <!-- StatusActivity -->
     <string name="status_activity_label">状态</string>
-
-    <!-- InitialSetupDialogFragment -->
-    <string name="initial_Setup">初始设置</string>
-    <string name="contact_name">联系人姓名</string>
-    <string name="contact_phone">联系人电话</string>
     <!-- AlarmCountdownActivity -->
     <string name="fall_down_alarm">摔倒警报</string>
     <string name="counting_down">倒计时中</string>
@@ -81,6 +76,14 @@
     <string name="call_to_somebody">给 %s 打电话</string>
     <string name="call_back">回电</string>
     <string name="navigate_to_this_position">导航到此位置</string>
+
+    <!-- InitialSetupDialogFragment -->
+    <string name="initial_Setup">初始设置</string>
+    <string name="contact_name">联系人姓名</string>
+    <string name="contact_phone">联系人电话</string>
+    <!-- NoContactInformationDialogFragment -->
+    <string name="no_contact_information">尚未设置联系方式</string>
+    <string name="no_contact_information_message">您还没有设置联系人的电话。要现在设置吗？</string>
 
     <!-- network -->
     <string name="no_connection_title">打开网络设置？</string>

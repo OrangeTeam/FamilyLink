@@ -260,6 +260,7 @@ public abstract class Message implements Cloneable{
 	 * @param contactId 联系人{@link Messages#COLUMN_NAME_CONTACT_ID ID}
 	 * @param dest 发送目的{@link Messages#COLUMN_NAME_ADDRESS 地址}
 	 * @return 保存后的本消息的{@link Uri}
+	 * @throws IllegalArgumentException 当dest == null || dest.isEmpty()时
 	 * @see #receiveAndSave(Context, String)
 	 */
 	public Uri sendAndSave(Context context, Long contactId , String dest) {
@@ -274,9 +275,12 @@ public abstract class Message implements Cloneable{
 	 * @param dest 发送目的{@link Messages#COLUMN_NAME_ADDRESS 地址}
 	 * @param password 要发送信息的加密密码
 	 * @return 保存后的本消息的{@link Uri}
+	 * @throws IllegalArgumentException 当dest == null || dest.isEmpty()时
 	 * @see #receiveAndSave(String, String)
 	 */
 	public Uri sendAndSave(Context context, Long contactId , String dest, String password) {
+		if(dest == null || dest.isEmpty())
+			throw new IllegalArgumentException("dest address shouldn't be empty");
 		Uri newUri = saveMessage(context, contactId, dest, Status.SENDING);
 		send(context, newUri, dest, password);
 		return newUri;

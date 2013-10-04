@@ -13,6 +13,7 @@ import org.orange.familylink.data.Settings.Role;
 import org.orange.familylink.data.UrgentMessageBody;
 import org.orange.familylink.fragment.dialog.InitialSetupDialogFragment;
 import org.orange.familylink.fragment.dialog.LocateFrequencyDialogFragment;
+import org.orange.familylink.fragment.dialog.NoContactInformationDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment.OnRoleChangeListener;
 import org.orange.familylink.location.LocationService;
@@ -44,6 +45,9 @@ import android.widget.TextView;
  * @author Team Orange
  */
 public class MainActivity extends BaseActivity {
+	private static enum DialogType {
+		DIALOG_NO_CONTACT_INFORMATION;
+	}
 	private GridView mMainMenuGridView;
 	private Role mRole;
 	private Function[] mFunctions;
@@ -156,6 +160,16 @@ public class MainActivity extends BaseActivity {
 		adapter.notifyDataSetChanged();
 	}
 
+	private void showDialogFragment(DialogType dialogType) {
+		switch(dialogType) {
+		case DIALOG_NO_CONTACT_INFORMATION:
+			new NoContactInformationDialogFragment().show(getFragmentManager(), dialogType.name());
+			break;
+		default:
+			throw new UnsupportedOperationException("unsupported dialog:" + dialogType);
+		}
+	}
+
 	/**
 	 * 检查指定服务是否已打开
 	 * @param serviceClass 待检测的服务的{@link Class}
@@ -227,7 +241,15 @@ public class MainActivity extends BaseActivity {
 			public void run() {
 				// 发送消息
 				Contact contact = ContactDetailActivity.getDefaultContact(MainActivity.this);
-				message.sendAndSave(MainActivity.this, contact.id, contact.phone);
+				if(contact.phone != null && !contact.phone.isEmpty())
+					message.sendAndSave(MainActivity.this, contact.id, contact.phone);
+				else
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							showDialogFragment(DialogType.DIALOG_NO_CONTACT_INFORMATION);
+						}
+					});
 			}
 		}.start();
 	}
@@ -304,9 +326,13 @@ public class MainActivity extends BaseActivity {
 			//----------------------- 通用 -----------------------
 			case GIVE_A_CALL: {
 				Contact contact = ContactDetailActivity.getDefaultContact(MainActivity.this);
-				Intent intent = new Intent(Intent.ACTION_CALL, Uri
-						.parse("tel:" + contact.phone));
-				startActivity(intent);
+				if(contact.phone != null && !contact.phone.isEmpty()) {
+					Intent intent = new Intent(Intent.ACTION_CALL, Uri
+							.parse("tel:" + contact.phone));
+					startActivity(intent);
+				} else {
+					showDialogFragment(DialogType.DIALOG_NO_CONTACT_INFORMATION);
+				}
 				break;
 			}
 			case OUTBOX: {

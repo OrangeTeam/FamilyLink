@@ -89,7 +89,7 @@ public class ContactDetailActivity extends BaseActivity {
 		Long id = null;
 		String phone = null;
 		String name = null;
-		if (cursor.moveToLast()) { // if the cursor isn't empty
+		if(cursor.moveToLast()) { // if the cursor isn't empty
 			int idIndex = cursor.getColumnIndex(Contract.Contacts._ID);
 			if(!cursor.isNull(idIndex))
 				id = cursor.getLong(idIndex);
