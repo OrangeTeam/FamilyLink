@@ -60,6 +60,11 @@ public class MainActivity extends BaseActivity {
 		setContentView(R.layout.activity_main);
 		mMainMenuGridView = (GridView) findViewById(R.id.main_menu);
 
+		//开启接收短信服务
+		Intent smsIntent = new Intent(this, SmsReceiverService.class);
+		smsIntent.setAction(SmsReceiverService.ACTION_FOREGROUND);
+		startService(smsIntent);
+
 		setup();
 	}
 
@@ -81,9 +86,6 @@ public class MainActivity extends BaseActivity {
 		else if(role == null) {
 			// 还没有配置用户角色， 现在配置
 			mFunctions = FUNCTIONS_GENERAL;
-			//第一次使用这个软件，开启接收短信服务
-			Intent smsIntent = new Intent(this, SmsReceiverService.class);
-			startService(smsIntent);
 			// 弹出对话框
 			InitialSetupDialogFragment dialog = new InitialSetupDialogFragment();
 			dialog.setOnClickListener(new InitialSetupDialogFragment.OnClickListener() {

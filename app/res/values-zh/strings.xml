@@ -92,6 +92,10 @@
     <!-- LocationService -->
     <string name="unconnection">网络未连接</string>
 
+    <!-- SmsReceiverService -->
+    <string name="SMS_receiver_service_title">心连每刻</string>
+    <string name="SMS_receiver_service_content">接收亲人信息功能-运行中</string>
+
     <!-- navigation -->
     <string name="no_maps_app_title">安装地图应用</string>
     <string name="no_maps_app_message">是否现在到安卓应用商定安装谷歌地图？</string>
