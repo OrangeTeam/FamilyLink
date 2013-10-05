@@ -14,7 +14,7 @@
 
     <!-- 这一个string-array也在InitialSetupDialogFragment使用 -->
     <string-array name="pref_role_titles">
-        <item>照料者</item>
+        <item>看护人</item>
         <item>受顾者</item>
     </string-array>
 

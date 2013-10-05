@@ -24,7 +24,7 @@
     <string name="seek_help">Seek Help</string>
     <string name="call">Call</string>
     <string name="outbox">Outbox</string>
-    <string name="response_message">Response</string>
+    <string name="response_message">Inbox</string>
     <string name="role_setting">Role</string>
     <string name="contacts_setting">Contacts</string>
     <!-- Contact -->
@@ -33,7 +33,7 @@
     <string name="no_contact">You haven\'t added any Contact.</string>
     <string name="name_label">Name</string>
     <string name="phone_label">Phone</string>
-    <string name="save">save</string>
+    <string name="save">Save</string>
     <string name="edit">Edit</string>
     <!-- Messages -->
     <string name="no_message_record">No Message Record</string>
@@ -82,8 +82,9 @@
 
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">Initial Setup</string>
-    <string name="contact_name">Contact Name</string>
-    <string name="contact_phone">Contact Phone</string>
+    <string name="role_label">You are </string>
+    <string name="initial_setup_dialog_contact_name_label">Contact(%s) Name</string>
+    <string name="initial_setup_dialog_contact_phone_label">Contact(%s) Phone</string>
     <!-- NoContactInformationDialogFragment -->
     <string name="no_contact_information">No Contact Information</string>
     <string name="no_contact_information_message">You haven\'t set contact\'s phone number. Would you like to set it now?</string>

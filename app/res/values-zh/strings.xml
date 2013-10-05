@@ -23,8 +23,8 @@
     <string name="fall_down_alarm_service">摔倒检测</string>
     <string name="seek_help">求助</string>
     <string name="call">电话</string>
-    <string name="outbox">已发消息</string>
-    <string name="response_message">反馈消息</string>
+    <string name="outbox">发件箱</string>
+    <string name="response_message">收件箱</string>
     <string name="role_setting">角色设置</string>
     <string name="contacts_setting">联系人</string>
     <!-- Contact -->
@@ -80,8 +80,9 @@
 
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">初始设置</string>
-    <string name="contact_name">联系人姓名</string>
-    <string name="contact_phone">联系人电话</string>
+    <string name="role_label">您是 </string>
+    <string name="initial_setup_dialog_contact_name_label">联系人（%s）姓名</string>
+    <string name="initial_setup_dialog_contact_phone_label">联系人（%s）电话</string>
     <!-- NoContactInformationDialogFragment -->
     <string name="no_contact_information">尚未设置联系方式</string>
     <string name="no_contact_information_message">您还没有设置联系人的电话。要现在设置吗？</string>
