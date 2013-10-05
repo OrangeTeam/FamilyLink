@@ -27,6 +27,12 @@
         android:orientation="vertical" >
 
         <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/stop_alarm"
+            android:onClick="onClickStopAlarm" />
+
+        <Button
             android:id="@+id/navigate_to_this_position"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

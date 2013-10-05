@@ -73,6 +73,7 @@
     <!-- AlarmActivity.java -->
     <string name="seek_help_alarm_notification"><b>%s</b>发来了求助请求，他（她）在</string>
     <string name="fall_down_alarm_notification"><b>%s</b>摔倒了，他（她）在</string>
+    <string name="stop_alarm">停止警报</string>
     <string name="call_to_somebody">给 %s 打电话</string>
     <string name="call_back">回电</string>
     <string name="navigate_to_this_position">导航到此位置</string>

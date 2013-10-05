@@ -1,17 +1,21 @@
 package org.orange.familylink;
 
+import java.io.IOException;
+
 import org.orange.familylink.ContactDetailActivity.Contact;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.UrgentMessageBody;
 import org.orange.familylink.fragment.dialog.NoContactInformationDialogFragment;
 import org.orange.familylink.location.LocationTracker;
 import org.orange.familylink.sms.SmsMessage;
+import org.orange.familylink.util.AudioFocusHelper;
 
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.Activity;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.widget.TextView;
@@ -28,6 +32,8 @@ public class AlarmCountdownActivity extends Activity {
 	private TextView mTextView;
 
 	private LocationTracker mLocationTracker;
+	private AudioFocusHelper mAudioFocusHelper;
+	private MediaPlayer mMediaPlayer;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -40,12 +46,20 @@ public class AlarmCountdownActivity extends Activity {
 		//Animation实例化
 		progress = (HoloCircularProgressBar) findViewById(R.id.holoCircularProgressBar1);
 		animate(progress, null);
+
+		mAudioFocusHelper = new AudioFocusHelper(this) {
+			@Override
+			public void onAudioFocusChange(int focusChange) {
+			}
+		};
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
 		mLocationTracker = new LocationTracker(this);
+		mMediaPlayer = MediaPlayer.create(this, R.raw.alarm);
+		mMediaPlayer.setLooping(true);
 	}
 
 	@Override
@@ -53,6 +67,11 @@ public class AlarmCountdownActivity extends Activity {
 		super.onStop();
 		mLocationTracker.stopUsingGPS();
 		mLocationTracker = null;
+		if(mMediaPlayer != null) {
+			stopAlarm();
+			mMediaPlayer.release();
+			mMediaPlayer = null;
+		}
 	}
 
 	/**
@@ -86,7 +105,9 @@ public class AlarmCountdownActivity extends Activity {
 					mLastPlayTimeSecond = currentPlayTimeSecond;
 					int countDownTime = NUM_SHOW_TIME / 1000 - currentPlayTimeSecond;
 					mTextView.setText(String.valueOf(countDownTime));
-					if(countDownTime == 0) {
+					if(countDownTime == NUM_SHOW_TIME / 2000) {
+						startAlarm();
+					} else if(countDownTime == 0) {
 						getActionBar().setTitle(R.string.fall_down_alarm);
 						sendAlarmMessage();
 					}
@@ -95,6 +116,37 @@ public class AlarmCountdownActivity extends Activity {
 		});
 		progressBar.setMarkerProgress(markerProgress);
 		progressBarAnimator.start();
+	}
+
+	/**
+	 * 开始播放警报声
+	 * @return 成功时，返回true；失败时，返回false
+	 */
+	private boolean startAlarm() {
+		if(mAudioFocusHelper.requestFocus()) {
+			try{
+				mMediaPlayer.prepare();
+			} catch(IllegalStateException e) {
+				// may be Prepared, do nothing
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+			mMediaPlayer.start();
+			return true;
+		} else
+			return false;
+	}
+	/**
+	 * 停止播放警报声
+	 */
+	private void stopAlarm() {
+		try{
+			mMediaPlayer.stop();
+		} catch(IllegalStateException e) {
+			// do nothing
+		}
+		mAudioFocusHelper.abandonFocus();
 	}
 
 	/**

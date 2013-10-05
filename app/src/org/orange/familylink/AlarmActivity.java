@@ -3,9 +3,12 @@
  */
 package org.orange.familylink;
 
+import java.io.IOException;
+
 import org.orange.familylink.data.UrgentMessageBody;
 import org.orange.familylink.database.Contract;
 import org.orange.familylink.navigation.StartNavigation;
+import org.orange.familylink.util.AudioFocusHelper;
 import org.orange.familylink.util.ConvertUtil;
 import org.orange.familylink.util.Network;
 
@@ -14,6 +17,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -39,10 +43,14 @@ public class AlarmActivity extends BaseActivity {
 	public static final String EXTRA_ID = AlarmActivity.class.getName() + ".extra.ID";
 
 	private MessageWrapper mUrgentMessage;
+	// 用于UI状态控制
 	private TextView mTextViewAlarmNotification;
 	private TextView mTextViewPosition;
 	private Button mButtonCallBack;
 	private Button mButtonNavigate;
+	// 用于警报蜂鸣声
+	private AudioFocusHelper mAudioFocusHelper;
+	private MediaPlayer mMediaPlayer;
 
 	private void setUrgentMessage(MessageWrapper message) {
 		mUrgentMessage = message;
@@ -69,9 +77,9 @@ public class AlarmActivity extends BaseActivity {
 			if(Network.isConnected(this)){
 				resultAddress = ConvertUtil.getAddress(message.body.getPositionLongitude(),
 						message.body.getPositionLatitude());
-			} else {
-				resultAddress = location;
 			}
+			if(resultAddress == null || resultAddress.isEmpty())
+				resultAddress = location;
 			// 设置在地图上显示的超链接
 			SpannableString ss = new SpannableString(resultAddress);
 			ss.setSpan(new URLSpan("geo:" + location), 0, ss.length(),
@@ -99,6 +107,29 @@ public class AlarmActivity extends BaseActivity {
 			throw new IllegalStateException("You must put extra: EXTRA_ID(fell down alarm message's ID)");
 		long messageId = extras.getLong(EXTRA_ID);
 		new ShowUrgentMessage().execute(messageId);
+
+		mAudioFocusHelper = new AudioFocusHelper(this) {
+			@Override
+			public void onAudioFocusChange(int focusChange) {
+			}
+		};
+	}
+	@Override
+	protected void onStart() {
+		super.onStart();
+		mMediaPlayer = MediaPlayer.create(this, R.raw.alarm);
+		mMediaPlayer.setLooping(true);
+		startAlarm();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		if(mMediaPlayer != null) {
+			stopAlarm();
+			mMediaPlayer.release();
+			mMediaPlayer = null;
+		}
 	}
 
 	/**
@@ -126,7 +157,44 @@ public class AlarmActivity extends BaseActivity {
 				Uri.parse("tel:" + mUrgentMessage.address));
 		startActivity(intent);
 	}
+	/**
+	 * 当停止警报声钮被点击时，调用此方法
+	 * @param button 被点击的按钮
+	 */
+	public void onClickStopAlarm(View button) {
+		stopAlarm();
+	}
 
+	/**
+	 * 开始播放警报声
+	 * @return 成功时，返回true；失败时，返回false
+	 */
+	private boolean startAlarm() {
+		if(mAudioFocusHelper.requestFocus()) {
+			try{
+				mMediaPlayer.prepare();
+			} catch(IllegalStateException e) {
+				// may be Prepared, do nothing
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+			mMediaPlayer.start();
+			return true;
+		} else
+			return false;
+	}
+	/**
+	 * 停止播放警报声
+	 */
+	private void stopAlarm() {
+		try{
+			mMediaPlayer.stop();
+		} catch(IllegalStateException e) {
+			// do nothing
+		}
+		mAudioFocusHelper.abandonFocus();
+	}
 
 	private static class MessageWrapper {
 		public String contact_name;
