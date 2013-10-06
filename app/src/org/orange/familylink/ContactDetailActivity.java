@@ -3,12 +3,17 @@ package org.orange.familylink;
 import org.orange.familylink.database.Contract;
 import org.orange.familylink.database.Contract.Contacts;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 /**设置联默认系人
@@ -20,6 +25,7 @@ public class ContactDetailActivity extends BaseActivity {
 			Contract.Contacts.COLUMN_NAME_NAME,
 			Contract.Contacts.COLUMN_NAME_PHONE_NUMBER};
 
+	private Animation mAnimationShake;
 	private EditText mEditTextPhone = null;
 	private EditText mEditTextName = null;
 	private Button mButtonEdit = null;
@@ -27,6 +33,7 @@ public class ContactDetailActivity extends BaseActivity {
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mAnimationShake = AnimationUtils.loadAnimation(this, R.anim.shake);
 		setContentView(R.layout.activity_contact_detial);
 		mEditTextPhone = (EditText) findViewById(R.id.phone_input);
 		mEditTextName = (EditText) findViewById(R.id.name_input);
@@ -58,26 +65,31 @@ public class ContactDetailActivity extends BaseActivity {
 		 */
 		mButtonSave.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				getContentResolver().delete(Contract.Contacts.CONTACTS_URI,
-							null, null);
-				ContentValues contact = new ContentValues(2);
-				contact.put(Contacts.COLUMN_NAME_NAME, getInputName());
-				contact.put(Contacts.COLUMN_NAME_PHONE_NUMBER, getInputPhone());
-				getContentResolver().insert(Contract.Contacts.CONTACTS_URI,
-						contact);
+				// 检查输入有效性
+				boolean inputValid = true;
+				final String name = mEditTextName.getText().toString();
+				final String phone = mEditTextPhone.getText().toString();
+				if(TextUtils.isEmpty(phone)) {
+					mEditTextPhone.requestFocus();
+					mEditTextPhone.startAnimation(mAnimationShake);
+					inputValid = false;
+				}
+				if(TextUtils.isEmpty(name)) {
+					mEditTextName.requestFocus();
+					mEditTextName.startAnimation(mAnimationShake);
+					inputValid = false;
+				}
+				if(!inputValid)
+					return;
+				// 保存联系人信息
+				new AsyncContactSaver(getContentResolver()).execute(name, phone);
+				// 退出编辑状态
 				mEditTextName.setFocusable(false);
 				mEditTextPhone.setFocusable(false);
 				mButtonSave.setVisibility(View.GONE);
 				mButtonEdit.setVisibility(View.VISIBLE);
 			}
 		});
-	}
-
-	private String getInputPhone() {
-		return mEditTextPhone.getText().toString();
-	}
-	private String getInputName() {
-		return mEditTextName.getText().toString();
 	}
 
 	/**
@@ -114,6 +126,35 @@ public class ContactDetailActivity extends BaseActivity {
 			this.id = id;
 			this.name = name;
 			this.phone = phone;
+		}
+	}
+
+
+	/**
+	 * {@link AsyncContactSaver#execute(String...)}的顺序为
+	 * <code>execute(contactName, contactPhone)</code>
+	 * <p>如：<code>new AsyncContactSaver(getContentResolver()).execute(name, phone);</code></p>
+	 * @author Team Orange
+	 */
+	private static class AsyncContactSaver extends AsyncTask<String, Void, Void> {
+		private ContentResolver mContentResolver;
+
+		/**
+		 * @see AsyncContactSaver
+		 */
+		public AsyncContactSaver(ContentResolver contentResolver) {
+			mContentResolver = contentResolver;
+		}
+
+		@Override
+		protected Void doInBackground(String... params) {
+			final String name = params[0], phone = params[1];
+			mContentResolver.delete(Contract.Contacts.CONTACTS_URI, null, null);
+			ContentValues contact = new ContentValues(2);
+			contact.put(Contacts.COLUMN_NAME_NAME, name);
+			contact.put(Contacts.COLUMN_NAME_PHONE_NUMBER, phone);
+			mContentResolver.insert(Contract.Contacts.CONTACTS_URI, contact);
+			return null;
 		}
 	}
 }
