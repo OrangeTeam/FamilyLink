@@ -59,8 +59,6 @@
     <string name="position_of_sender">Sender\'s Position</string>
 
     <string name="send_status_formatter" translatable="false">(%s)</string>
-    <string name="has_read">read</string>
-    <string name="unread">unread</string>
     <string name="sending">sending</string>
     <string name="sent">sent</string>
     <string name="delivered">delivered</string>

@@ -298,14 +298,6 @@ public class MessagesFragment extends ListFragment {
 			throw new UnsupportedOperationException("unsupported type: " + type);
 		}
 	}
-	private String valueOfHasRead(Status status) {
-		if(status == Status.HAVE_READ)
-			return getString(R.string.has_read);
-		else if(status == Status.UNREAD)
-			return getString(R.string.unread);
-		else
-			return "";
-	}
 	private String valueOfSendStatus(Status status) {
 		if(status == null || status.getDirection() != Direction.SEND)
 			return "";
@@ -597,7 +589,6 @@ public class MessagesFragment extends ListFragment {
 			holder.send_status = (TextView) rootView.findViewById(R.id.send_status);
 			holder.date = (TextView) rootView.findViewById(R.id.date);
 			holder.type_icon = (ImageView) rootView.findViewById(R.id.type_icon);
-			holder.unread_icon = (ImageView) rootView.findViewById(R.id.unread_icon);
 			rootView.setTag(holder);
 			return rootView;
 		}
@@ -655,15 +646,6 @@ public class MessagesFragment extends ListFragment {
 			} else {
 				holder.date.setVisibility(View.INVISIBLE);
 			}
-			// is it unread
-			if((status == Status.UNREAD)) {
-				holder.unread_icon.setVisibility(View.VISIBLE);
-				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem_Strong);
-			} else {	 // 包括 就收 或 status==null 的情况
-				holder.unread_icon.setVisibility(View.INVISIBLE);
-				setTextAppearance(holder, R.style.TextAppearance_AppTheme_ListItem);
-			}
-			holder.unread_icon.setContentDescription(valueOfHasRead(status));
 			// is it sent
 			if(status == null || status.getDirection() != Direction.SEND)
 				holder.send_status.setVisibility(View.GONE);
@@ -712,19 +694,6 @@ public class MessagesFragment extends ListFragment {
 			typeIcon.setImageResource(colorResId);
 		}
 		/**
-		 * 设置文字显示效果（颜色、大小等）
-		 * @param holder 要设置的数据项视图的{@link ViewHolder}
-		 * @param resid TextAppearance资源ID
-		 * @see TextView#setTextAppearance(Context, int)
-		 */
-		private void setTextAppearance(ViewHolder holder, int resid) {
-			holder.senderAndReceiver.setTextAppearance(mContext, resid);
-			holder.body.setTextAppearance(mContext, resid);
-			holder.send_status.setTextAppearance(mContext, resid);
-			holder.date.setTextAppearance(mContext, resid);
-		}
-
-		/**
 		 * 保存对 每项记录的视图中各元素 的引用，避免每次重复执行<code>findViewById()</code>，也方便使用
 		 * @author Team Orange
 		 */
@@ -734,7 +703,6 @@ public class MessagesFragment extends ListFragment {
 			TextView send_status;
 			TextView date;
 			ImageView type_icon;
-			ImageView unread_icon;
 		}
 	}
 

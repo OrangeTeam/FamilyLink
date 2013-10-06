@@ -57,8 +57,6 @@
     <string name="content">内容</string>
     <string name="position_of_sender">发送者的位置</string>
 
-    <string name="has_read">已读</string>
-    <string name="unread">未读</string>
     <string name="sending">正在发送</string>
     <string name="sent">已发送</string>
     <string name="delivered">已送达</string>

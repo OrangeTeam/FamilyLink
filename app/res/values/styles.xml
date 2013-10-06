@@ -13,9 +13,6 @@
     </style>
     <style name="TextAppearance.AppTheme.ListItem" parent="@android:style/TextAppearance.Large">
     </style>
-    <style name="TextAppearance.AppTheme.ListItem.Strong">
-        <item name="android:textStyle">bold</item>
-    </style>
 
     <style name="FamilyLink.CircularProgressBarLight" parent="@style/CircularProgressBarLight">
         <item name="progress_color">@android:color/holo_red_light</item>
