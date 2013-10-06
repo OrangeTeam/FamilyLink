@@ -113,18 +113,14 @@ public class AlarmActivity extends BaseActivity {
 			public void onAudioFocusChange(int focusChange) {
 			}
 		};
-	}
-	@Override
-	protected void onStart() {
-		super.onStart();
 		mMediaPlayer = MediaPlayer.create(this, R.raw.alarm);
 		mMediaPlayer.setLooping(true);
 		startAlarm();
 	}
 
 	@Override
-	protected void onStop() {
-		super.onStop();
+	protected void onDestroy() {
+		super.onDestroy();
 		if(mMediaPlayer != null) {
 			stopAlarm();
 			mMediaPlayer.release();

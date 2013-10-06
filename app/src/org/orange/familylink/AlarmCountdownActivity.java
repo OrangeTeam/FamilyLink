@@ -52,14 +52,14 @@ public class AlarmCountdownActivity extends Activity {
 			public void onAudioFocusChange(int focusChange) {
 			}
 		};
+		mMediaPlayer = MediaPlayer.create(this, R.raw.alarm);
+		mMediaPlayer.setLooping(true);
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
 		mLocationTracker = new LocationTracker(this);
-		mMediaPlayer = MediaPlayer.create(this, R.raw.alarm);
-		mMediaPlayer.setLooping(true);
 	}
 
 	@Override
@@ -67,6 +67,11 @@ public class AlarmCountdownActivity extends Activity {
 		super.onStop();
 		mLocationTracker.stopUsingGPS();
 		mLocationTracker = null;
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
 		if(mMediaPlayer != null) {
 			stopAlarm();
 			mMediaPlayer.release();
