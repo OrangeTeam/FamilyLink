@@ -57,7 +57,10 @@ public class MessagesActivity extends Activity {
 						extras.getLongArray(EXTRA_IDS));
 			messages.setArguments(args);
 		}
-		getFragmentManager().beginTransaction().add(R.id.messages, messages).commit();
+		if(savedInstanceState == null)
+			getFragmentManager().beginTransaction().add(R.id.messages, messages).commit();
+		else
+			getFragmentManager().beginTransaction().replace(R.id.messages, messages).commit();
 	}
 
 }
