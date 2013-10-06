@@ -7,6 +7,7 @@ import org.orange.familylink.BuildConfig;
 import org.orange.familylink.MessagesActivity;
 import org.orange.familylink.R;
 import org.orange.familylink.data.MessageLogRecord.Status;
+import org.orange.familylink.database.Contract;
 import org.orange.familylink.database.Contract.Messages;
 
 import android.app.Activity;
@@ -19,6 +20,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
@@ -71,8 +73,12 @@ public class SmsStatusReceiver extends BroadcastReceiver {
 				updateValues.put(Messages.COLUMN_NAME_STATUS, Status.SENT.name());
 				contentResolver.update(intent.getData(), updateValues, null, null);
 			}
-			//TODO 改进友好性
-			Toast.makeText(context, "sent:"+intent.getDataString(), Toast.LENGTH_LONG).show();
+			// 提示发送了短信
+			String contactName = getReceiverOfMessage(context, intent.getData());
+			if(contactName == null)
+				contactName = context.getString(R.string.unknown);
+			Toast.makeText(context, context.getString(R.string.sms_sent_notification, contactName),
+					Toast.LENGTH_LONG).show();
 			return;
 		default:
 			onFailedToSend(context, intent);
@@ -149,8 +155,38 @@ public class SmsStatusReceiver extends BroadcastReceiver {
 		ContentValues updateValues = new ContentValues();
 		updateValues.put(Messages.COLUMN_NAME_STATUS, Status.DELIVERED.name());
 		context.getContentResolver().update(intent.getData(), updateValues, null, null);
-		//TODO 改进友好性
-		Toast.makeText(context, "delivered:"+intent.getDataString(), Toast.LENGTH_LONG).show();
+		// 提示短息已送达
+		String contactName = getReceiverOfMessage(context, intent.getData());
+		if(contactName == null)
+			contactName = context.getString(R.string.unknown);
+		Toast.makeText(context, context.getString(R.string.sms_delivered_notification, contactName),
+				Toast.LENGTH_LONG).show();
 	}
 
+	private String getReceiverOfMessage(final Context context, final Uri uriOfMessage) {
+		final ContentResolver contentResolver = context.getContentResolver();
+		Cursor cursor = contentResolver.query(uriOfMessage,
+				new String[]{Contract.Messages.COLUMN_NAME_CONTACT_ID}, null, null, null);
+		Long contactId = null;
+		if(cursor.moveToFirst()) {
+			int index = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CONTACT_ID);
+			if(!cursor.isNull(index))
+				contactId = cursor.getLong(index);
+		}
+		cursor.close();
+		if(contactId == null)
+			return null;
+		final Uri uriOfContact = ContentUris.withAppendedId(
+				Contract.Contacts.CONTACTS_ID_URI, contactId);
+		cursor = contentResolver.query(uriOfContact,
+				new String[]{Contract.Contacts.COLUMN_NAME_NAME}, null, null, null);
+		String contactName = null;
+		if(cursor.moveToFirst()) {
+			int index = cursor.getColumnIndex(Contract.Contacts.COLUMN_NAME_NAME);
+			if(!cursor.isNull(index))
+				contactName = cursor.getString(index);
+		}
+		cursor.close();
+		return contactName;
+	}
 }

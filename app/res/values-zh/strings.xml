@@ -14,6 +14,8 @@
     <string name="delete">删除</string>
 
     <!-- SmsStatusReceiver -->
+    <string name="sms_sent_notification">给 %s 发送了一条短信</string>
+    <string name="sms_delivered_notification">发给 %s 的一条短信已送达</string>
     <string name="failed_to_send_because_of_radio_off">由于无线被关闭，发送消息失败。</string>
     <string name="failed_to_send_because_of_generic_failure">遇到了一般错误（错误代码：%s），发送消息失败。请联系您的电话服务商。</string>
 
