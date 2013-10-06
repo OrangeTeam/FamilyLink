@@ -29,7 +29,7 @@
             android:descendantFocusability="blocksDescendants" >
 
             <TextView
-                android:id="@+id/sender"
+                android:id="@+id/sender_and_receiver"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -38,34 +38,13 @@
                 android:autoLink="phone|email"
                 android:focusable="false" />
 
-            <ImageView
-                android:id="@+id/direction_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@id/sender"
-                android:contentDescription="@string/to"
-                android:focusable="false"
-                android:paddingTop="4dp"
-                android:src="@drawable/right" />
-
-            <TextView
-                android:id="@+id/receiver"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignWithParentIfMissing="true"
-                android:layout_toRightOf="@id/direction_icon"
-                android:autoLink="phone|email"
-                android:focusable="false" />
-
             <TextView
                 android:id="@+id/body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@id/sender"
+                android:layout_alignLeft="@id/sender_and_receiver"
                 android:layout_alignParentRight="true"
-                android:layout_below="@id/sender"
+                android:layout_below="@id/sender_and_receiver"
                 android:focusable="false" />
 
             <TextView

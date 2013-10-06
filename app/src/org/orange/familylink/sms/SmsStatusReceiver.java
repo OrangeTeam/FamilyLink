@@ -107,7 +107,7 @@ public class SmsStatusReceiver extends BroadcastReceiver {
 		case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
 			Bundle extra = intent.getExtras();
 			boolean containErrorCode = false;
-			String errorCode = null;
+			String errorCode = "null";
 			if(extra != null && extra.containsKey("errorCode"))
 				containErrorCode = true;
 			if(containErrorCode)

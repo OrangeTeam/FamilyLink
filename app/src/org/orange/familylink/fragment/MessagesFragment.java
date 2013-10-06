@@ -592,13 +592,11 @@ public class MessagesFragment extends ListFragment {
 			// Creates a ViewHolder and store references to the two children views
 			// we want to bind data to.
 			ViewHolder holder = new ViewHolder();
-			holder.sender = (TextView) rootView.findViewById(R.id.sender);
-			holder.receiver = (TextView) rootView.findViewById(R.id.receiver);
+			holder.senderAndReceiver = (TextView) rootView.findViewById(R.id.sender_and_receiver);
 			holder.body = (TextView) rootView.findViewById(R.id.body);
 			holder.send_status = (TextView) rootView.findViewById(R.id.send_status);
 			holder.date = (TextView) rootView.findViewById(R.id.date);
 			holder.type_icon = (ImageView) rootView.findViewById(R.id.type_icon);
-			holder.directon_icon = (ImageView) rootView.findViewById(R.id.direction_icon);
 			holder.unread_icon = (ImageView) rootView.findViewById(R.id.unread_icon);
 			rootView.setTag(holder);
 			return rootView;
@@ -633,29 +631,22 @@ public class MessagesFragment extends ListFragment {
 			if(contactName == null)
 				contactName = getString(R.string.unknown);
 			// address
-			String contact;
+			String senderAndReceiver;
 			if(address != null)
-				contact = getString(R.string.contact_formatter, contactName, address);
+				senderAndReceiver = getString(R.string.contact_formatter, contactName, address);
 			else
-				contact = contactName;
+				senderAndReceiver = contactName;
 			// direction (in status)
 			if(status != null) {
-				holder.sender.setVisibility(View.VISIBLE);
-				holder.directon_icon.setVisibility(View.VISIBLE);
 				Direction dirct = status.getDirection();
 				if(dirct == Direction.SEND) {
-					holder.sender.setText(R.string.me);
-					holder.receiver.setText(contact);
+					senderAndReceiver = getString(R.string.me) + "→" + senderAndReceiver;
 				} else if(dirct == Direction.RECEIVE) {
-					holder.sender.setText(contact);
-					holder.receiver.setText(R.string.me);
+					senderAndReceiver = senderAndReceiver + " → " + getString(R.string.me);
 				} else
 					throw new IllegalStateException("unknown Direction: " + dirct.name());
-			} else {
-				holder.sender.setVisibility(View.GONE);
-				holder.directon_icon.setVisibility(View.GONE);
-				holder.receiver.setText(contact);
 			}
+			holder.senderAndReceiver.setText(senderAndReceiver);
 			// date
 			if(date != null) {
 				holder.date.setVisibility(View.VISIBLE);
@@ -727,8 +718,7 @@ public class MessagesFragment extends ListFragment {
 		 * @see TextView#setTextAppearance(Context, int)
 		 */
 		private void setTextAppearance(ViewHolder holder, int resid) {
-			holder.sender.setTextAppearance(mContext, resid);
-			holder.receiver.setTextAppearance(mContext, resid);
+			holder.senderAndReceiver.setTextAppearance(mContext, resid);
 			holder.body.setTextAppearance(mContext, resid);
 			holder.send_status.setTextAppearance(mContext, resid);
 			holder.date.setTextAppearance(mContext, resid);
@@ -739,13 +729,11 @@ public class MessagesFragment extends ListFragment {
 		 * @author Team Orange
 		 */
 		private class ViewHolder {
-			TextView sender;
-			TextView receiver;
+			TextView senderAndReceiver;
 			TextView body;
 			TextView send_status;
 			TextView date;
 			ImageView type_icon;
-			ImageView directon_icon;
 			ImageView unread_icon;
 		}
 	}

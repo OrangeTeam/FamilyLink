@@ -42,7 +42,6 @@
     <string name="prompt_one_retransmission_at_a_time">Please do this after last retransmission finished</string>
     <string name="prompt_delete_messages_successfully">Deleted %d message(s) successfully</string>
 
-    <string name="to">to</string>
     <string name="me">Me</string>
     <string name="contact_formatter" translatable="false">%s(%s)</string>
     <string name="illegal_code">Illegal Code: %d</string>
