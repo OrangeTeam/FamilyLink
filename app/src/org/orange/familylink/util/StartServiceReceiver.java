@@ -27,8 +27,9 @@ public class StartServiceReceiver extends BroadcastReceiver {
 			Intent locationIntent = new Intent(arg0, LocationService.class);
 			arg0.startService(locationIntent);
 			//启动SmsReceiverservice
-			Intent SmsIntent = new Intent(arg0, SmsReceiverService.class);
-			arg0.startService(SmsIntent);
+			Intent smsIntent = new Intent(arg0, SmsReceiverService.class);
+			smsIntent.setAction(SmsReceiverService.ACTION_FOREGROUND);
+			arg0.startService(smsIntent);
 		}
 	}
 
