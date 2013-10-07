@@ -43,6 +43,7 @@ public class AlarmActivity extends BaseActivity {
 	public static final String EXTRA_ID = AlarmActivity.class.getName() + ".extra.ID";
 
 	private MessageWrapper mUrgentMessage;
+	private AsyncPositionTranslator mAsyncPositionTranslator;
 	// 用于UI状态控制
 	private TextView mTextViewAlarmNotification;
 	private TextView mTextViewPosition;
@@ -73,24 +74,33 @@ public class AlarmActivity extends BaseActivity {
 		if(message.body.containsPosition()) {
 			String location = message.body.getPositionLatitude() + "," +
 								message.body.getPositionLongitude();
-			String resultAddress = null;
-			if(Network.isConnected(this)){
-				resultAddress = ConvertUtil.getAddress(message.body.getPositionLongitude(),
-						message.body.getPositionLatitude());
-			}
-			if(resultAddress == null || resultAddress.isEmpty())
-				resultAddress = location;
-			// 设置在地图上显示的超链接
-			SpannableString ss = new SpannableString(resultAddress);
-			ss.setSpan(new URLSpan("geo:" + location), 0, ss.length(),
-						SpannableString.SPAN_INCLUSIVE_EXCLUSIVE);
-			mTextViewPosition.setText(ss);
-			mTextViewPosition.setMovementMethod(LinkMovementMethod.getInstance());
+			setPosition(location);
 			mButtonNavigate.setVisibility(View.VISIBLE);
+			// 异步把location翻译为人类可读的地点
+			if(mAsyncPositionTranslator != null)
+				mAsyncPositionTranslator.cancel(true);
+			mAsyncPositionTranslator = new AsyncPositionTranslator();
+			mAsyncPositionTranslator.execute((Void)null);
 		} else {
 			mTextViewPosition.setText(R.string.unknown);
 			mButtonNavigate.setVisibility(View.INVISIBLE);
 		}
+	}
+	private void setPosition(String text) {
+		if(text != null) {
+			if(mUrgentMessage.body.containsPosition()) {
+				// 设置在地图上显示的超链接
+				SpannableString ss = new SpannableString(text);
+				URLSpan span = new URLSpan("geo:" +
+						mUrgentMessage.body.getPositionLatitude() + "," +
+						mUrgentMessage.body.getPositionLongitude());
+				ss.setSpan(span, 0, ss.length(), SpannableString.SPAN_INCLUSIVE_EXCLUSIVE);
+				mTextViewPosition.setText(ss);
+				mTextViewPosition.setMovementMethod(LinkMovementMethod.getInstance());
+			} else // !mUrgentMessage.body.containsPosition()
+				mTextViewPosition.setText(text);
+		} else // text == null
+			mTextViewPosition.setText(R.string.unknown);
 	}
 
 	@Override
@@ -232,6 +242,35 @@ public class AlarmActivity extends BaseActivity {
 		protected void onPostExecute(MessageWrapper result) {
 			if(result != null)
 				setUrgentMessage(result);
+		}
+	}
+
+	private class AsyncPositionTranslator extends AsyncTask<Void, Void, String> {
+		@Override
+		protected String doInBackground(Void... params) {
+			String resultAddress = null;
+			if(!mUrgentMessage.body.containsPosition())
+				return null;
+			final double latitude = mUrgentMessage.body.getPositionLatitude();
+			final double longitude = mUrgentMessage.body.getPositionLongitude();
+			if(!Network.isConnected(AlarmActivity.this))
+				return null;
+			resultAddress = ConvertUtil.getAddress(longitude, latitude);
+			if(resultAddress != null) {
+				if(resultAddress.isEmpty())
+					resultAddress = null;
+				else
+					resultAddress += "(" + latitude + "," + longitude + ")";
+			}
+			return resultAddress;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			if(result != null)
+				setPosition(result);
+			if(mAsyncPositionTranslator == this)
+				mAsyncPositionTranslator = null;
 		}
 	}
 
