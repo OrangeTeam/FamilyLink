@@ -10,12 +10,10 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.EditText;
+
 /**设置联默认系人
  * @author Team Orange
  */
@@ -28,8 +26,6 @@ public class ContactDetailActivity extends BaseActivity {
 	private Animation mAnimationShake;
 	private EditText mEditTextPhone = null;
 	private EditText mEditTextName = null;
-	private Button mButtonEdit = null;
-	private Button mButtonSave = null;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,59 +33,43 @@ public class ContactDetailActivity extends BaseActivity {
 		setContentView(R.layout.activity_contact_detial);
 		mEditTextPhone = (EditText) findViewById(R.id.phone_input);
 		mEditTextName = (EditText) findViewById(R.id.name_input);
-		mButtonEdit = (Button) findViewById(R.id.button_edit);
-		mButtonSave = (Button) findViewById(R.id.button_save);
-		mEditTextName.setFocusable(false);
-		mEditTextPhone.setFocusable(false);
 
 		Contact contact = getDefaultContact(this);
 		mEditTextName.setText(contact.name);
 		mEditTextPhone.setText(contact.phone);
-		/**
-		 * 解锁获取焦点
-		 */
-		mButtonEdit.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				mEditTextPhone.setFocusable(true);
-				mEditTextPhone.setFocusableInTouchMode(true);
-				mEditTextName.setFocusable(true);
-				mEditTextName.setFocusableInTouchMode(true);
-				mEditTextName.requestFocus();
-				mEditTextName.setSelection(mEditTextName.length());
-				mButtonEdit.setVisibility(View.GONE);
-				mButtonSave.setVisibility(View.VISIBLE);
-			}
-		});
-		/**先删除上一个后保存下一个
-		 * 保存之后继续取消焦点
-		 */
-		mButtonSave.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				// 检查输入有效性
-				boolean inputValid = true;
-				final String name = mEditTextName.getText().toString();
-				final String phone = mEditTextPhone.getText().toString();
-				if(TextUtils.isEmpty(phone)) {
-					mEditTextPhone.requestFocus();
-					mEditTextPhone.startAnimation(mAnimationShake);
-					inputValid = false;
-				}
-				if(TextUtils.isEmpty(name)) {
-					mEditTextName.requestFocus();
-					mEditTextName.startAnimation(mAnimationShake);
-					inputValid = false;
-				}
-				if(!inputValid)
-					return;
-				// 保存联系人信息
-				new AsyncContactSaver(getContentResolver()).execute(name, phone);
-				// 退出编辑状态
-				mEditTextName.setFocusable(false);
-				mEditTextPhone.setFocusable(false);
-				mButtonSave.setVisibility(View.GONE);
-				mButtonEdit.setVisibility(View.VISIBLE);
-			}
-		});
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		final String name = mEditTextName.getText().toString();
+		final String phone = mEditTextPhone.getText().toString();
+		if(TextUtils.isEmpty(phone) || TextUtils.isEmpty(name)) {
+			return;
+		}
+		new AsyncContactSaver(getContentResolver()).execute(name, phone);
+	}
+
+	@Override
+	public void onBackPressed() {
+		// 检查输入有效性
+		boolean inputValid = true;
+		final String name = mEditTextName.getText().toString();
+		final String phone = mEditTextPhone.getText().toString();
+		if(TextUtils.isEmpty(phone)) {
+			mEditTextPhone.requestFocus();
+			mEditTextPhone.startAnimation(mAnimationShake);
+			inputValid = false;
+		}
+		if(TextUtils.isEmpty(name)) {
+			mEditTextName.requestFocus();
+			mEditTextName.startAnimation(mAnimationShake);
+			inputValid = false;
+		}
+		if(!inputValid)
+			return;
+		// 在onStop保存联系人信息
+		super.onBackPressed();	//因为目前没有使用Fragment，暂时没未考虑Fragment的问题
 	}
 
 	/**
@@ -148,6 +128,7 @@ public class ContactDetailActivity extends BaseActivity {
 
 		@Override
 		protected Void doInBackground(String... params) {
+			//TODO 同步，完善多个AsyncContactSaver同时运行时的情况
 			final String name = params[0], phone = params[1];
 			mContentResolver.delete(Contract.Contacts.CONTACTS_URI, null, null);
 			ContentValues contact = new ContentValues(2);

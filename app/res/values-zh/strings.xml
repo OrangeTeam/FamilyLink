@@ -35,8 +35,6 @@
     <string name="no_contact">您还没有添加联系人</string>
     <string name="name_label">姓名</string>
     <string name="phone_label">电话</string>
-    <string name="save">保存</string>
-    <string name="edit">编辑</string>
     <!-- Messages -->
     <string name="no_message_record">无过往消息记录</string>
     <string name="checked_one_message">1 条消息</string>

@@ -35,8 +35,6 @@
     <string name="no_contact">You haven\'t added any Contact.</string>
     <string name="name_label">Name</string>
     <string name="phone_label">Phone</string>
-    <string name="save">Save</string>
-    <string name="edit">Edit</string>
     <!-- Messages -->
     <string name="no_message_record">No Message Record</string>
     <string name="checked_one_message">One message</string>
