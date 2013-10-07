@@ -68,6 +68,8 @@
     <string name="touch_again_to_cancel">请再按一次来取消警报</string>
     <string name="tips_touch_twice_to_cancel">小贴士：触摸屏幕两次来取消警报</string>
     <!-- AlarmActivity.java -->
+    <string name="alarm">警报</string>
+    <string name="seek_help_alarm">求助警报</string>
     <string name="seek_help_alarm_notification"><b>%s</b>发来了求助请求，他（她）在</string>
     <string name="fall_down_alarm_notification"><b>%s</b>摔倒了，他（她）在</string>
     <string name="stop_alarm">停止警报</string>

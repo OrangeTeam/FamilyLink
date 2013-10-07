@@ -59,10 +59,13 @@ public class AlarmActivity extends BaseActivity {
 			return;
 		// 设置 通告内容和回电（call back）按钮的内容
 		Integer notificationResId = null;
-		if(message.body.getType() == UrgentMessageBody.Type.SEEK_HELP)
+		if(message.body.getType() == UrgentMessageBody.Type.SEEK_HELP) {
+			getActionBar().setTitle(R.string.seek_help_alarm);
 			notificationResId = R.string.seek_help_alarm_notification;
-		else if(message.body.getType() == UrgentMessageBody.Type.FALL_DOWN_ALARM)
+		} else if(message.body.getType() == UrgentMessageBody.Type.FALL_DOWN_ALARM) {
+			getActionBar().setTitle(R.string.fall_down_alarm);
 			notificationResId = R.string.fall_down_alarm_notification;
+		}
 		if(message.contact_name != null) {
 			mTextViewAlarmNotification.setText(getString(notificationResId, message.contact_name));
 			mButtonCallBack.setText(getString(R.string.call_to_somebody, message.contact_name));

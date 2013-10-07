@@ -92,7 +92,7 @@
         </activity>
         <activity
             android:name="org.orange.familylink.AlarmActivity"
-            android:label="@string/fall_down_alarm" >
+            android:label="@string/alarm" >
         </activity>
 
         <service android:name=".location.LocationService" />

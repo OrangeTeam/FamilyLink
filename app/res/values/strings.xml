@@ -70,6 +70,8 @@
     <string name="touch_again_to_cancel">Please touch again to cancel alarm.</string>
     <string name="tips_touch_twice_to_cancel">Tips: You can touch twice to cancel alarm.</string>
     <!-- AlarmActivity.java -->
+    <string name="alarm">Alarm</string>
+    <string name="seek_help_alarm">Seek Help Alarm</string>
     <string name="seek_help_alarm_notification"><b>%s</b> is seeking help at:</string>
     <string name="fall_down_alarm_notification"><b>%s</b> fell down at:</string>
     <string name="stop_alarm">Stop Alarm</string>
