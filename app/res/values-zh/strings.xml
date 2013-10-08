@@ -9,7 +9,6 @@
     <string name="undefined">未定义</string>
 
     <!-- menu -->
-    <string name="add_contact">添加联系人</string>
     <string name="retransmit">重发</string>
     <string name="delete">删除</string>
 
@@ -32,7 +31,6 @@
     <!-- Contact -->
     <string name="contact">联系人</string>
     <string name="contact_details">联系人详情</string>
-    <string name="no_contact">您还没有添加联系人</string>
     <string name="name_label">姓名</string>
     <string name="phone_label">电话</string>
     <!-- Messages -->
