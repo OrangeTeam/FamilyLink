@@ -117,6 +117,8 @@ public class SmsReceiverService extends Service {
 			String bodyResult = null;
 			//信息中的电话号码
 			String addressResult = null;
+			//信息中的ID
+			long idResult = 0;
 
 			ContentResolver contentResolver = mContext.getContentResolver();
 			Uri uri = Uri.parse("content://sms/inbox");
@@ -138,17 +140,20 @@ public class SmsReceiverService extends Service {
 				}
 
 				addressResult = cursor.getString(cursor.getColumnIndex("address"));
+				idResult = cursor.getLong(cursor.getColumnIndex("_id"));
 				cursor.close();
 			}else{
 				cursor.close();
 				return;
 			}
 
-			//删除收件箱中的短信
-			contentResolver.delete(
-					Uri.parse("content://sms/conversations/" + getThreadId()),
-					"read = 0",
-					null);
+			if(idResult != 0){
+				//删除收件箱中的短信
+				contentResolver.delete(
+						Uri.parse("content://sms/conversations/" + getThreadId()),
+						"read = 0 and _id = ?",
+						new String[] {String.valueOf(idResult)});
+			}
 
 			Message msg = new Message();
 			Bundle bundle = new Bundle();
