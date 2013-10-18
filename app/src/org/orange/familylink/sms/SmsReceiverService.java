@@ -2,13 +2,17 @@ package org.orange.familylink.sms;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.orange.familylink.AlarmActivity;
 import org.orange.familylink.ContactDetailActivity;
 import org.orange.familylink.MainActivity;
+import org.orange.familylink.MessagesActivity;
 import org.orange.familylink.R;
 import org.orange.familylink.data.Message.Code;
+import org.orange.familylink.data.MessageLogRecord.Direction;
 import org.orange.familylink.data.Settings;
+import org.orange.familylink.database.Contract.Messages;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -18,6 +22,8 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -28,6 +34,7 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -94,6 +101,38 @@ public class SmsReceiverService extends Service {
 				mIntent.putExtra(AlarmActivity.EXTRA_ID, messageId);
 				mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				mContext.startActivity(mIntent);
+			}else if(Code.Extra.Inform.hasSetPulse(localMessage.getCode())) {//TODO 演示用
+				//导航用的定位信息，包括起点到终点位置信息
+				Uri location = Uri.parse("http://maps.google.com/maps?f=dsaddr=startLat startLng&daddr=" + 39.0565822 + " " + 117.1386525 + "&hl=en");
+				Intent intent = new Intent(Intent.ACTION_VIEW, location);
+				//专用启动谷歌地图
+				intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+				//看是否有应用课用于启动
+				PackageManager packageManager = mContext.getPackageManager();
+				List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, 0);
+				boolean isIntentSafe = activities.size() > 0;
+				if(!isIntentSafe) {
+					intent = new Intent(mContext, MessagesActivity.class);
+					intent.setAction(Intent.ACTION_VIEW);
+					intent.setType(Messages.MESSAGES_TYPE);
+					intent.putExtra(MessagesActivity.EXTRA_DIRECTION, Direction.RECEIVE);
+					long id = ContentUris.parseId(uri);
+					if(id >= 1) {
+						intent.putExtra(MessagesActivity.EXTRA_IDS, new long[]{id});
+					}
+				}
+				PendingIntent resultPendingIntent = PendingIntent.getActivity(
+						mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+				builder.setContentTitle("收到定时联络消息")
+						.setContentText(localMessage.getBody())
+						.setSmallIcon(R.drawable.ic_launcher)
+						.setContentIntent(resultPendingIntent)
+						.setAutoCancel(true);
+				((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE))
+				.notify(0, builder.build());
+
+				Toast.makeText(mContext, "收到定时联络消息", Toast.LENGTH_LONG).show();
 			}
 		}
 	}

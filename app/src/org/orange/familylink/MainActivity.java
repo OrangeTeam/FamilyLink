@@ -18,6 +18,7 @@ import org.orange.familylink.fragment.dialog.RoleDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment.OnRoleChangeListener;
 import org.orange.familylink.location.LocationService;
 import org.orange.familylink.location.LocationTracker;
+import org.orange.familylink.navigation.StartNavigation;
 import org.orange.familylink.sms.SmsMessage;
 import org.orange.familylink.sms.SmsReceiverService;
 
@@ -30,6 +31,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.View;
@@ -52,6 +54,8 @@ public class MainActivity extends BaseActivity {
 	private GridView mMainMenuGridView;
 	private Role mRole;
 	private Function[] mFunctions;
+	//TODO delete 演示用代码
+	final Handler handler = new Handler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -235,6 +239,8 @@ public class MainActivity extends BaseActivity {
 			break;
 		case LOCATE_NOW:
 			message.setCode(Code.COMMAND | Code.Extra.Command.LOCATE_NOW);
+			//TODO delete 演示用代码
+			message.setBody("看护方命令本应用返回受顾方现在的位置");
 			break;
 		default:
 			throw new IllegalArgumentException("unsupported function: " + function);
@@ -331,6 +337,17 @@ public class MainActivity extends BaseActivity {
 			//----------------------- 监护方 -----------------------
 			case LOCATE_NOW:
 				sendMessage(Function.LOCATE_NOW);
+				//TODO delete 以下演示代码
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						//Do something after 5000ms
+						Toast.makeText(MainActivity.this, "收到受顾方的位置坐标，在地图中显示", Toast.LENGTH_LONG).show();
+						StartNavigation.toStartNavigationApp(MainActivity.this,
+								getFragmentManager(),
+								39.0565822, 117.1386525);
+					}
+					}, 5000);
 				break;
 			//----------------------- 通用 -----------------------
 			case GIVE_A_CALL: {
