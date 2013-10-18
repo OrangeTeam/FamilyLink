@@ -26,7 +26,7 @@ public class AlarmCountdownActivity extends Activity {
 	private long mExitTime;
 	private ObjectAnimator objectAnimator;		 //获取ObjectAnimator对象的一个引用
 
-	private static final int NUM_SHOW_TIME = 20000;	 //倒计时的时间
+	private static final int NUM_SHOW_TIME = 6000;	 //倒计时的时间
 	private static final float[] POSTION_TIME = {1f, 0f};  //动画的起止点，从0开始，绕一圈结束
 	private HoloCircularProgressBar progress;
 	private TextView mTextView;
