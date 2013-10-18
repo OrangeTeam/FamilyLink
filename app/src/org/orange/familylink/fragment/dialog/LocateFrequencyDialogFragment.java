@@ -38,16 +38,17 @@ public class LocateFrequencyDialogFragment extends DialogFragment {
 			.setTitle(R.string.pref_title_location_frequency)
 			.setSingleChoiceItems(R.array.pref_location_frequency_titles, currentPosition,
 				new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				String value = values[which];
-				Settings.setLocateFrequency(getActivity(), value);
-				Intent intent = new Intent(getActivity(), LocationService.class);
-				getActivity().stopService(intent);
-				getActivity().startService(intent);
-				dismiss();
-			}
-		});
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					String value = values[which];
+					Settings.setLocateFrequency(getActivity(), value);
+					Intent intent = new Intent(getActivity(), LocationService.class);
+					getActivity().stopService(intent);
+					getActivity().startService(intent);
+					dismiss();
+				}
+			})
+			.setPositiveButton(android.R.string.cancel, null);
 		return builder.create();
 	}
 

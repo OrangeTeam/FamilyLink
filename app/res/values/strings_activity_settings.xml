@@ -40,20 +40,22 @@
     </string-array>
 
     <string-array name="pref_location_frequency_titles">
-        <item>15minutes</item><item>30minutes</item>
-        <item>1hour</item><item>1.5hours</item>
-        <item>2hours</item><item>2.5hours</item>
-        <item>3hours</item><item>3.5hours</item>
-        <item>4hours</item><item>4.5hours</item>
-        <item>5hours</item><item>6hours</item>
+        <item>1 minute</item>
+        <item>3 minutes</item>
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
     </string-array>
     <string-array name="pref_location_frequency_values" translatable="false">
-        <item>15</item><item>30</item>
-        <item>60</item><item>90</item>
-        <item>120</item><item>150</item>
-        <item>180</item><item>210</item>
-        <item>240</item><item>270</item>
-        <item>300</item><item>360</item>
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
     </string-array>
 
 
