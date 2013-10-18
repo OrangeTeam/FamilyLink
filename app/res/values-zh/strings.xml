@@ -24,6 +24,7 @@
     <string name="locate_service">定时定位</string>
     <string name="locate_frequency">定位频率</string>
     <string name="fall_down_alarm_service">摔倒检测</string>
+    <string name="mock_fall_down_alarm">摔倒演示</string>
     <string name="seek_help">求助</string>
     <string name="call">电话</string>
     <string name="outbox">紧急发信箱</string>

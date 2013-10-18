@@ -24,6 +24,7 @@
     <string name="locate_service">Locate Service</string>
     <string name="locate_frequency">Locate Frequency</string>
     <string name="fall_down_alarm_service">Fall Dow Alarm</string>
+    <string name="mock_fall_down_alarm">Mock Fall Down Alarm</string>
     <string name="seek_help">Seek Help</string>
     <string name="call">Call</string>
     <string name="outbox">Outbox</string>

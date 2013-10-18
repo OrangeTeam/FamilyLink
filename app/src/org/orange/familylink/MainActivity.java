@@ -154,11 +154,11 @@ public class MainActivity extends BaseActivity {
 			View view = null;
 			view = mMainMenuGridView.getChildAt(
 					adapter.getItemPosition(Function.LOCATE_SERVICE));
-			if(view.isActivated())
+			if(view != null && view.isActivated())
 				setLocateService(view, false);
 			view = mMainMenuGridView.getChildAt(
 					adapter.getItemPosition(Function.FALL_DOWN_ALARM_SERVICE));
-			if(view.isActivated())
+			if(view != null && view.isActivated())
 				setFallDownAlarmService(view, false);
 		}
 		// 更新Pagers的顺序设置
@@ -331,6 +331,9 @@ public class MainActivity extends BaseActivity {
 			case FALL_DOWN_ALARM_SERVICE:
 				setFallDownAlarmService(view, !view.isActivated());
 				break;
+			case MOCK_FALL_DOWN_ALARM:
+				startActivity(new Intent(MainActivity.this, AlarmCountdownActivity.class));
+				break;
 			case SEEK_HELP:
 				sendMessage(Function.SEEK_HELP);
 				break;
@@ -398,6 +401,9 @@ public class MainActivity extends BaseActivity {
 		LOCATE_FREQUENCY(R.string.locate_frequency, R.drawable.ic_main_menu_locate_frequency),
 		/** 摔倒检测服务（开关） */
 		FALL_DOWN_ALARM_SERVICE(R.string.fall_down_alarm_service, R.drawable.ic_main_menu_fall_down_alarm_service),
+		//TODO detete this
+		/** 模拟摔倒，用于在虚拟机中演示摔倒情况 */
+		MOCK_FALL_DOWN_ALARM(R.string.mock_fall_down_alarm, R.drawable.ic_main_menu_fall_down_alarm_service_on),
 		/** 求助 */
 		SEEK_HELP(R.string.seek_help, R.drawable.ic_main_menu_seek_help),
 		//----------------------- 监护方 -----------------------
@@ -439,7 +445,7 @@ public class MainActivity extends BaseActivity {
 	Function.CONTACTS_SETTING, Function.ROLE_SETTING};
 	/** 受顾者的功能及其顺序 */
 	private static final Function[] FUNCTIONS_CAREE = ArrayUtils.addAll(
-			new Function[]{Function.FALL_DOWN_ALARM_SERVICE, Function.LOCATE_SERVICE,
+			new Function[]{Function.MOCK_FALL_DOWN_ALARM, Function.LOCATE_SERVICE,
 					Function.LOCATE_FREQUENCY, Function.SEEK_HELP},
 			FUNCTIONS_GENERAL);
 	/** 照料者的功能及其顺序 */
