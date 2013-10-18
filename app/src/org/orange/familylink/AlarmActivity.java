@@ -61,9 +61,11 @@ public class AlarmActivity extends BaseActivity {
 		Integer notificationResId = null;
 		if(message.body.getType() == UrgentMessageBody.Type.SEEK_HELP) {
 			getActionBar().setTitle(R.string.seek_help_alarm);
+			findViewById(R.id.main_container).setBackgroundColor(getResources().getColor(R.color.urgent));
 			notificationResId = R.string.seek_help_alarm_notification;
 		} else if(message.body.getType() == UrgentMessageBody.Type.FALL_DOWN_ALARM) {
 			getActionBar().setTitle(R.string.fall_down_alarm);
+			findViewById(R.id.main_container).setBackgroundColor(getResources().getColor(R.color.command));
 			notificationResId = R.string.fall_down_alarm_notification;
 		}
 		if(message.contact_name != null) {

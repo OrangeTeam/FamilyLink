@@ -19,13 +19,15 @@
     <string name="failed_to_send_because_of_generic_failure">遇到了一般错误（错误代码：%s），发送消息失败。请联系您的电话服务商。</string>
 
     <!-- Main Menu -->
+    <string name="have_started_periodically_contact">定时联络服务已打开</string>
+    <string name="have_stopt_periodically_contact">定时联络服务已关闭</string>
     <string name="locate_service">定时定位</string>
     <string name="locate_frequency">定位频率</string>
     <string name="fall_down_alarm_service">摔倒检测</string>
     <string name="seek_help">求助</string>
     <string name="call">电话</string>
-    <string name="outbox">发件箱</string>
-    <string name="response_message">收件箱</string>
+    <string name="outbox">紧急发信箱</string>
+    <string name="response_message">紧急收信箱</string>
     <string name="role_setting">角色设置</string>
     <string name="contacts_setting">联系人</string>
     <!-- Contact -->
@@ -68,8 +70,8 @@
     <!-- AlarmActivity.java -->
     <string name="alarm">警报</string>
     <string name="seek_help_alarm">求助警报</string>
-    <string name="seek_help_alarm_notification"><b>%s</b>发来了求助请求，他（她）在</string>
-    <string name="fall_down_alarm_notification"><b>%s</b>摔倒了，他（她）在</string>
+    <string name="seek_help_alarm_notification"><b>%s</b>发来了<b>求助</b>请求\n他（她）在：</string>
+    <string name="fall_down_alarm_notification"><b>%s 摔倒</b>了\n他（她）在：</string>
     <string name="stop_alarm">停止警报</string>
     <string name="call_to_somebody">给 %s 打电话</string>
     <string name="call_back">回电</string>

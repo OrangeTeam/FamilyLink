@@ -39,6 +39,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * 主{@link Activity}。应用的默认{@link Activity}
@@ -309,9 +310,15 @@ public class MainActivity extends BaseActivity {
 			Function function = Function.values()[(int)id];
 			switch (function) {
 			//----------------------- 受顾方 -----------------------
-			case LOCATE_SERVICE:
-				setLocateService(view, !view.isActivated());
+			case LOCATE_SERVICE: {
+				boolean newIsStarted = !view.isActivated();
+				setLocateService(view, newIsStarted);
+				if(newIsStarted)
+					Toast.makeText(MainActivity.this, R.string.have_started_periodically_contact, Toast.LENGTH_LONG).show();
+				else
+					Toast.makeText(MainActivity.this, R.string.have_stopt_periodically_contact, Toast.LENGTH_LONG).show();
 				break;
+			}
 			case LOCATE_FREQUENCY:
 				mLocateFrequencyDialogFragment.show(getFragmentManager(), null);
 				break;
