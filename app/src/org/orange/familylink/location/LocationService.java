@@ -4,13 +4,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.orange.familylink.ContactDetailActivity;
-import org.orange.familylink.R;
 import org.orange.familylink.ContactDetailActivity.Contact;
 import org.orange.familylink.data.Message.Code;
 import org.orange.familylink.data.Settings;
 import org.orange.familylink.sms.SmsMessage;
-import org.orange.familylink.util.ConvertUtil;
-import org.orange.familylink.util.Network;
 
 import android.app.Service;
 import android.content.Context;
@@ -21,7 +18,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
-import android.widget.Toast;
 
 /**
  * 定位服务
@@ -61,16 +57,16 @@ public class LocationService extends Service {
 		 */
 		@Override
 		public void handleMessage(Message msg){
-			String resultAddress = null;
+			String resultAddress = "此为模拟器下演示,无法给出位置信息";
 
-			if(Network.isConnected(mContext)){
-				//根据经纬度获取地址位置信息
-				resultAddress = ConvertUtil.getAddress(mLocationTracker.getLongitude(),
-						mLocationTracker.getLatitude());
-			}else{
-				Toast.makeText(mContext, R.string.unconnection, Toast.LENGTH_LONG).show();
-				return;
-			}
+//			if(Network.isConnected(mContext)){
+//				//根据经纬度获取地址位置信息
+//				resultAddress = ConvertUtil.getAddress(mLocationTracker.getLongitude(),
+//						mLocationTracker.getLatitude());
+//			}else{
+//				Toast.makeText(mContext, R.string.unconnection, Toast.LENGTH_LONG).show();
+//				return;
+//			}
 
 			if(mLocationTracker.canGetLocation()){
 				localMessage = new SmsMessage();
