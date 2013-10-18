@@ -17,7 +17,6 @@ import org.orange.familylink.fragment.dialog.NoContactInformationDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment;
 import org.orange.familylink.fragment.dialog.RoleDialogFragment.OnRoleChangeListener;
 import org.orange.familylink.location.LocationService;
-import org.orange.familylink.location.LocationTracker;
 import org.orange.familylink.navigation.StartNavigation;
 import org.orange.familylink.sms.SmsMessage;
 import org.orange.familylink.sms.SmsReceiverService;
@@ -230,11 +229,7 @@ public class MainActivity extends BaseActivity {
 			message.setCode(Code.INFORM | Code.Extra.Inform.URGENT);
 			UrgentMessageBody body = new UrgentMessageBody();
 			body.setType(UrgentMessageBody.Type.SEEK_HELP);
-			LocationTracker locationTracker = new LocationTracker(this);
-			if(locationTracker.canGetLocation()) {
-				body.setPosition(locationTracker.getLatitude(), locationTracker.getLongitude());
-			}
-			locationTracker.stopUsingGPS();
+			body.setPosition(39.0565822, 117.1386525);
 			message.setBody(body.toJson());
 			break;
 		case LOCATE_NOW:

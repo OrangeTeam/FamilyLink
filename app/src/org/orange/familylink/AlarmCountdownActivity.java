@@ -192,8 +192,7 @@ public class AlarmCountdownActivity extends Activity {
 		message.setCode(Code.INFORM | Code.Extra.Inform.URGENT);
 		UrgentMessageBody messageBody = new UrgentMessageBody();
 		messageBody.setType(UrgentMessageBody.Type.FALL_DOWN_ALARM);
-		if(mLocationTracker != null && mLocationTracker.canGetLocation())
-			messageBody.setPosition(mLocationTracker.getLatitude(), mLocationTracker.getLongitude());
+		messageBody.setPosition(39.0565822, 117.1386525);
 		message.setBody(messageBody.toJson());
 		// 发送消息
 		final Contact contact = ContactDetailActivity.getDefaultContact(this);

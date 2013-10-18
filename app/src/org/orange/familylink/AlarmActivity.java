@@ -27,6 +27,7 @@ import android.text.style.URLSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -153,6 +154,8 @@ public class AlarmActivity extends BaseActivity {
 					getFragmentManager(),
 					mUrgentMessage.body.getPositionLatitude(),
 					mUrgentMessage.body.getPositionLongitude());
+			//TODO 演示用
+			Toast.makeText(this, "在模拟器上，Google Map无法正常地显示地图", Toast.LENGTH_LONG).show();
 		} catch(NullPointerException e) {
 			// do nothing
 		}
@@ -173,6 +176,8 @@ public class AlarmActivity extends BaseActivity {
 	 * @param button 被点击的按钮
 	 */
 	public void onClickStopAlarm(View button) {
+		//TODO 演示用
+		Toast.makeText(this, "警报鸣声已停止", Toast.LENGTH_LONG).show();
 		stopAlarm();
 	}
 
