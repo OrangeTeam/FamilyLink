@@ -20,11 +20,18 @@
         android:layout_below="@id/alarm_notification"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+    <com.amap.api.maps.MapView
+        android:id="@+id/map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/position" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
         android:orientation="vertical" >
 
         <Button
@@ -32,8 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:background="@drawable/custom_button_green"
-            android:text="@string/stop_alarm"
-            android:onClick="onClickStopAlarm" />
+            android:onClick="onClickStopAlarm"
+            android:text="@string/stop_alarm" />
 
         <Button
             android:id="@+id/navigate_to_this_position"
@@ -41,8 +48,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:background="@drawable/custom_button_green"
-            android:text="@string/navigate_to_this_position"
-            android:onClick="onClickNavigateToThisPosition" />
+            android:onClick="onClickNavigateToThisPosition"
+            android:text="@string/navigate_to_this_position" />
 
         <Button
             android:id="@+id/call_to_somebody"
@@ -50,9 +57,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:background="@drawable/custom_button_red"
-            android:text="@string/call_to_somebody"
-            android:onClick="onClickCallBack" />
-
+            android:onClick="onClickCallBack"
+            android:text="@string/call_to_somebody" />
     </LinearLayout>
 
 </RelativeLayout>
