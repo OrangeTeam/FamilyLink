@@ -8,6 +8,7 @@ import org.orange.familylink.database.Contract;
 import org.orange.familylink.database.Contract.Messages;
 import org.orange.familylink.util.Objects;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -282,9 +283,30 @@ public abstract class Message implements Cloneable{
 		if(dest == null || dest.isEmpty())
 			throw new IllegalArgumentException("dest address shouldn't be empty");
 		Uri newUri = saveMessage(context, contactId, dest, Status.SENDING);
+		if (Code.isCommand(getCode())) beforeSendCommandMessage(context, newUri);
 		send(context, newUri, dest, password);
 		return newUri;
 	}
+	/**
+	 * 发送Command Message之前，更新body的ID
+	 * @param messageUri 此{@link Message}的{@link Uri}
+	 */
+	private void beforeSendCommandMessage(Context context, Uri messageUri) {
+		if (getBody() !=  null) throw new IllegalStateException("have setBody");
+		final long id = ContentUris.parseId(messageUri);
+		CommandMessageBody body = new CommandMessageBody();
+		body.setId(id);
+		setBody(body.toJson());
+		// 更新Content Provider中的记录发送日志
+		ContentValues message = new ContentValues();
+		message.put(Messages.COLUMN_NAME_TIME, System.currentTimeMillis());
+		message.put(Messages.COLUMN_NAME_BODY, getBody());
+		final int rowsUpdated = context.getContentResolver().update(
+				ContentUris.withAppendedId(Messages.MESSAGES_URI, id),
+				message, null, null);
+		assert rowsUpdated == 1;
+	}
+
 	/**
 	 * 发送本消息
 	 * @param context 应用包环境信息
