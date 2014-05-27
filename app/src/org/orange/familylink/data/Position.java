@@ -1,87 +1,53 @@
 package org.orange.familylink.data;
 
+/**
+ * 位置信息
+ * 
+ * @author Team Orange
+ */
 public class Position {
-	/**
-	 * 位置信息类
-	 * 
-	 * @author Team Orange
-	 */
 
 	/** 经度 */
-	private double longitude;
+	private Double longitude;
 	/** 纬度 */
-	private double latitude;
-	/** 高度 */
-	private double altitude;
-	/** 速度 */
-	private double speed;
-	/** 半径 */
-	private double radius;
+	private Double latitude;
 
-	public double getRadius() {
-		return radius;
-	}
-
-	public void setRadius(double radius) {
-		this.radius = radius;
-	}
-
-	public double getAltitude() {
-		return altitude;
-	}
-
-	public void setAltitude(double altitude) {
-		this.altitude = altitude;
-	}
-
-	public double getSpeed() {
-		return speed;
-	}
-
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
-
+	/**
+	 * @return 经度
+	 */
 	public double getLongitude() {
 		return longitude;
 	}
 
-	public void setLongitude(double longitude) {
+	/**
+	 * @param longitude 经度
+	 * @return this
+	 */
+	public Position setLongitude(Double longitude) {
 		this.longitude = longitude;
+		return this;
 	}
 
+	/**
+	 * @return 纬度
+	 */
 	public double getLatitude() {
 		return latitude;
 	}
 
-	public void setLatitude(double latitude) {
+	/**
+	 * @param latitude 纬度
+	 * @return this
+	 */
+	public Position setLatitude(Double latitude) {
 		this.latitude = latitude;
-	}
-
-	public Position(double longitude, double latitude, double altitude,
-			double speed) {
-		super();
-		this.longitude = longitude;
-		this.latitude = latitude;
-		this.altitude = altitude;
-		this.speed = speed;
-	}
-
-	public Position(double longitude, double latitude, double altitude,
-			double speed, double radius) {
-		super();
-		this.longitude = longitude;
-		this.latitude = latitude;
-		this.altitude = altitude;
-		this.speed = speed;
-		this.radius = radius;
+		return this;
 	}
 
 	@Override
 	/** 用于转换String类型 */
 	public String toString() {
 		return "Position :\n longitude=" + longitude + " \n latitude="
-				+ latitude + "\n altitude = " + altitude + "\n speed = "
-				+ speed + "\n radius = " + radius;
+				+ latitude + "\n altitude = ";
 	}
 }

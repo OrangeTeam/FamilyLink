@@ -11,6 +11,7 @@ import org.orange.familylink.data.Message.Code.Extra.Inform;
  */
 public class ResponseMessage extends MessageBody {
 	private Long id;
+	private String response;
 
 	/**
 	 * 取得 要应答的消息(target)在其发送方的ID
@@ -23,7 +24,24 @@ public class ResponseMessage extends MessageBody {
 	 * 设置 要应答的消息(target)在其发送方的ID
 	 * @param id 要应答的消息(target)在其发送方的ID
 	 */
-	public void setId(long id) {
+	public ResponseMessage setId(long id) {
 		this.id = id;
+		return this;
 	}
+	/**
+	 * 取得响应信息的json表示，请根据响应的命令消息，确认此json的类型
+	 * @return 响应信息的json表示
+	 */
+	public String getResponse() {
+		return response;
+	}
+	/**
+	 * @param response 响应信息的json表示
+	 * @return this
+	 */
+	public ResponseMessage setResponse(String response) {
+		this.response = response;
+		return this;
+	}
+
 }
