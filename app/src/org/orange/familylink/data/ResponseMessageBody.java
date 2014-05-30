@@ -9,38 +9,39 @@ import org.orange.familylink.data.Message.Code.Extra.Inform;
  * {@link Inform#RESPONSE RESPONSE} {@link Message}的{@link Message#body body}
  * @author Team Orange
  */
-public class ResponseMessage extends MessageBody {
+public class ResponseMessageBody extends MessageBody {
 	private Long id;
-	private String response;
 
 	/**
 	 * 取得 要应答的消息(target)在其发送方的ID
 	 * @return 要应答的消息(target)在其发送方的ID
 	 */
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	/**
 	 * 设置 要应答的消息(target)在其发送方的ID
 	 * @param id 要应答的消息(target)在其发送方的ID
 	 */
-	public ResponseMessage setId(long id) {
+	public ResponseMessageBody setId(Long id) {
 		this.id = id;
 		return this;
 	}
 	/**
-	 * 取得响应信息的json表示，请根据响应的命令消息，确认此json的类型
+	 * 取得响应信息的json表示。请根据本消息响应的命令消息，确认此json的类型
 	 * @return 响应信息的json表示
 	 */
-	public String getResponse() {
-		return response;
+	@Override
+	public String getContent() {
+		return super.getContent();
 	}
 	/**
 	 * @param response 响应信息的json表示
 	 * @return this
 	 */
-	public ResponseMessage setResponse(String response) {
-		this.response = response;
+	@Override
+	public ResponseMessageBody setContent(String response) {
+		super.setContent(response);
 		return this;
 	}
 

@@ -16,14 +16,15 @@ public class CommandMessageBody extends MessageBody {
 	 * 取得本消息在发送方的ID
 	 * @return 本消息在发送方的ID
 	 */
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 	/**
 	 * 设置本消息在发送方的ID
 	 * @param id 本消息在发送方的ID
 	 */
-	public void setId(long id) {
+	public CommandMessageBody setId(Long id) {
 		this.id = id;
+		return this;
 	}
 }

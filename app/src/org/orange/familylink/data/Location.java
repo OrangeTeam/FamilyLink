@@ -5,7 +5,7 @@ package org.orange.familylink.data;
  * 
  * @author Team Orange
  */
-public class Position {
+public class Location {
 
 	/** 经度 */
 	private Double longitude;
@@ -23,7 +23,7 @@ public class Position {
 	 * @param longitude 经度
 	 * @return this
 	 */
-	public Position setLongitude(Double longitude) {
+	public Location setLongitude(Double longitude) {
 		this.longitude = longitude;
 		return this;
 	}
@@ -39,7 +39,7 @@ public class Position {
 	 * @param latitude 纬度
 	 * @return this
 	 */
-	public Position setLatitude(Double latitude) {
+	public Location setLatitude(Double latitude) {
 		this.latitude = latitude;
 		return this;
 	}

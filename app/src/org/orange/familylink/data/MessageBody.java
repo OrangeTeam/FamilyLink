@@ -23,8 +23,9 @@ public class MessageBody {
 	 * 设置附加内容
 	 * @param content 附加内容
 	 */
-	public void setContent(String content) {
+	public MessageBody setContent(String content) {
 		this.content = content;
+		return this;
 	}
 
 	/**

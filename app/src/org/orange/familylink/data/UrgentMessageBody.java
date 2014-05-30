@@ -22,8 +22,9 @@ public class UrgentMessageBody extends MessageBody {
 	 * 设置本消息的{@link Type}
 	 * @param type
 	 */
-	public void setType(Type type) {
+	public UrgentMessageBody setType(Type type) {
 		this.type = type;
+		return this;
 	}
 	/**
 	 * 检测是否包含位置信息
@@ -51,11 +52,12 @@ public class UrgentMessageBody extends MessageBody {
 	 * @param latitude 纬度
 	 * @param longitude 经度
 	 */
-	public void setPosition(double latitude, double longitude) {
+	public UrgentMessageBody setPosition(double latitude, double longitude) {
 		if(position == null)
 			position = new double[2];
 		position[0] = latitude;
 		position[1] = longitude;
+		return this;
 	}
 
 	/**
