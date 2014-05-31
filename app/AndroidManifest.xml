@@ -107,6 +107,10 @@
             android:name="org.orange.familylink.AlarmActivity"
             android:label="@string/alarm" >
         </activity>
+        <activity 
+            android:name="org.orange.familylink.MapActivity"
+            android:label="@string/locate_result" >
+        </activity>
 
         <service android:name=".location.LocationService" />
         <service android:name="org.orange.familylink.sms.SmsReceiverService" />

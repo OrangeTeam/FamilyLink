@@ -77,6 +77,9 @@
     <string name="call_back">回电</string>
     <string name="navigate_to_this_position">导航到此位置</string>
 
+    <!-- MapActivity -->
+    <string name="locate_result">现在定位结果</string>
+
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">初始设置</string>
     <string name="role_label">您是 </string>

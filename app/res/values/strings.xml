@@ -79,6 +79,9 @@
     <string name="call_back">Call back</string>
     <string name="navigate_to_this_position">Navigate to this position</string>
 
+    <!-- MapActivity -->
+    <string name="locate_result">Request Locate Result</string>
+
     <!-- InitialSetupDialogFragment -->
     <string name="initial_Setup">Initial Setup</string>
     <string name="role_label">You are </string>

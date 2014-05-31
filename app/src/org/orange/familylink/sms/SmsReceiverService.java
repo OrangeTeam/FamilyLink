@@ -7,7 +7,9 @@ import org.orange.familylink.AlarmActivity;
 import org.orange.familylink.ContactDetailActivity;
 import org.orange.familylink.MainActivity;
 import org.orange.familylink.R;
+import org.orange.familylink.data.CommandMessageBody;
 import org.orange.familylink.data.Message.Code;
+import org.orange.familylink.data.ResponseMessageBody;
 import org.orange.familylink.data.Settings;
 
 import android.app.Notification;
@@ -29,6 +31,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 /**
@@ -78,24 +81,66 @@ public class SmsReceiverService extends Service {
 			SmsMessage localMessage = new SmsMessage();
 			//对接收的信息进行存储
 			Uri uri = localMessage.receiveAndSave(mContext, bodyResult, addressResult);
-			startHelp(bodyResult, uri);
+
+			localMessage.receive(bodyResult, Settings.getPassword(mContext));
+			if (localMessage.getCode() == null) return;
+			final int code = localMessage.getCode();
+
+			//监护方接收到消息启动AlarmActivity
+			if(Code.Extra.Inform.hasSetUrgent(code))
+			startAlarm(uri);
+
+			//受顾方返回现在定位请求
+			if (Code.isCommand(code))
+				rebackMessage(localMessage, code);
+
+			//监护方接收到受顾方返回的现在定位结果
+			if(Code.isInform(code) && Code.Extra.Inform.hasSetRespond(code))
+				startMap();
 		}
+
 		/**
 		 * 监护方接收到本应用发出的短信，之后通过这个方法分析短信的内容是否为紧急消息，如果是就会启动警告界面来提供帮助
-		 * @param body
 		 * @param uri
 		 */
-		private void startHelp(String body, Uri uri){
-			SmsMessage localMessage = new SmsMessage();
-			localMessage.receive(body, Settings.getPassword(mContext));
+		private void startAlarm(Uri uri){
 			long messageId = ContentUris.parseId(uri);
-			if(Code.Extra.Inform.hasSetUrgent(localMessage.getCode())){
-				Intent mIntent = new Intent(mContext, AlarmActivity.class);
-				mIntent.putExtra(AlarmActivity.EXTRA_ID, messageId);
-				mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				mContext.startActivity(mIntent);
-			}
+			Intent mIntent = new Intent(mContext, AlarmActivity.class);
+			mIntent.putExtra(AlarmActivity.EXTRA_ID, messageId);
+			mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			mContext.startActivity(mIntent);
 		}
+
+		/**
+		 * 受顾方返回现在定位请求
+		 * @param localMessage
+		 * @param code
+		 */
+		private void rebackMessage(SmsMessage localMessage, int code){
+			final Gson gson = new Gson();
+			CommandMessageBody messageBody = gson.fromJson(
+							localMessage.getBody(),
+							CommandMessageBody.class);
+			ResponseMessageBody response = new ResponseMessageBody();
+			response.setId(messageBody.getId());
+			if (Code.Extra.Command.hasSetLocateNow(code)) {
+//				Location location;
+//				location = new Location();//TODO get current location
+//				response.setContent(gson.toJson(location));
+			}
+			final SmsMessage message = new SmsMessage();
+			message.setCode(Code.INFORM | Code.Extra.Inform.RESPONSE);
+			message.setBody(response.toJson());
+			// 在非UI线程中发送消息，可以使用message的sendAndSave方法
+		}
+
+		/**
+		 * 监护方接收到受顾方返回的现在定位结果
+		 */
+		private void startMap(){
+			//MapActivity
+		}
+
 	}
 
 	/**
