@@ -165,7 +165,7 @@ public class SmsReceiverService extends Service {
 		}
 
 		/**
-		 * 受顾方返回现在定位请求
+		 * 接收到命令消息时被调用
 		 */
 		private void onReceiveCommandMessage(String messageAddress, SmsMessage localMessage, int code){
 			final Gson gson = new Gson();
@@ -184,9 +184,7 @@ public class SmsReceiverService extends Service {
 			message.setBody(response.toJson());
 			// 发送消息
 			Contact contact = ContactDetailActivity.getDefaultContact(mContext);
-			if(contact.phone == null ||
-					contact.phone.isEmpty() ||
-					contact.phone.equals(messageAddress)) {
+			if(!contact.phone.equals(messageAddress)) {
 				throw new IllegalStateException(
 						"Message's sender isn't the default contact");
 			}
