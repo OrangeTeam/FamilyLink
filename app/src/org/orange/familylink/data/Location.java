@@ -1,12 +1,14 @@
 package org.orange.familylink.data;
 
+import java.io.Serializable;
+
 /**
  * 位置信息
  * 
  * @author Team Orange
  */
-public class Location {
-
+public class Location implements Serializable {
+	private static final long serialVersionUID = -3734746950853065137L;
 	/** 经度 */
 	private Double longitude;
 	/** 纬度 */
@@ -15,7 +17,7 @@ public class Location {
 	/**
 	 * @return 经度
 	 */
-	public double getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
 
@@ -31,7 +33,7 @@ public class Location {
 	/**
 	 * @return 纬度
 	 */
-	public double getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
 
