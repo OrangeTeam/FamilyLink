@@ -7,8 +7,11 @@ import org.orange.familylink.AlarmActivity;
 import org.orange.familylink.ContactDetailActivity;
 import org.orange.familylink.MainActivity;
 import org.orange.familylink.R;
+import org.orange.familylink.ContactDetailActivity.Contact;
 import org.orange.familylink.data.CommandMessageBody;
+import org.orange.familylink.data.Location;
 import org.orange.familylink.data.Message.Code;
+import org.orange.familylink.database.Contract;
 import org.orange.familylink.data.ResponseMessageBody;
 import org.orange.familylink.data.Settings;
 
@@ -86,17 +89,67 @@ public class SmsReceiverService extends Service {
 			if (localMessage.getCode() == null) return;
 			final int code = localMessage.getCode();
 
-			//监护方接收到消息启动AlarmActivity
-			if(Code.Extra.Inform.hasSetUrgent(code))
-			startAlarm(uri);
+			if (Code.isInform(code)) {
+				if (Code.Extra.Inform.hasSetUrgent(code)) {
+					//监护方接收到紧急消息，启动AlarmActivity
+					startAlarm(uri);
+				} else if (Code.Extra.Inform.hasSetRespond(code)) {
+					//监护方接收到受顾方返回的响应消息
+					onReceiveRespondMessage(addressResult, localMessage, code);
+				}
+			} else if (Code.isCommand(code)) {
+				//受顾方接收监护方的命令消息
+				onReceiveCommandMessage(addressResult, localMessage, code);
+			}
+		}
 
-			//受顾方返回现在定位请求
-			if (Code.isCommand(code))
-				rebackMessage(localMessage, code);
-
-			//监护方接收到受顾方返回的现在定位结果
-			if(Code.isInform(code) && Code.Extra.Inform.hasSetRespond(code))
-				startMap();
+		private void onReceiveRespondMessage(String messageAddress, SmsMessage message, int code) {
+			final Gson gson = new Gson();
+			final ResponseMessageBody messageBody = gson.fromJson(
+							message.getBody(),
+							ResponseMessageBody.class);
+			// 查询此消息响应的命令
+			if (messageBody.getId() == null) throw new NullPointerException("responseMessageBody's id is null");
+			final String[] projection = {
+					Contract.Messages.COLUMN_NAME_ADDRESS,
+					Contract.Messages.COLUMN_NAME_CODE};
+			Uri uri = ContentUris.withAppendedId(
+					Contract.Messages.MESSAGES_ID_URI, messageBody.getId());
+			Cursor cursor = mContext.getContentResolver().query(
+					uri, projection, null, null, null);
+			if (cursor.getCount() != 1) {
+				if (cursor.getCount() == 0) {
+					throw new IllegalStateException(
+						"Can't find command to whom this message respond");
+				} else {
+					throw new RuntimeException();
+				}
+			}
+			// 检查此消息的发送者和命令的接受者 是否一致
+			cursor.moveToFirst();
+			String commanded = cursor.getString(cursor
+					.getColumnIndex(Contract.Messages.COLUMN_NAME_ADDRESS));
+			if (!messageAddress.equals(commanded)) {
+				throw new IllegalStateException("The sender of response " +
+						"message isn't the receiver of the command message");
+			}
+			// 确认此消息应答的消息，是个命令消息
+			int codeIndex = cursor.getColumnIndex(Contract.Messages.COLUMN_NAME_CODE);
+			if (cursor.isNull(codeIndex)) {
+				throw new IllegalStateException("The message to whom this " +
+						"message respond isn't a command message");
+			}
+			final int commandCode = cursor.getInt(codeIndex);
+			cursor.close();
+			if (!Code.isCommand(commandCode)) {
+				throw new IllegalStateException("The message to whom this " +
+						"message respond isn't a command message");
+			}
+			// 根据命令类型，处理此响应消息
+			if (Code.Extra.Command.hasSetLocateNow(commandCode)) {
+				//监护方接收到受顾方返回的现在定位结果
+				startMap(gson.fromJson(messageBody.getContent(), Location.class));
+			}
 		}
 
 		/**
@@ -113,10 +166,8 @@ public class SmsReceiverService extends Service {
 
 		/**
 		 * 受顾方返回现在定位请求
-		 * @param localMessage
-		 * @param code
 		 */
-		private void rebackMessage(SmsMessage localMessage, int code){
+		private void onReceiveCommandMessage(String messageAddress, SmsMessage localMessage, int code){
 			final Gson gson = new Gson();
 			CommandMessageBody messageBody = gson.fromJson(
 							localMessage.getBody(),
@@ -131,13 +182,22 @@ public class SmsReceiverService extends Service {
 			final SmsMessage message = new SmsMessage();
 			message.setCode(Code.INFORM | Code.Extra.Inform.RESPONSE);
 			message.setBody(response.toJson());
-			// 在非UI线程中发送消息，可以使用message的sendAndSave方法
+			// 发送消息
+			Contact contact = ContactDetailActivity.getDefaultContact(mContext);
+			if(contact.phone == null ||
+					contact.phone.isEmpty() ||
+					contact.phone.equals(messageAddress)) {
+				throw new IllegalStateException(
+						"Message's sender isn't the default contact");
+			}
+			message.sendAndSave(mContext, contact.id, contact.phone);
 		}
 
 		/**
 		 * 监护方接收到受顾方返回的现在定位结果
+		 * @param location 应答现在定位命令的位置信息
 		 */
-		private void startMap(){
+		private void startMap(Location location){
 			//MapActivity
 		}
 
